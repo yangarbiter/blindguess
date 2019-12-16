@@ -1,0 +1,1 @@
+# autovar_project_template
