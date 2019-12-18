@@ -4,3 +4,4 @@ mkdir_p
 bistiming
 numpy
 cleverhans
+tqdm

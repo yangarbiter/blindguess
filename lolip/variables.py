@@ -8,6 +8,7 @@ from autovar.hooks import default_get_file_name as get_file_name
 
 from .datasets import DatasetVarClass
 from .models import ModelVarClass
+from .attacks import AttackVarClass
 
 auto_var = AutoVar(
     logging_level=logging.INFO,
@@ -45,6 +46,7 @@ class NormVarClass(VariableClass, metaclass=RegisteringChoiceType):
 auto_var.add_variable_class(NormVarClass())
 auto_var.add_variable_class(DatasetVarClass())
 auto_var.add_variable_class(ModelVarClass())
+auto_var.add_variable_class(AttackVarClass())
 auto_var.add_variable('random_seed', int)
 auto_var.add_variable('eps', float)
 

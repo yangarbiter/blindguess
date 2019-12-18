@@ -7,6 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data as data_utils
 from torch.optim.lr_scheduler import MultiStepLR
+from tqdm import tqdm
 
 from cleverhans.future.torch.attacks import fast_gradient_method, projected_gradient_descent
 
@@ -43,6 +44,7 @@ class TorchModel(BaseEstimator):
         self.callbacks=callbacks
         self.random_state = random_state
         self.train_type = train_type
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         ### Attack ####
         self.eps = eps
@@ -66,20 +68,21 @@ class TorchModel(BaseEstimator):
         verbose = 0 if not DEBUG else 1
         log_interval = 1
         loss_fn = get_loss(self.loss_name)
+        scheduler = MultiStepLR(self.optimizer, milestones=[75, 90, 100], gamma=0.1)
         X = self._preprocess_x(X)
 
         dataset = self._get_dataset(X, y)
         train_loader = torch.utils.data.DataLoader(dataset,
             batch_size=self.batch_size, shuffle=True, num_workers=2)
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-        scheduler = MultiStepLR(self.optimizer, milestones=[75,90,100], gamma=0.1)
+        if self.tst_ds is not None:
+            pass
 
         self.model.train()
         for epoch in range(1, self.epochs+1):
             train_loss = 0.
-            for x, y in train_loader:
-                x, y = x.to(device), y.to(device)
+            for x, y in tqdm(train_loader, desc=f"Epoch {epoch}"):
+                x, y = x.to(self.device), y.to(self.device)
 
                 if 'adv' in self.loss_name:
                     x = projected_gradient_descent(self.model, x, y=y,
@@ -96,16 +99,25 @@ class TorchModel(BaseEstimator):
                 print('epoch: {}/{}, train loss: {:.3f}'.format(epoch, self.epochs, train_loss))
 
     def predict(self, X):
+        X = self._preprocess_x(X)
         self.model.eval()
         dataset = data_utils.TensorDataset(torch.from_numpy(X).float())
         loader = torch.utils.data.DataLoader(dataset,
             batch_size=self.batch_size, shuffle=False, num_workers=2)
 
-        x = torch.from_numpy(X).float()
-        _, y_pred = self.model(x).max(1)
-        return y_pred.numpy()
+        ret = []
+        for [x] in loader:
+            ret.append(self.model(x.to(self.device)).argmax(1).cpu().numpy())
+        return np.concatenate(ret)
 
     def predict_proba(self, X):
+        X = self._preprocess_x(X)
         self.model.eval()
-        x = torch.from_numpy(X).float()
-        return self.model(x).detach().numpy()
+        dataset = data_utils.TensorDataset(torch.from_numpy(X).float())
+        loader = torch.utils.data.DataLoader(dataset,
+            batch_size=self.batch_size, shuffle=False, num_workers=2)
+
+        ret = []
+        for x in loader:
+            ret.append(self.model(x.to(self.device)).cpu().numpy())
+        return np.concatenate(ret, axis=0)

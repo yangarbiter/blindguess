@@ -20,7 +20,6 @@ def local_lip(model, x, xp):
     return torch.norm(model(x) - model(xp)) / torch.norm(x - xp) 
 
 
-
 def estimate_local_lip(model, x, norm, perturb_steps=10, step_size=0.003, epsilon=0.01):
     model.eval()
     batch_size = len(x)

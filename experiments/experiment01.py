@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 
 from .utils import set_random_seed
+from lolip.utils import estimate_local_lip
 
 
 def run_experiment01(auto_var):
@@ -25,15 +26,15 @@ def run_experiment01(auto_var):
     print(f"train acc: {result['trn_acc']}")
     print(f"test acc: {result['tst_acc']}")
 
-    attack_fn = auto_var.get_var("attack", model=model)
+    attack_model = auto_var.get_var("attack", model=model)
     with Stopwatch("Attacking"):
-        adv_tstX = attack_fn(tstX)
+        adv_tstX = attack_model.perturb(tstX)
 
     result['adv_tst_acc'] = (model.predict(adv_tstX) == tsty).mean()
     print(f"adversarial test acc: {result['adv_tst_acc']}")
 
-    with Stopwatch("Estiimating Lip"):
-        pass
+    with Stopwatch("Estimating Lip"):
+        estimate_local_lip(model.model, tstX, norm=norm, epsilon=auto_var.get("eps"))
 
 
     return result

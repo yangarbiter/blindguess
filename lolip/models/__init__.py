@@ -1,5 +1,8 @@
+import os
 
 from autovar.base import RegisteringChoiceType, VariableClass, register_var
+
+DEBUG = int(os.getenv("DEBUG", 0))
 
 def get_hyper(name, arch):
     ret = {}
@@ -21,6 +24,9 @@ def get_hyper(name, arch):
         else:
             ret['learning_rate'] = 1e-1
         ret['batch_size'] = 128
+
+    if DEBUG:
+        ret['epochs'] = 2
     return ret
 
 class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
