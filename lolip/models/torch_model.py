@@ -1,4 +1,3 @@
-import itertools
 import os
 from functools import partial
 
@@ -15,16 +14,16 @@ import numpy as np
 from sklearn.base import BaseEstimator
 from .torch_utils import get_optimizer, get_loss
 from .torch_utils.archs import *
+from ..attacks.torch.projected_gradient_descent import projected_gradient_descent
 
 DEBUG = int(os.getenv("DEBUG", 0))
 
 
 class TorchModel(BaseEstimator):
-    def __init__(self, lbl_enc, n_features, n_classes, loss_name='ce', learning_rate=1e-4,
-                momentum=0.0, batch_size=256, epochs=20, optimizer='adam', l2_weight=0,
-                architecture='arch_001', random_state=None, attacker=None,
-                callbacks=None, train_type:str=None, eps:float=0.1, ord=np.inf,
-                attack_method:str = None):
+    def __init__(self, lbl_enc, n_features, n_classes, loss_name='ce',
+                learning_rate=1e-4, momentum=0.0, batch_size=256, epochs=20,
+                optimizer='adam', architecture='arch_001', random_state=None,
+                callbacks=None, train_type:str=None, eps:float=0.1, norm=np.inf):
         self.n_features = n_features
         self.n_classes = n_classes
         self.batch_size = batch_size
@@ -39,18 +38,15 @@ class TorchModel(BaseEstimator):
             model = model.cuda()
 
         self.optimizer = get_optimizer(model, optimizer, learning_rate, momentum)
+        self.model = model
 
-        self.l2_weight = l2_weight
         self.callbacks=callbacks
         self.random_state = random_state
         self.train_type = train_type
-        self.attack_method = attack_method
-
-        self.model = model
 
         ### Attack ####
         self.eps = eps
-        self.ord = ord
+        self.norm = norm
         ###############
 
     def fit(self, X, y, sample_weight=None):
@@ -73,9 +69,9 @@ class TorchModel(BaseEstimator):
             train_loss = 0.
             for x, y in train_loader:
                 x, y = x.to(device), y.to(device)
-                if 'adv' in self.train_type:
+                if 'adv' in self.loss_name:
                     x = projected_gradient_descent(self.model, x, y=y,
-                        eps_iter=0.01, eps=self.eps, ord=self.ord, nb_iter=40)
+                        eps_iter=0.01, eps=self.eps, norm=self.norm, nb_iter=40)
                 self.optimizer.zero_grad()
                 loss = loss_fn(self.model(x), y)
                 loss.backward()

@@ -19,9 +19,9 @@ def get_optimizer(model, optimizer: str, learning_rate: float, momentum):
     return ret
 
 def get_loss(loss_name: str):
-    if loss_name == 'ce':
+    if 'ce' in loss_name:
         ret = nn.CrossEntropyLoss(reduction='mean')
-    elif loss_name == 'mse':
+    elif 'mse' in loss_name:
         ret = nn.MSELoss()
     else:
         raise ValueError(f"Not supported loss {loss_name}")

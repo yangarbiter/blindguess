@@ -1,3 +1,6 @@
 autovar
 joblib
 mkdir_p
+bistiming
+numpy
+cleverhans

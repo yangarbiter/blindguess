@@ -8,22 +8,16 @@ from mkdir_p import mkdir_p
 import numpy as np
 import pandas as pd
 
-from package.variables import auto_var, get_file_name
+from lolip.variables import auto_var, get_file_name
 from autovar import AutoVar
 from autovar.hooks import get_ext
 
-from main import run_exp_name
 from experiments import run_experiment01
 
 logging.basicConfig(level=0)
 tex_base = "./tex_files"
 
 def setup_experiments(auto_var):
-    #exp_name = 'exp_name'
-    #mkdir_p(f"./results/{exp_name}")
-    #auto_var.register_experiment(f'{exp_name}', run_exp_name,
-    #        {'file_format': 'pickle', 'result_file_dir': f'./results/{exp_name}'})
-
     exp_name = 'experiment01'
     mkdir_p(f"./results/{exp_name}")
     auto_var.register_experiment(f'{exp_name}', run_experiment01,
