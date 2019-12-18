@@ -16,6 +16,10 @@ class LocalLip(_Loss):
     def forward(self, input, target):
         return -F.mse_loss(input, target, reduction=self.reduction)
 
+def local_lip(model, x, xp):
+    return torch.norm(model(x) - model(xp)) / torch.norm(x - xp) 
+
+
 
 def estimate_local_lip(model, x, norm, perturb_steps=10, step_size=0.003, epsilon=0.01):
     model.eval()
@@ -26,7 +30,7 @@ def estimate_local_lip(model, x, norm, perturb_steps=10, step_size=0.003, epsilo
         for _ in range(perturb_steps):
             x_adv.requires_grad_()
             with torch.enable_grad():
-                loss = LocalLip(model(x), model(x_adv))
+                loss = local_lip(model, x, x_adv)
             grad = torch.autograd.grad(loss, [x_adv])[0]
             x_adv = x_adv.detach() + step_size * torch.sign(grad.detach())
             x_adv = torch.min(torch.max(x_adv, x - epsilon), x + epsilon)

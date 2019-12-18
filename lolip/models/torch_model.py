@@ -5,8 +5,8 @@ import torch
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
-import torchvision
 import torch.utils.data as data_utils
+from torch.optim.lr_scheduler import MultiStepLR
 
 from cleverhans.future.torch.attacks import fast_gradient_method, projected_gradient_descent
 
@@ -33,7 +33,7 @@ class TorchModel(BaseEstimator):
         self.lbl_enc = lbl_enc
         self.loss_name = loss_name
 
-        model = globals()[self.architecture](self.n_features[0], self.n_classes)
+        model = globals()[self.architecture](self.n_classes)
         if torch.cuda.is_available():
             model = model.cuda()
 
@@ -49,42 +49,63 @@ class TorchModel(BaseEstimator):
         self.norm = norm
         ###############
 
-    def fit(self, X, y, sample_weight=None):
-        verbose = 0 if not DEBUG else 1
-        Y = self.lbl_enc.transform(y.reshape(-1, 1))
-        y_ori = y
-        loss_fn = get_loss(self.loss_name)
-
+    def _get_dataset(self, X, y=None):
+        if y is None:
+            return data_utils.TensorDataset(torch.from_numpy(X).float())
         if 'mse' in self.loss_name:
+            Y = self.lbl_enc.transform(y.reshape(-1, 1))
             dataset = data_utils.TensorDataset(torch.from_numpy(X).float(), torch.from_numpy(Y).float())
         else:
-            dataset = data_utils.TensorDataset(torch.from_numpy(X).float(), torch.from_numpy(y))
+            dataset = data_utils.TensorDataset(torch.from_numpy(X).float(), torch.from_numpy(y).long())
+        return dataset
 
+    def _preprocess_x(self, X):
+        return X.transpose(0, 3, 1, 2)
+
+    def fit(self, X, y, sample_weight=None):
+        verbose = 0 if not DEBUG else 1
+        log_interval = 1
+        loss_fn = get_loss(self.loss_name)
+        X = self._preprocess_x(X)
+
+        dataset = self._get_dataset(X, y)
         train_loader = torch.utils.data.DataLoader(dataset,
             batch_size=self.batch_size, shuffle=True, num_workers=2)
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+        scheduler = MultiStepLR(self.optimizer, milestones=[75,90,100], gamma=0.1)
 
         self.model.train()
         for epoch in range(1, self.epochs+1):
             train_loss = 0.
             for x, y in train_loader:
                 x, y = x.to(device), y.to(device)
+
                 if 'adv' in self.loss_name:
                     x = projected_gradient_descent(self.model, x, y=y,
                         eps_iter=0.01, eps=self.eps, norm=self.norm, nb_iter=40)
+
                 self.optimizer.zero_grad()
-                loss = loss_fn(self.model(x), y)
+                output = self.model(x)
+                loss = loss_fn(output, y)
                 loss.backward()
-                self.optimizer.step()
                 train_loss += loss.item()
-            print('epoch: {}/{}, train loss: {:.3f}'.format(epoch, self.epochs, train_loss))
-        self.model.eval()
+                self.optimizer.step()
+                scheduler.step()
+            if (epoch - 1) % log_interval == 0:
+                print('epoch: {}/{}, train loss: {:.3f}'.format(epoch, self.epochs, train_loss))
 
     def predict(self, X):
+        self.model.eval()
+        dataset = data_utils.TensorDataset(torch.from_numpy(X).float())
+        loader = torch.utils.data.DataLoader(dataset,
+            batch_size=self.batch_size, shuffle=False, num_workers=2)
+
         x = torch.from_numpy(X).float()
         _, y_pred = self.model(x).max(1)
         return y_pred.numpy()
 
     def predict_proba(self, X):
+        self.model.eval()
         x = torch.from_numpy(X).float()
         return self.model(x).detach().numpy()

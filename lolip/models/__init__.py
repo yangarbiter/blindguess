@@ -27,13 +27,12 @@ class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
     """Model Variable Class"""
     var_name = "model"
 
-    @register_var(argument=r'(?P<train>[a-zA-Z0-9]+-)?(?P<loss>[a-zA-Z0-9]+-)?-tor-(?P<arch>[a-zA-Z0-9]+)(?P<hyper>[a-zA-Z0-9]+)?')
+    @register_var(argument=r'(?P<train>[a-zA-Z0-9]+-)?(?P<loss>[a-zA-Z0-9]+)-tor-(?P<arch>[a-zA-Z0-9]+)(?P<hyper>-[a-zA-Z0-9]+)?')
     @staticmethod
     def torch_model(auto_var, inter_var, train, loss, arch, hyper, trnX, trny):
         from .torch_model import TorchModel
 
         train = train[:-1] if train else None
-        loss = loss[:-1] if loss else None
 
         n_features = trnX.shape[1:]
         n_classes = len(set(trny))

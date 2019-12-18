@@ -8,12 +8,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 import torch.optim as optim
+from torch.nn.modules.loss import _Loss
 
 
 def squared_l2_norm(x):
     flattened = x.view(x.unsqueeze(0).shape[0], -1)
     return (flattened ** 2).sum(1)
-
 
 def l2_norm(x):
     return squared_l2_norm(x).sqrt()
@@ -44,7 +44,7 @@ def trades_loss(model,
             x_adv = x_adv.detach() + step_size * torch.sign(grad.detach())
             x_adv = torch.min(torch.max(x_adv, x_natural - epsilon), x_natural + epsilon)
             x_adv = torch.clamp(x_adv, 0.0, 1.0)
-    elif distance == 'l_2':
+    elif norm == 2:
         delta = 0.001 * torch.randn(x_natural.shape).cuda().detach()
         delta = Variable(delta.data, requires_grad=True)
 

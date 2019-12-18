@@ -22,7 +22,7 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
             tstX.append(x_test[y_test==i][:20])
             tsty.append(np.ones(20) * i)
 
-        return np.hstack(trnX), np.concatenate(trny), np.hstack(tstX), np.concatenate(tsty)
+        return np.vstack(trnX), np.concatenate(trny), np.vstack(tstX), np.concatenate(tsty)
 
     @register_var(argument=r"mnist", shown_name="mnist")
     @staticmethod
