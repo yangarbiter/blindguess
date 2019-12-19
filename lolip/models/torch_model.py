@@ -67,6 +67,8 @@ class TorchModel(BaseEstimator):
     def fit(self, X, y, sample_weight=None):
         verbose = 0 if not DEBUG else 1
         log_interval = 1
+
+        history = []
         loss_fn = get_loss(self.loss_name)
         scheduler = MultiStepLR(self.optimizer, milestones=[75, 90, 100], gamma=0.1)
         X = self._preprocess_x(X)
@@ -89,35 +91,42 @@ class TorchModel(BaseEstimator):
                         eps_iter=0.01, eps=self.eps, norm=self.norm, nb_iter=40)
 
                 self.optimizer.zero_grad()
-                output = self.model(x)
+                output = F.softmax(self.model(x), dim=1)
                 loss = loss_fn(output, y)
                 loss.backward()
                 train_loss += loss.item()
                 self.optimizer.step()
                 scheduler.step()
+
             if (epoch - 1) % log_interval == 0:
                 print('epoch: {}/{}, train loss: {:.3f}'.format(epoch, self.epochs, train_loss))
-
-    def predict(self, X):
+    
+    def _prep_pred(self, X):
         X = self._preprocess_x(X)
         self.model.eval()
         dataset = data_utils.TensorDataset(torch.from_numpy(X).float())
         loader = torch.utils.data.DataLoader(dataset,
             batch_size=self.batch_size, shuffle=False, num_workers=2)
+        return loader
 
+    def predict(self, X):
+        loader = self._prep_pred(X)
         ret = []
         for [x] in loader:
             ret.append(self.model(x.to(self.device)).argmax(1).cpu().numpy())
         return np.concatenate(ret)
 
     def predict_proba(self, X):
-        X = self._preprocess_x(X)
-        self.model.eval()
-        dataset = data_utils.TensorDataset(torch.from_numpy(X).float())
-        loader = torch.utils.data.DataLoader(dataset,
-            batch_size=self.batch_size, shuffle=False, num_workers=2)
-
+        loader = self._prep_pred(X)
         ret = []
-        for x in loader:
-            ret.append(self.model(x.to(self.device)).cpu().numpy())
+        for [x] in loader:
+            output = F.softmax(self.model(x.to(self.device)).detach())
+            ret.append(output.cpu().numpy())
+        return np.concatenate(ret, axis=0)
+
+    def predict_real(self, X):
+        loader = self._prep_pred(X)
+        ret = []
+        for [x] in loader:
+            ret.append(self.model(x.to(self.device)).detach().cpu().numpy())
         return np.concatenate(ret, axis=0)

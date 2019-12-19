@@ -17,11 +17,18 @@ class LocalLip(_Loss):
         return -F.mse_loss(input, target, reduction=self.reduction)
 
 def local_lip(model, x, xp):
-    return torch.norm(model(x) - model(xp)) / torch.norm(x - xp) 
+    top = torch.flatten(model(x), start_dim=1) - torch.flatten(model(xp), start_dim=1)
+    down = torch.flatten(x - xp, start_dim=1)
+    return torch.mean(
+        torch.norm(top, dim=1) / torch.norm(down + 1e-6, dim=1))
 
+def preprocess_x(x):
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    return torch.from_numpy(x.transpose(0, 3, 1, 2)).to(device).float()
 
 def estimate_local_lip(model, x, norm, perturb_steps=10, step_size=0.003, epsilon=0.01):
     model.eval()
+    x = preprocess_x(x)
     batch_size = len(x)
     # generate adversarial example
     if norm == np.inf:
@@ -39,7 +46,7 @@ def estimate_local_lip(model, x, norm, perturb_steps=10, step_size=0.003, epsilo
         delta = torch.autograd.Variable(delta.data, requires_grad=True)
 
         # Setup optimizers
-        optimizer = optim.SGD([delta], lr=epsilon / perturb_steps * 2)
+        optimizer = optim.SGD([delta], lr=step_size)
 
         for _ in range(perturb_steps):
             x_adv = x + delta
@@ -47,7 +54,7 @@ def estimate_local_lip(model, x, norm, perturb_steps=10, step_size=0.003, epsilo
             # optimize
             optimizer.zero_grad()
             with torch.enable_grad():
-                loss = (-1) * LocalLip(model(x), model(x_adv))
+                loss = (-1) * local_lip(model, x, x_adv)
             loss.backward()
             # renorming gradient
             grad_norms = delta.grad.view(batch_size, -1).norm(p=2, dim=1)
@@ -56,6 +63,7 @@ def estimate_local_lip(model, x, norm, perturb_steps=10, step_size=0.003, epsilo
             if (grad_norms == 0).any():
                 delta.grad[grad_norms == 0] = torch.randn_like(delta.grad[grad_norms == 0])
             optimizer.step()
+            print(loss)
 
             # projection
             delta.data.add_(x)
@@ -64,4 +72,4 @@ def estimate_local_lip(model, x, norm, perturb_steps=10, step_size=0.003, epsilo
         x_adv = x + delta
     else:
         raise ValueError(f"Unsupported norm {norm}")
-    return x_adv
+    return x_adv.detach().cpu().numpy().transpose(0, 2, 3, 1)
