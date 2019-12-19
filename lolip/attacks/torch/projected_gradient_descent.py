@@ -3,6 +3,7 @@ from functools import partial
 
 import numpy as np
 import torch
+import torch.utils.data as data_utils
 from cleverhans.future.torch.utils import clip_eta
 
 from .fast_gradient_method import fast_gradient_method
@@ -13,22 +14,29 @@ class ProjectedGradientDescent(AttackModel):
 
   def __init__(self, model_fn, eps, eps_iter, nb_iter, norm, loss_fn=None,
                clip_min=None, clip_max=None, y=None, targeted=False,
-               rand_init=True, rand_minmax=None):
+               batch_size=128, rand_init=True, rand_minmax=None):
     self.model_fn = model_fn
     self.eps = eps
+    self.batch_size = 128
     self.attack_fn = partial(projected_gradient_descent, model_fn=model_fn,
       eps=eps, eps_iter=eps_iter, nb_iter=nb_iter, norm=norm, loss_fn=loss_fn,
       clip_min=clip_min, clip_max=clip_max, targeted=targeted, rand_init=rand_init,
       rand_minmax=rand_minmax)
 
   def _preprocess_x(self, X):
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    return torch.from_numpy(X.transpose(0, 3, 1, 2)).to(device).float()
+    return torch.from_numpy(X.transpose(0, 3, 1, 2)).float()
 
   def perturb(self, X, y=None, eps=None):
-    x = self._preprocess_x(X)
-    adv_x = self.attack_fn(x=x, y=y).detach().cpu().numpy()
-    return adv_x.transpose(0, 2, 3, 1)
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    dataset = data_utils.TensorDataset(self._preprocess_x(X))
+    loader = torch.utils.data.DataLoader(dataset,
+        batch_size=self.batch_size, shuffle=False, num_workers=2)
+
+    ret = []
+    for [x] in loader:
+      x = x.to(device)
+      ret.append(self.attack_fn(x=x, y=y).detach().cpu().numpy())
+    return np.concatenate(ret, axis=0).transpose(0, 2, 3, 1)
 
 
 def projected_gradient_descent(model_fn, x, eps, eps_iter, nb_iter, norm, loss_fn=None,

@@ -83,6 +83,7 @@ class TorchModel(BaseEstimator):
         self.model.train()
         for epoch in range(1, self.epochs+1):
             train_loss = 0.
+            train_acc = 0.
             for x, y in tqdm(train_loader, desc=f"Epoch {epoch}"):
                 x, y = x.to(self.device), y.to(self.device)
 
@@ -91,15 +92,26 @@ class TorchModel(BaseEstimator):
                         eps_iter=0.01, eps=self.eps, norm=self.norm, nb_iter=40)
 
                 self.optimizer.zero_grad()
-                output = F.softmax(self.model(x), dim=1)
-                loss = loss_fn(output, y)
+                outputs = F.softmax(self.model(x), dim=1)
+                loss = loss_fn(outputs, y)
                 loss.backward()
-                train_loss += loss.item()
+
+                if (epoch - 1) % log_interval == 0:
+                    train_loss += loss.item()
+                    train_acc += (outputs.argmax(dim=1)==y).sum().float().item()
+
                 self.optimizer.step()
                 scheduler.step()
 
             if (epoch - 1) % log_interval == 0:
-                print('epoch: {}/{}, train loss: {:.3f}'.format(epoch, self.epochs, train_loss))
+                history.append({
+                    'epoch': epoch,
+                    'trn_loss': train_loss / len(train_loader.dataset),
+                    'trn_acc': train_acc / len(train_loader.dataset),
+                })
+                print('epoch: {}/{}, train loss: {:.3f}, train acc: {:.3f}'.format(
+                    epoch, self.epochs, history[-1]['trn_loss'], history[-1]['trn_acc']))
+        return history
     
     def _prep_pred(self, X):
         X = self._preprocess_x(X)
