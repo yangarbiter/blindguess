@@ -32,7 +32,8 @@ def estimate_local_lip(model, X, norm, batch_size=128, perturb_steps=10, step_si
     dataset = data_utils.TensorDataset(preprocess_x(X))
     loader = torch.utils.data.DataLoader(dataset,
         batch_size=batch_size, shuffle=False, num_workers=2)
-
+    
+    ret = []
     for [x] in loader:
         x = x.to(device)
         # generate adversarial example
@@ -62,13 +63,12 @@ def estimate_local_lip(model, X, norm, batch_size=128, perturb_steps=10, step_si
                     loss = (-1) * local_lip(model, x, x_adv)
                 loss.backward()
                 # renorming gradient
-                grad_norms = delta.grad.view(batch_size, -1).norm(p=2, dim=1)
+                grad_norms = delta.grad.view(len(x), -1).norm(p=2, dim=1)
                 delta.grad.div_(grad_norms.view(-1, 1, 1, 1))
                 # avoid nan or inf if gradient is 0
                 if (grad_norms == 0).any():
                     delta.grad[grad_norms == 0] = torch.randn_like(delta.grad[grad_norms == 0])
                 optimizer.step()
-                print(loss)
 
                 # projection
                 delta.data.add_(x)
@@ -77,4 +77,5 @@ def estimate_local_lip(model, X, norm, batch_size=128, perturb_steps=10, step_si
             x_adv = x + delta
         else:
             raise ValueError(f"Unsupported norm {norm}")
-    return x_adv.detach().cpu().numpy().transpose(0, 2, 3, 1)
+        ret.append(x_adv.detach().cpu().numpy().transpose(0, 2, 3, 1))
+    return np.concatenate(ret, axis=0)

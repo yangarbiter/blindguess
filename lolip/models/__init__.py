@@ -4,13 +4,14 @@ from autovar.base import RegisteringChoiceType, VariableClass, register_var
 
 DEBUG = int(os.getenv("DEBUG", 0))
 
-def get_hyper(name, arch):
+def get_hyper(name, arch, dataset_name):
     ret = {}
-    if 'CNN' in arch:
+    if 'CNN' in arch and ('mnist' in dataset_name or 'fashion' in dataset_name):
         ret['epochs'] = 200
-        ret['learning_rate'] = 1e-3
-        ret['batch_size'] = 128
-    elif 'resnet' in arch:
+        ret['learning_rate'] = 1e-4
+        ret['momentum'] = 0.9
+        ret['batch_size'] = 64
+    elif 'ResNet' in arch:
         ret['epochs'] = 200
         ret['learning_rate'] = 1e-2
         ret['batch_size'] = 64
@@ -42,8 +43,9 @@ class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
 
         n_features = trnX.shape[1:]
         n_classes = len(set(trny))
+        dataset_name = auto_var.get_variable_name('dataset')
 
-        params: dict = get_hyper(hyper, arch)
+        params: dict = get_hyper(hyper, arch, dataset_name)
         params['eps'] = auto_var.get_var("eps")
         params['norm'] = auto_var.get_var("norm")
         params['loss_name'] = loss

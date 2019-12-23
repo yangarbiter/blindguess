@@ -4,9 +4,10 @@ import json
 
 from mkdir_p import mkdir_p
 
-from stream.variables import auto_var, get_file_name
+from lolip.variables import auto_var, get_file_name
 from params import (
-    sample_experiments
+    mnistLip,
+    cifarLip
 )
 from utils import setup_experiments
 
@@ -16,7 +17,8 @@ DEBUG = True if os.environ.get('DEBUG', False) else False
 
 def main(auto_var):
     experiments = [
-        sample_experiments(),
+        mnistLip(),
+        cifarLip(),
     ]
     grid_params = []
     for exp in experiments:
@@ -26,8 +28,8 @@ def main(auto_var):
             run_param['n_jobs'] = 1
             run_param['allow_failure'] = False
         else:
-            run_param['n_jobs'] = 4
-            run_param['allow_failure'] = True
+            run_param['n_jobs'] = 1
+            run_param['allow_failure'] = False
 
         auto_var.run_grid_params(exp_fn, grid_params, **run_param)
     #auto_var.run_grid_params(delete_file, grid_params, n_jobs=1,

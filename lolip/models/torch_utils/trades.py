@@ -20,6 +20,7 @@ def l2_norm(x):
 
 
 def trades_loss(model,
+                loss_fn,
                 x_natural,
                 y,
                 norm,
@@ -29,7 +30,8 @@ def trades_loss(model,
                 perturb_steps=10,
                 beta=1.0):
     # define KL-loss
-    criterion_kl = nn.KLDivLoss(size_average=False)
+    #criterion_kl = nn.KLDivLoss(size_average=False)
+    criterion_kl = nn.KLDivLoss(reduction='sum')
     model.eval()
     batch_size = len(x_natural)
     # generate adversarial example
@@ -81,9 +83,10 @@ def trades_loss(model,
     # zero gradient
     optimizer.zero_grad()
     # calculate robust loss
-    logits = model(x_natural)
-    loss_natural = F.cross_entropy(logits, y)
+    #outputs = F.softmax(model(x_natural), dim=1)
+    outputs = model(x_natural)
+    loss_natural = loss_fn(outputs, y)
     loss_robust = (1.0 / batch_size) * criterion_kl(F.log_softmax(model(x_adv), dim=1),
                                                     F.softmax(model(x_natural), dim=1))
     loss = loss_natural + beta * loss_robust
-    return loss
+    return outputs, loss

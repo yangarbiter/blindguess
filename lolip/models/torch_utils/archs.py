@@ -4,6 +4,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from .wideresnet import WideResNet
+
 class CNN001(nn.Module):
     def __init__(self, n_classes):
         super(CNN001, self).__init__()

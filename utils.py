@@ -36,10 +36,9 @@ class Experiments():
     def __call__(self):
         return self.experiment_fn, self.name, self.grid_params, self.run_param
 
-class SampleExperiments(Experiments):
+class ExpExperiments(Experiments):
     def __new__(cls, *args, **kwargs):
         # if attribute is function it will pass self as one of its argument
-        cls.experiment_fn = 'sample'
         cls.run_param = {'verbose': 1, 'n_jobs': 4,}
         return Experiments.__new__(cls, *args, **kwargs)
 

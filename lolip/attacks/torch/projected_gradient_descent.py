@@ -4,11 +4,43 @@ from functools import partial
 import numpy as np
 import torch
 import torch.utils.data as data_utils
-from cleverhans.future.torch.utils import clip_eta
 
 from .fast_gradient_method import fast_gradient_method
 from ..base import AttackModel
 
+
+def clip_eta(eta, norm, eps):
+  """
+  PyTorch implementation of the clip_eta in utils_tf.
+  :param eta: Tensor
+  :param norm: np.inf, 1, or 2
+  :param eps: float
+  """
+  if norm not in [np.inf, 1, 2]:
+    raise ValueError('norm must be np.inf, 1, or 2.')
+
+  avoid_zero_div = torch.tensor(1e-12, dtype=eta.dtype, device=eta.device)
+  reduc_ind = list(range(1, len(eta.size())))
+  if norm == np.inf:
+    eta = torch.clamp(eta, -eps, eps)
+  else:
+    if norm == 1:
+      raise NotImplementedError("L1 clip is not implemented.")
+      norm = torch.max(
+          avoid_zero_div,
+          torch.sum(torch.abs(eta), dim=reduc_ind, keepdim=True)
+      )
+    elif norm == 2:
+      norm = torch.sqrt(torch.max(
+          avoid_zero_div,
+          torch.sum(eta ** 2, dim=reduc_ind, keepdim=True)
+      ))
+    factor = torch.min(
+        torch.tensor(1., dtype=eta.dtype, device=eta.device),
+        eps / norm
+        )
+    eta = eta * factor
+  return eta
 
 class ProjectedGradientDescent(AttackModel):
 
