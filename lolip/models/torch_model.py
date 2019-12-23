@@ -98,7 +98,8 @@ class TorchModel(BaseEstimator):
                 else:
                     if 'adv' in self.loss_name:
                         x = projected_gradient_descent(self.model, x, y=y,
-                            eps_iter=self.eps/5, eps=self.eps, norm=self.norm, nb_iter=10)
+                                clip_min=0, clip_max=1, eps_iter=self.eps/5,
+                                eps=self.eps, norm=self.norm, nb_iter=10)
                     self.optimizer.zero_grad()
                     outputs = self.model(x)
                     #outputs = F.softmax(self.model(x), dim=1)
