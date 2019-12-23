@@ -14,7 +14,7 @@ from .attacks import AttackVarClass
 auto_var = AutoVar(
     logging_level=logging.INFO,
     before_experiment_hooks=[
-        partial(check_result_file_exist, get_name_fn=get_file_name)
+        partial(check_result_file_exist, get_name_fn=get_file_name),
         partial(create_placeholder_file, get_name_fn=get_file_name)
     ],
     after_experiment_hooks=[partial(save_result_to_file, get_name_fn=get_file_name)],
