@@ -15,6 +15,7 @@ from .torch_utils import get_optimizer, get_loss
 from .torch_utils.archs import *
 from ..attacks.torch.projected_gradient_descent import projected_gradient_descent
 from .torch_utils.trades import trades_loss
+from .torch_utils.llr import locally_linearity_regularization
 
 DEBUG = int(os.getenv("DEBUG", 0))
 
@@ -24,6 +25,7 @@ class TorchModel(BaseEstimator):
                 learning_rate=1e-4, momentum=0.0, batch_size=256, epochs=20,
                 optimizer='sgd', architecture='arch_001', random_state=None,
                 callbacks=None, train_type=None, eps:float=0.1, norm=np.inf):
+        print(f'lr: {learning_rate}, opt: {optimizer}, loss: {loss_name}')
         self.n_features = n_features
         self.n_classes = n_classes
         self.batch_size = batch_size
@@ -94,6 +96,11 @@ class TorchModel(BaseEstimator):
                         self.model, loss_fn, x, y, norm=self.norm, optimizer=self.optimizer,
                         step_size=self.eps/5, epsilon=self.eps, perturb_steps=10,
                         beta=1.0
+                    )
+                elif 'llr' in self.loss_name:
+                    outputs, loss = locally_linearity_regularization(
+                        self.model, loss_fn, x, y, norm=self.norm, optimizer=self.optimizer,
+                        step_size=self.eps/5, epsilon=self.eps, perturb_steps=10,
                     )
                 else:
                     if 'adv' in self.loss_name:

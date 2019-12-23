@@ -46,6 +46,10 @@ class NetworkBlock(nn.Module):
     def forward(self, x):
         return self.layer(x)
 
+class WRN_40_10(WideResNet):
+    def __init__(self, depth=40, num_classes=10, widen_factor=10, dropRate=0.0):
+        super(WideResNet, self).__init__(depth=depth, num_classes=num_classes,
+                widen_factor=widen_factor, dropRate=dropRate)
 
 class WideResNet(nn.Module):
     def __init__(self, depth=34, num_classes=10, widen_factor=10, dropRate=0.0):
