@@ -11,13 +11,12 @@ def get_hyper(name, arch, dataset_name):
         ret['learning_rate'] = 1e-4
         ret['momentum'] = 0.9
         ret['batch_size'] = 64
-    elif 'ResNet' in arch:
+    elif 'ResNet' in arch or 'WRN' in arch:
         ret['epochs'] = 200
         ret['learning_rate'] = 1e-2
         ret['batch_size'] = 64
     else:
         ret['epochs'] = 500
-        #ret['epochs'] = 5000
         if 'trades' in name:
             ret['learning_rate'] = 1e-2
         elif 'sgd' in name:

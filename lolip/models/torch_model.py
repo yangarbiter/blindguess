@@ -25,7 +25,8 @@ class TorchModel(BaseEstimator):
                 learning_rate=1e-4, momentum=0.0, batch_size=256, epochs=20,
                 optimizer='sgd', architecture='arch_001', random_state=None,
                 callbacks=None, train_type=None, eps:float=0.1, norm=np.inf):
-        print(f'lr: {learning_rate}, opt: {optimizer}, loss: {loss_name}')
+        print(f'lr: {learning_rate}, opt: {optimizer}, loss: {loss_name}, '
+              f'arch: {architecture}')
         self.n_features = n_features
         self.n_classes = n_classes
         self.batch_size = batch_size
