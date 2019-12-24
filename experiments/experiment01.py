@@ -10,9 +10,9 @@ from lolip.utils import estimate_local_lip
 from lolip.variables import get_file_name
 
 
-def calc_lip(model, X, Xp):
-    top = np.linalg.norm(model.predict_real(X)-model.predict_real(Xp), axis=1)
-    down = np.linalg.norm(X.reshape(len(Xp), -1)-Xp.reshape(len(Xp), -1), axis=1)
+def calc_lip(model, X, Xp, top_norm, btm_norm):
+    top = np.linalg.norm(model.predict_real(X)-model.predict_real(Xp), ord=top_norm, axis=1)
+    down = np.linalg.norm(X.reshape(len(Xp), -1)-Xp.reshape(len(Xp), -1), ord=btm_norm, axis=1)
     return np.mean(top / (down+1e-6))
 
 def run_experiment01(auto_var):
@@ -56,13 +56,15 @@ def run_experiment01(auto_var):
     print(f"adv tst acc: {result['adv_tst_acc']}")
 
     with Stopwatch("Estimating trn Lip"):
-        trn_lip = estimate_local_lip(model.model, trnX,
-                                     norm=norm, epsilon=auto_var.get_var("eps"))
-    result['avg_trn_lip'] = calc_lip(model, trnX, trn_lip).mean()
+        trn_lip = estimate_local_lip(model.model, trnX, top_norm=2, btm_norm=norm,
+                                     epsilon=auto_var.get_var("eps"))
+    result['avg_trn_lip'] = calc_lip(model, trnX, trn_lip, top_norm=2, btm_norm=norm).mean()
     with Stopwatch("Estimating tst Lip"):
-        tst_lip = estimate_local_lip(model.model, tstX,
-                                     norm=norm, epsilon=auto_var.get_var("eps"))
-    result['avg_tst_lip'] = calc_lip(model, tstX, tst_lip).mean()
+        tst_lip = estimate_local_lip(model.model, tstX, top_norm=2, btm_norm=norm,
+                                     epsilon=auto_var.get_var("eps"))
+    result['avg_tst_lip'] = calc_lip(model, tstX, tst_lip, top_norm=2, btm_norm=norm).mean()
+    print(f"avg trn lip: {result['avg_trn_lip']}")
+    print(f"avg tst lip: {result['avg_tst_lip']}")
 
     print(result)
 

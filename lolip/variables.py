@@ -1,6 +1,7 @@
 import logging
 from functools import partial
 
+import numpy as np
 from autovar import AutoVar
 from autovar.base import RegisteringChoiceType, register_var, VariableClass
 from autovar.hooks import check_result_file_exist, save_result_to_file

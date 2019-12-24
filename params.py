@@ -27,13 +27,23 @@ class cifarLip(ExpExperiments):
         grid_params.append({
             'dataset': ['cifar10'],
             'model': [
-                'ce-tor-WideResNet', 'tradesce-tor-WideResNet', #'advce-tor-WideResNet'
                 'ce-tor-WRN_40_10', 'tradesce-tor-WRN_40_10', 'advce-tor-WRN_40_10'
             ],
-            'eps': [5.0],
-            'norm': ['2'],
+            'eps': [0.031],
+            'norm': ['inf'],
             'attack': ['pgd'],
             'random_seed': random_seed,
         })
+        #grid_params.append({
+        #    'dataset': ['cifar10'],
+        #    'model': [
+        #        'ce-tor-WideResNet', 'tradesce-tor-WideResNet', #'advce-tor-WideResNet'
+        #        'ce-tor-WRN_40_10', 'tradesce-tor-WRN_40_10', 'advce-tor-WRN_40_10'
+        #    ],
+        #    'eps': [5.0],
+        #    'norm': ['2'],
+        #    'attack': ['pgd'],
+        #    'random_seed': random_seed,
+        #})
         cls.grid_params = grid_params
         return ExpExperiments.__new__(cls, *args, **kwargs)
