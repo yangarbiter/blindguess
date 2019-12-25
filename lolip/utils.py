@@ -5,23 +5,19 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import torch.utils.data as data_utils
-from torch.nn.modules.loss import _Loss
 
 
-class LocalLip(_Loss):
-    __constants__ = ['reduction']
-
-    def __init__(self, size_average=None, reduce=None, reduction='mean'):
-        super(LocalLip, self).__init__(size_average, reduce, reduction)
-
-    def forward(self, input, target):
-        return -F.mse_loss(input, target, reduction=self.reduction)
-
-def local_lip(model, x, xp, top_norm, btm_norm):
+def local_lip(model, x, xp, top_norm, btm_norm, reduction='mean'):
     top = torch.flatten(model(x), start_dim=1) - torch.flatten(model(xp), start_dim=1)
     down = torch.flatten(x - xp, start_dim=1)
-    return torch.mean(
-        torch.norm(top, dim=1, p=top_norm) / torch.norm(down + 1e-6, dim=1, p=btm_norm))
+    if reduction == 'mean':
+        return torch.mean(
+            torch.norm(top, dim=1, p=top_norm) / torch.norm(down + 1e-6, dim=1, p=btm_norm))
+    elif reduction == 'sum':
+        return torch.sum(
+            torch.norm(top, dim=1, p=top_norm) / torch.norm(down + 1e-6, dim=1, p=btm_norm))
+    else:
+        raise ValueError(f"Not supported reduction: {reduction}")
 
 def preprocess_x(x):
     return torch.from_numpy(x.transpose(0, 3, 1, 2)).float()
@@ -106,8 +102,8 @@ def estimate_local_lip_v2(model, X, top_norm, btm_norm,
         else:
             raise ValueError(f"Unsupported norm {btm_norm}")
 
-        total_loss += local_lip(model, x, x_adv, top_norm, btm_norm).item()
+        total_loss += local_lip(model, x, x_adv, top_norm, btm_norm, reduction='sum').item()
 
         ret.append(x_adv.detach().cpu().numpy().transpose(0, 2, 3, 1))
-    print(total_loss)
+    print(total_loss / len(X))
     return np.concatenate(ret, axis=0)

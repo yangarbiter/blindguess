@@ -36,7 +36,7 @@ class TorchModel(BaseEstimator):
         self.lbl_enc = lbl_enc
         self.loss_name = loss_name
 
-        model = globals()[self.architecture](self.n_classes)
+        model = globals()[self.architecture](n_classes=self.n_classes)
         if torch.cuda.is_available():
             model = model.cuda()
 
