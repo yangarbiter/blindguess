@@ -12,11 +12,20 @@ class mnistLip(ExpExperiments):
             'dataset': ['mnist', 'fashion'],
             'model': ['ce-tor-CNN001', 'tradesce-tor-CNN001',
                 'advce-tor-CNN001', 'llrce-tor-CNN001'],
-            'eps': [1.0],
-            'norm': ['2'],
+            'eps': [0.031],
+            'norm': ['inf'],
             'attack': ['pgd'],
             'random_seed': random_seed,
         })
+        #grid_params.append({
+        #    'dataset': ['mnist', 'fashion'],
+        #    'model': ['ce-tor-CNN001', 'tradesce-tor-CNN001',
+        #        'advce-tor-CNN001', 'llrce-tor-CNN001'],
+        #    'eps': [1.0],
+        #    'norm': ['2'],
+        #    'attack': ['pgd'],
+        #    'random_seed': random_seed,
+        #})
         cls.grid_params = grid_params
         return ExpExperiments.__new__(cls, *args, **kwargs)
 
