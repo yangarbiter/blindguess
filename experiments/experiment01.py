@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from .utils import set_random_seed
-from lolip.utils import estimate_local_lip
+from lolip.utils import estimate_local_lip_v2
 from lolip.variables import get_file_name
 
 
@@ -55,11 +55,11 @@ def run_experiment01(auto_var):
     print(f"adv tst acc: {result['adv_tst_acc']}")
 
     with Stopwatch("Estimating trn Lip"):
-        trn_lip = estimate_local_lip(model.model, trnX, top_norm=2, btm_norm=norm,
+        trn_lip = estimate_local_lip_v2(model.model, trnX, top_norm=2, btm_norm=norm,
                                      epsilon=auto_var.get_var("eps"))
     result['avg_trn_lip'] = calc_lip(model, trnX, trn_lip, top_norm=2, btm_norm=norm).mean()
     with Stopwatch("Estimating tst Lip"):
-        tst_lip = estimate_local_lip(model.model, tstX, top_norm=2, btm_norm=norm,
+        tst_lip = estimate_local_lip_v2(model.model, tstX, top_norm=2, btm_norm=norm,
                                      epsilon=auto_var.get_var("eps"))
     result['avg_tst_lip'] = calc_lip(model, tstX, tst_lip, top_norm=2, btm_norm=norm).mean()
     print(f"avg trn lip: {result['avg_trn_lip']}")
