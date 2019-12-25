@@ -92,16 +92,21 @@ class TorchModel(BaseEstimator):
                 self.model.train()
                 x, y = x.to(self.device), y.to(self.device)
 
-                if 'trades' in self.loss_name:
+                if 'trades6' in self.loss_name:
                     outputs, loss = trades_loss(
                         self.model, loss_fn, x, y, norm=self.norm, optimizer=self.optimizer,
-                        step_size=self.eps/5, epsilon=self.eps, perturb_steps=10,
-                        beta=1.0
+                        step_size=self.eps/5, epsilon=self.eps, perturb_steps=10, beta=6.0
+                    )
+                elif 'trades' in self.loss_name:
+                    outputs, loss = trades_loss(
+                        self.model, loss_fn, x, y, norm=self.norm, optimizer=self.optimizer,
+                        step_size=self.eps/5, epsilon=self.eps, perturb_steps=10, beta=1.0
                     )
                 elif 'llr' in self.loss_name:
                     outputs, loss = locally_linearity_regularization(
                         self.model, loss_fn, x, y, norm=self.norm, optimizer=self.optimizer,
                         step_size=self.eps/5, epsilon=self.eps, perturb_steps=10,
+                        lambd=4.0, mu=3.0
                     )
                 else:
                     if 'adv' in self.loss_name:

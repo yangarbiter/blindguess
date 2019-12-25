@@ -30,7 +30,6 @@ def run_experiment01(auto_var):
     #        (len(trnX), ) + img_shape)
     #tstX = scaler.transform(tstX.reshape(len(tstX), -1)).reshape((len(tstX), ) + img_shape)
 
-
     result = {}
     model = auto_var.get_var("model", trnX=trnX, trny=trny)
     model.tst_ds = (tstX, tsty)

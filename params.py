@@ -10,7 +10,8 @@ class mnistLip(ExpExperiments):
         grid_params = []
         grid_params.append({
             'dataset': ['mnist', 'fashion'],
-            'model': ['ce-tor-CNN001', 'tradesce-tor-CNN001', 'advce-tor-CNN001'],
+            'model': ['ce-tor-CNN001', 'tradesce-tor-CNN001',
+                'advce-tor-CNN001', 'llrce-tor-CNN001'],
             'eps': [1.0],
             'norm': ['2'],
             'attack': ['pgd'],
@@ -27,7 +28,11 @@ class cifarLip(ExpExperiments):
         grid_params.append({
             'dataset': ['cifar10'],
             'model': [
-                'ce-tor-WRN_40_10', 'tradesce-tor-WRN_40_10', 'advce-tor-WRN_40_10'
+                'ce-tor-WRN_40_10',
+                'tradesce-tor-WRN_40_10',
+                'trades6ce-tor-WRN_40_10',
+                'advce-tor-WRN_40_10',
+                'llrce-tor-WRN_40_10',
             ],
             'eps': [0.031],
             'norm': ['inf'],
