@@ -13,7 +13,8 @@ def find_z(model, loss_fn, inputs, targets, h, device):
     inputs.requires_grad_()
     outputs = model.eval()(inputs)
     loss_z = loss_fn(outputs, targets)
-    loss_z.backward(torch.ones(targets.size()).to(device))
+    #loss_z.backward(torch.ones(targets.size()).to(device))
+    loss_z.backward()
     grad = inputs.grad.data + 0.0
     #norm_grad = grad.norm().item()
     z = torch.sign(grad).detach() + 0.
@@ -35,7 +36,7 @@ def cure_loss(model, loss_fn, inputs, targets, h=3., lambda_=4, device="cuda"):
     loss_orig = loss_fn(outputs_orig, targets)
     grad_diff = torch.autograd.grad(
             loss_pos-loss_orig, inputs,
-            grad_outputs=torch.ones(targets.size()).to(device),
+            #grad_outputs=torch.ones(targets.size()).to(device),
             create_graph=True)[0]
     reg = grad_diff.reshape(grad_diff.size(0), -1).norm(dim=1)
     model.zero_grad()
