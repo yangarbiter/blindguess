@@ -16,7 +16,7 @@ def calc_lip(model, X, Xp, top_norm, btm_norm):
     return np.mean(top / (down+1e-6))
 
 def run_experiment01(auto_var):
-    #random_state = set_random_seed(auto_var)
+    _ = set_random_seed(auto_var)
     norm = auto_var.get_var("norm")
     trnX, trny, tstX, tsty = auto_var.get_var("dataset")
     lbl_enc = OneHotEncoder(categories=[np.sort(np.unique(trny))], sparse=False).fit(trny.reshape(-1, 1))
