@@ -16,6 +16,7 @@ from .torch_utils.archs import *
 from ..attacks.torch.projected_gradient_descent import projected_gradient_descent
 from .torch_utils.trades import trades_loss
 from .torch_utils.llr import locally_linearity_regularization
+from .torch_utils.cure import cure_loss
 
 DEBUG = int(os.getenv("DEBUG", 0))
 
@@ -47,6 +48,8 @@ class TorchModel(BaseEstimator):
         self.random_state = random_state
         self.train_type = train_type
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+        self.tst_ds = None
 
         ### Attack ####
         self.eps = eps
@@ -108,6 +111,9 @@ class TorchModel(BaseEstimator):
                         step_size=self.eps/5, epsilon=self.eps, perturb_steps=10,
                         lambd=4.0, mu=3.0
                     )
+                elif 'cure' in self.loss_name:
+                    outputs, loss = cure_loss(
+                        self.model, loss_fn, x, y, h=3, lambda_=4, device=self.device)
                 else:
                     if 'adv' in self.loss_name:
                         x = projected_gradient_descent(self.model, x, y=y,

@@ -10,8 +10,13 @@ class mnistLip(ExpExperiments):
         grid_params = []
         grid_params.append({
             'dataset': ['mnist', 'fashion'],
-            'model': ['ce-tor-CNN001', 'tradesce-tor-CNN001',
-                'advce-tor-CNN001', 'llrce-tor-CNN001'],
+            'model': [
+                'ce-tor-CNN001',
+                'tradesce-tor-CNN001',
+                'curece-tor-CNN001',
+                'advce-tor-CNN001',
+                'llrce-tor-CNN001'
+            ],
             'eps': [0.031],
             'norm': ['inf'],
             'attack': ['pgd'],
