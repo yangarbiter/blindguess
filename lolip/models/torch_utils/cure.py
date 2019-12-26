@@ -6,7 +6,7 @@ import torch
 from torch.autograd.gradcheck import zero_gradients
 
 
-def find_z(model, loss_fn, inputs, targets, h, device):
+def find_z(model, loss_fn, inputs, targets, h):
     '''
     Finding the direction in the regularizer
     '''
@@ -26,7 +26,7 @@ def find_z(model, loss_fn, inputs, targets, h, device):
 
 
 def cure_loss(model, loss_fn, inputs, targets, h=3., lambda_=4, device="cuda"):
-    z = find_z(model, loss_fn, inputs, targets, h, device)
+    z = find_z(model, loss_fn, inputs, targets, h)
 
     inputs.requires_grad_()
     outputs_pos = model.eval()(inputs + z)

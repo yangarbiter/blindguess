@@ -12,12 +12,12 @@ class mnistLip(ExpExperiments):
             'dataset': ['mnist', 'fashion'],
             'model': [
                 'ce-tor-CNN001',
-                'tradesce-tor-CNN001',
+                'trades6ce-tor-CNN001',
                 'curece-tor-CNN001',
                 'advce-tor-CNN001',
                 'llrce-tor-CNN001'
             ],
-            'eps': [0.031],
+            'eps': [0.1],
             'norm': ['inf'],
             'attack': ['pgd'],
             'random_seed': random_seed,
