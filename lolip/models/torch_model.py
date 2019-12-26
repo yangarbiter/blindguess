@@ -86,7 +86,7 @@ class TorchModel(BaseEstimator):
             tstX, tsty = self.tst_ds
             dataset = self._get_dataset(tstX, tsty)
             test_loader = torch.utils.data.DataLoader(dataset,
-                batch_size=self.batch_size, shuffle=False, num_workers=1)
+                batch_size=16, shuffle=False, num_workers=1)
 
         for epoch in range(1, self.epochs+1):
             train_loss = 0.

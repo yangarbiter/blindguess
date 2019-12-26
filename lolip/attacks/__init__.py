@@ -9,13 +9,27 @@ class AttackVarClass(VariableClass, metaclass=RegisteringChoiceType):
 
     @register_var()
     @staticmethod
-    def pgd(auto_var, inter_var, model):
+    def pgd(auto_var, inter_var, model, n_classes):
         from .torch.projected_gradient_descent import ProjectedGradientDescent
         nb_iter=10
         return ProjectedGradientDescent(
             model_fn=model.model,
             norm=auto_var.get_var("norm"),
             #lbl_enc=inter_var['lbl_enc'],
+            eps=auto_var.get_var("eps"),
+            eps_iter=auto_var.get_var("eps")*2/nb_iter,
+            nb_iter=nb_iter,
+        )
+
+    @register_var()
+    @staticmethod
+    def multitarget(auto_var, inter_var, model, n_classes):
+        from .torch.multi_target import MultiTarget
+        nb_iter=10
+        return MultiTarget(
+            n_classes=n_classes,
+            model_fn=model.model,
+            norm=auto_var.get_var("norm"),
             eps=auto_var.get_var("eps"),
             eps_iter=auto_var.get_var("eps")*2/nb_iter,
             nb_iter=nb_iter,

@@ -46,10 +46,10 @@ class ProjectedGradientDescent(AttackModel):
 
   def __init__(self, model_fn, eps, eps_iter, nb_iter, norm, loss_fn=None,
                clip_min=None, clip_max=None, y=None, targeted=False,
-               batch_size=128, rand_init=True, rand_minmax=None):
+               batch_size=16, rand_init=True, rand_minmax=None):
     self.model_fn = model_fn
     self.eps = eps
-    self.batch_size = 128
+    self.batch_size = batch_size
     self.attack_fn = partial(projected_gradient_descent, model_fn=model_fn,
       eps=eps, eps_iter=eps_iter, nb_iter=nb_iter, norm=norm, loss_fn=loss_fn,
       clip_min=clip_min, clip_max=clip_max, targeted=targeted, rand_init=rand_init,

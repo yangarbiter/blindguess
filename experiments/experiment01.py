@@ -21,6 +21,7 @@ def run_experiment01(auto_var):
     trnX, trny, tstX, tsty = auto_var.get_var("dataset")
     lbl_enc = OneHotEncoder(categories=[np.sort(np.unique(trny))], sparse=False).fit(trny.reshape(-1, 1))
     auto_var.set_intermidiate_variable("lbl_enc", lbl_enc)
+    n_classes = len(np.unique(trny))
 
     #trnX -= 0.5
     #tstX -= 0.5
@@ -45,7 +46,7 @@ def run_experiment01(auto_var):
     print(f"train acc: {result['trn_acc']}")
     print(f"test acc: {result['tst_acc']}")
 
-    attack_model = auto_var.get_var("attack", model=model)
+    attack_model = auto_var.get_var("attack", model=model, n_classes=n_classes)
     with Stopwatch("Attacking"):
         adv_trnX = attack_model.perturb(trnX)
         adv_tstX = attack_model.perturb(tstX)
