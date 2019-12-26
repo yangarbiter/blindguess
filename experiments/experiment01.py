@@ -54,6 +54,7 @@ def run_experiment01(auto_var):
     result['adv_tst_acc'] = (model.predict(adv_tstX) == tsty).mean()
     print(f"adv trn acc: {result['adv_trn_acc']}")
     print(f"adv tst acc: {result['adv_tst_acc']}")
+    del attack_model
 
     with Stopwatch("Estimating trn Lip"):
         trn_lip = estimate_local_lip_v2(model.model, trnX, top_norm=2, btm_norm=norm,

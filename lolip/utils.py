@@ -23,7 +23,7 @@ def preprocess_x(x):
     return torch.from_numpy(x.transpose(0, 3, 1, 2)).float()
 
 def estimate_local_lip(model, X, top_norm, btm_norm,
-        batch_size=128, perturb_steps=10, step_size=0.003, epsilon=0.01):
+        batch_size=16, perturb_steps=10, step_size=0.003, epsilon=0.01):
     model.eval()
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     dataset = data_utils.TensorDataset(preprocess_x(X))
@@ -69,7 +69,7 @@ def estimate_local_lip(model, X, top_norm, btm_norm,
     return np.concatenate(ret, axis=0)
 
 def estimate_local_lip_v2(model, X, top_norm, btm_norm,
-        batch_size=128, perturb_steps=10, step_size=0.003, epsilon=0.01):
+        batch_size=16, perturb_steps=10, step_size=0.003, epsilon=0.01):
     model.eval()
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     dataset = data_utils.TensorDataset(preprocess_x(X))

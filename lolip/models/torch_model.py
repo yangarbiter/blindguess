@@ -1,3 +1,4 @@
+import gc
 import os
 from functools import partial
 
@@ -82,6 +83,7 @@ class TorchModel(BaseEstimator):
         train_loader = torch.utils.data.DataLoader(dataset,
             batch_size=self.batch_size, shuffle=True, num_workers=1)
 
+        test_loader = None
         if self.tst_ds is not None:
             tstX, tsty = self.tst_ds
             dataset = self._get_dataset(tstX, tsty)
@@ -156,6 +158,12 @@ class TorchModel(BaseEstimator):
                     history[-1]['tst_acc'] = tst_acc / len(test_loader.dataset)
                     print('             test loss: {:.3f}, test acc: {:.3f}'.format(
                           history[-1]['tst_loss'], history[-1]['tst_acc']))
+
+        if test_loader is not None:
+            del test_loader
+        del train_loader
+        gc.collect()
+
         return history
     
     def _prep_pred(self, X):
@@ -171,6 +179,7 @@ class TorchModel(BaseEstimator):
         ret = []
         for [x] in loader:
             ret.append(self.model(x.to(self.device)).argmax(1).cpu().numpy())
+        del loader
         return np.concatenate(ret)
 
     def predict_proba(self, X):
@@ -179,6 +188,7 @@ class TorchModel(BaseEstimator):
         for [x] in loader:
             output = F.softmax(self.model(x.to(self.device)).detach())
             ret.append(output.cpu().numpy())
+        del loader
         return np.concatenate(ret, axis=0)
 
     def predict_real(self, X):
@@ -186,6 +196,7 @@ class TorchModel(BaseEstimator):
         ret = []
         for [x] in loader:
             ret.append(self.model(x.to(self.device)).detach().cpu().numpy())
+        del loader
         return np.concatenate(ret, axis=0)
 
     def save(self, path):
