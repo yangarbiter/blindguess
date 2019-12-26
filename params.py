@@ -35,6 +35,29 @@ class mnistLip(ExpExperiments):
         cls.grid_params = grid_params
         return ExpExperiments.__new__(cls, *args, **kwargs)
 
+class svhnLip(ExpExperiments):
+    def __new__(cls, *args, **kwargs):
+        cls.name = "svhn"
+        cls.experiment_fn = 'experiment01'
+        grid_params = []
+        grid_params.append({
+            'dataset': ['svhn'],
+            'model': [
+                'ce-tor-WRN_40_10',
+                'trades6ce-tor-WRN_40_10',
+                'curece-tor-WRN_40_10',
+                'advce-tor-WRN_40_10',
+                'llrce-tor-WRN_40_10',
+            ],
+            'eps': [0.031],
+            'norm': ['inf'],
+            'attack': ['pgd'],
+            'random_seed': random_seed,
+        })
+        cls.grid_params = grid_params
+        return ExpExperiments.__new__(cls, *args, **kwargs)
+
+
 class cifarLip(ExpExperiments):
     def __new__(cls, *args, **kwargs):
         cls.name = "cifar"
@@ -44,8 +67,8 @@ class cifarLip(ExpExperiments):
             'dataset': ['cifar10'],
             'model': [
                 'ce-tor-WRN_40_10',
-                'tradesce-tor-WRN_40_10',
                 'trades6ce-tor-WRN_40_10',
+                'curece-tor-WRN_40_10',
                 'advce-tor-WRN_40_10',
                 'llrce-tor-WRN_40_10',
             ],

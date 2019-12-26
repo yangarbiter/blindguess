@@ -7,12 +7,11 @@ from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data as data_utils
-from torch.optim.lr_scheduler import MultiStepLR
 from tqdm import tqdm
 
 import numpy as np
 from sklearn.base import BaseEstimator
-from .torch_utils import get_optimizer, get_loss
+from .torch_utils import get_optimizer, get_loss, get_scheduler
 from .torch_utils.archs import *
 from ..attacks.torch.projected_gradient_descent import projected_gradient_descent
 from .torch_utils.trades import trades_loss
@@ -77,7 +76,7 @@ class TorchModel(BaseEstimator):
 
         history = []
         loss_fn = get_loss(self.loss_name)
-        scheduler = MultiStepLR(self.optimizer, milestones=[60, 100, 140, 180], gamma=0.1)
+        scheduler = get_scheduler(self.optimizer, n_epochs=self.epochs)
 
         dataset = self._get_dataset(X, y)
         train_loader = torch.utils.data.DataLoader(dataset,

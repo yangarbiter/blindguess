@@ -1,5 +1,6 @@
 from torch import optim
 import torch.nn as nn
+from torch.optim.lr_scheduler import MultiStepLR
 
 from .optimizer_nadam import Nadam
 
@@ -26,3 +27,12 @@ def get_loss(loss_name: str):
     else:
         raise ValueError(f"Not supported loss {loss_name}")
     return ret
+
+def get_scheduler(optimizer, n_epochs: int):
+    if n_epochs <= 80:
+        scheduler = MultiStepLR(optimizer, milestones=[30, 50, 70], gamma=0.1)
+    elif n_epochs <= 120:
+        scheduler = MultiStepLR(optimizer, milestones=[40, 80, 100], gamma=0.1)
+    else:
+        scheduler = MultiStepLR(optimizer, milestones=[60, 100, 140, 180], gamma=0.1)
+    return scheduler
