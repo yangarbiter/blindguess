@@ -14,8 +14,10 @@ class mnistLip(ExpExperiments):
                 'ce-tor-CNN001',
                 'tradesce-tor-CNN001',
                 'trades6ce-tor-CNN001',
+                'trades10ce-tor-CNN001',
                 'curece-tor-CNN001',
                 'advce-tor-CNN001',
+                'llr86ce-tor-CNN001'
                 'llrce-tor-CNN001'
             ],
             'eps': [0.1],
