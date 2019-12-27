@@ -118,8 +118,12 @@ class TorchModel(BaseEstimator):
                         lambd=lambd, mu=mu
                     )
                 elif 'cure' in self.loss_name:
+                    if 'cure68' in self.loss_name:
+                        h, lambda_ = 6.0, 8.0
+                    else:
+                        h, lambda_ = 3.0, 4.0
                     outputs, loss = cure_loss(
-                        self.model, loss_fn, x, y, h=3, lambda_=4, device=self.device)
+                        self.model, loss_fn, x, y, h=h, lambda_=lambda_, device=self.device)
                 else:
                     if 'adv' in self.loss_name:
                         x = projected_gradient_descent(self.model, x, y=y,

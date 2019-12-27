@@ -5,6 +5,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .wideresnet import *
+from .resnet import resnet50
+
+def ResNet50(n_classes):
+    return resnet50(pretrained=False, n_channels=1, num_classes=n_classes)
 
 class CNN001(nn.Module):
     def __init__(self, n_classes):
