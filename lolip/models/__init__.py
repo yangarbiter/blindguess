@@ -13,7 +13,7 @@ def get_hyper(name, loss, arch, dataset_name):
         ret['batch_size'] = 64
     elif 'ResNet' in arch or 'WRN' in arch:
         if 'svhn' in dataset_name:
-            ret['epochs'] = 80
+            ret['epochs'] = 60
         elif 'cifar' in dataset_name:
             ret['epochs'] = 120
         else:

@@ -29,7 +29,9 @@ def get_loss(loss_name: str):
     return ret
 
 def get_scheduler(optimizer, n_epochs: int):
-    if n_epochs <= 80:
+    if n_epochs <= 60:
+        scheduler = MultiStepLR(optimizer, milestones=[20, 40, 50], gamma=0.1)
+    elif n_epochs <= 80:
         scheduler = MultiStepLR(optimizer, milestones=[30, 50, 70], gamma=0.1)
     elif n_epochs <= 120:
         scheduler = MultiStepLR(optimizer, milestones=[40, 80, 100], gamma=0.1)
