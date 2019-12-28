@@ -15,6 +15,7 @@ class mnistLip(ExpExperiments):
                 f'ce-tor-{arch}',
                 f'tradesce-tor-{arch}',
                 f'trades6ce-tor-{arch}',
+                f'trades6K20ce-tor-{arch}',
                 f'trades10ce-tor-{arch}',
                 f'curece-tor-{arch}',
                 f'advce-tor-{arch}',

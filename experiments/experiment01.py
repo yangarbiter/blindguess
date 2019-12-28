@@ -34,12 +34,15 @@ def run_experiment01(auto_var):
     result = {}
     model = auto_var.get_var("model", trnX=trnX, trny=trny)
     model.tst_ds = (tstX, tsty)
-    with Stopwatch("Fitting Model"):
-        history = model.fit(trnX, trny)
     result['model_path'] = os.path.join('./models', get_file_name(auto_var) + '.pt')
-    model.save(result['model_path'])
-
-    result['history'] = history
+    if None:
+        model.load(result['model_path'])
+        model.model.cuda()
+    else:
+        with Stopwatch("Fitting Model"):
+            history = model.fit(trnX, trny)
+        model.save(result['model_path'])
+        result['history'] = history
 
     result['trn_acc'] = (model.predict(trnX) == trny).mean()
     result['tst_acc'] = (model.predict(tstX) == tsty).mean()
