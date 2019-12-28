@@ -17,6 +17,7 @@ from ..attacks.torch.projected_gradient_descent import projected_gradient_descen
 from .torch_utils.trades import trades_loss
 from .torch_utils.llr import locally_linearity_regularization
 from .torch_utils.cure import cure_loss
+from .torch_utils.gradient_regularization import gradient_regularization
 
 DEBUG = int(os.getenv("DEBUG", 0))
 
@@ -122,8 +123,17 @@ class TorchModel(BaseEstimator):
                         h, lambda_ = 6.0, 8.0
                     else:
                         h, lambda_ = 3.0, 4.0
+
+                    self.optimizer.zero_grad()
                     outputs, loss = cure_loss(
                         self.model, loss_fn, x, y, h=h, lambda_=lambda_, device=self.device)
+                elif 'gr' in self.loss_name:
+                    if 'cure68' in self.loss_name:
+                        h, lambda_ = 6.0, 8.0
+                    else:
+                        h, lambda_ = 3.0, 4.0
+                    outputs, loss = gradient_regularization(
+                        self.model, loss_fn, self.optimizer, x, y, lambd=lambd)
                 else:
                     if 'adv' in self.loss_name:
                         x = projected_gradient_descent(self.model, x, y=y,
