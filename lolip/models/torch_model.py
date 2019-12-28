@@ -109,8 +109,8 @@ class TorchModel(BaseEstimator):
                         step_size=self.eps/5, epsilon=self.eps, perturb_steps=10, beta=beta
                     )
                 elif 'llr' in self.loss_name:
-                    if 'llr86' in self.loss_name:
-                        lambd, mu = 8.0, 6.0
+                    if 'llr65' in self.loss_name:
+                        lambd, mu = 6.0, 5.0
                     else:
                         lambd, mu = 4.0, 3.0
                     outputs, loss = locally_linearity_regularization(
