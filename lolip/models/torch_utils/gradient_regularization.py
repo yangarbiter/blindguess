@@ -21,6 +21,6 @@ def gradient_regularization(model, loss_fn, optimizer, x, y, lambd):
     outputs = model(x)
     loss_natural = loss_fn(outputs, y)
 
-    loss = loss_natural + lambd * gradient_regularization
+    loss = loss_natural + lambd * regularization
 
     return outputs, loss

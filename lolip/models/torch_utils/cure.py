@@ -25,7 +25,7 @@ def find_z(model, loss_fn, inputs, targets, h):
     return z#, norm_grad
 
 
-def cure_loss(model, loss_fn, inputs, targets, h=3., lambda_=4, device="cuda"):
+def cure_loss(model, loss_fn, inputs, targets, h=3., lambda_=4):
     z = find_z(model, loss_fn, inputs, targets, h)
 
     inputs.requires_grad_()

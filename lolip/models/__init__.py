@@ -18,8 +18,9 @@ def get_hyper(name, loss, arch, dataset_name):
             ret['epochs'] = 120
         else:
             ret['epochs'] = 200
-        if 'advce' in loss:
-            ret['learning_rate'] = 1e-2
+
+        if 'fashion' in dataset_name and 'adv' in loss:
+            ret['learning_rate'] = 1e-3
         else:
             ret['learning_rate'] = 1e-2
         ret['batch_size'] = 64

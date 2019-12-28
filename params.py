@@ -19,6 +19,7 @@ class mnistLip(ExpExperiments):
                 'advce-tor-CNN001',
                 'llr65ce-tor-CNN001',
                 'llrce-tor-CNN001',
+                'grce-tor-CNN001',
             ],
             'eps': [0.1],
             'norm': ['inf'],
