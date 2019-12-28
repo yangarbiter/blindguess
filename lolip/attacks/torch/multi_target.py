@@ -34,14 +34,17 @@ class MultiTarget(AttackModel):
       x = x.to(device)
 
       r = []
+      scores = []
       for j in range(self.n_classes):
         yp = j * torch.ones(self.batch_size).long().to(device)
         r.append(self.attack_fn(x=x, y=yp).detach().cpu().numpy())
+        self.model_fn(r[-1])[:, yp]
       r = np.array(r).T
-      import ipdb; ipdb.set_trace()
 
       for i in range(self.batch_size):
         pred = self.model_fn(torch.Tensor(r[i]).to(device)).argmax(1).cpu().numpy()
+        s
+
         ret.append(x[np.where(pred != y[i])[0]].cpu().numpy())
 
     return np.concatenate(ret, axis=0).transpose(0, 2, 3, 1)

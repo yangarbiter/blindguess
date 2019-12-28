@@ -8,18 +8,35 @@ class mnistLip(ExpExperiments):
         cls.name = "mnist"
         cls.experiment_fn = 'experiment01'
         grid_params = []
+        arch = "CNN001"
         grid_params.append({
             'dataset': ['mnist', 'fashion'],
             'model': [
-                'ce-tor-CNN001',
-                'tradesce-tor-CNN001',
-                'trades6ce-tor-CNN001',
-                'trades10ce-tor-CNN001',
-                'curece-tor-CNN001',
-                'advce-tor-CNN001',
-                'llr65ce-tor-CNN001',
-                'llrce-tor-CNN001',
-                'grce-tor-CNN001',
+                f'ce-tor-{arch}',
+                f'tradesce-tor-{arch}',
+                f'trades6ce-tor-{arch}',
+                f'trades10ce-tor-{arch}',
+                f'curece-tor-{arch}',
+                f'advce-tor-{arch}',
+                f'llr65ce-tor-{arch}',
+                f'llrce-tor-{arch}',
+                f'grce-tor-{arch}',
+            ],
+            'eps': [0.1],
+            'norm': ['inf'],
+            'attack': ['pgd'],
+            'random_seed': random_seed,
+        })
+        arch = "ResNet50"
+        grid_params.append({
+            'dataset': ['fashion'],
+            'model': [
+                f'ce-tor-{arch}',
+                f'trades10ce-tor-{arch}',
+                f'curece-tor-{arch}',
+                f'advce-tor-{arch}',
+                f'llr65ce-tor-{arch}',
+                f'grce-tor-{arch}',
             ],
             'eps': [0.1],
             'norm': ['inf'],
