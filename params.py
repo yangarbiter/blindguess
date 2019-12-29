@@ -14,6 +14,7 @@ class mnistLip(ExpExperiments):
             'model': [
                 f'ce-tor-{arch}',
                 f'tradesce-tor-{arch}',
+                f'tradesce-tor-{arch}-lrem3',
                 f'trades6ce-tor-{arch}',
                 f'trades6K20ce-tor-{arch}',
                 f'trades10ce-tor-{arch}',

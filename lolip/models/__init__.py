@@ -32,16 +32,22 @@ def get_hyper(name, loss, arch, dataset_name):
         ret['batch_size'] = 64
     else:
         ret['epochs'] = 500
-        if 'trades' in name:
-            ret['learning_rate'] = 1e-2
-        elif 'sgd' in name:
-            ret['learning_rate'] = 5e-1
-        else:
-            ret['learning_rate'] = 1e-1
+        ret['learning_rate'] = 1e-1
         ret['batch_size'] = 128
 
     if DEBUG:
         ret['epochs'] = 2
+
+    if 'lr1em4' in name:
+        ret['learning_rate'] = 1e-4
+    elif 'lr1em3' in name:
+        ret['learning_rate'] = 1e-3
+    elif 'lr1em2' in name:
+        ret['learning_rate'] = 1e-3
+    elif 'lr1em1' in name:
+        ret['learning_rate'] = 1e-3
+    
+
     return ret
 
 class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
