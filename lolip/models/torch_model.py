@@ -132,7 +132,10 @@ class TorchModel(BaseEstimator):
                     self.optimizer.zero_grad()
                     outputs, loss = cure_loss(self.model, loss_fn, x, y, h=h, lambda_=lambda_)
                 elif 'gr' in self.loss_name:
-                    lambd = 1.0
+                    if 'gr4' in self.loss_name:
+                        lambd = 4.0
+                    else:
+                        lambd = 1.0
                     outputs, loss = gradient_regularization(
                         self.model, loss_fn, self.optimizer, x, y, lambd=lambd)
                 else:
