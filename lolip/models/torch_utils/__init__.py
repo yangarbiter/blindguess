@@ -35,6 +35,8 @@ def get_scheduler(optimizer, n_epochs: int):
         scheduler = MultiStepLR(optimizer, milestones=[30, 50, 70], gamma=0.1)
     elif n_epochs <= 120:
         scheduler = MultiStepLR(optimizer, milestones=[40, 80, 100], gamma=0.1)
+    elif n_epochs <= 160:
+        scheduler = MultiStepLR(optimizer, milestones=[40, 80, 120, 140], gamma=0.1)
     else:
         scheduler = MultiStepLR(optimizer, milestones=[60, 100, 140, 180], gamma=0.1)
     return scheduler

@@ -7,7 +7,7 @@ DEBUG = int(os.getenv("DEBUG", 0))
 def get_hyper(name, loss, arch, dataset_name):
     ret = {}
     if 'CNN' in arch and ('mnist' in dataset_name or 'fashion' in dataset_name):
-        ret['epochs'] = 200
+        ret['epochs'] = 160
         ret['learning_rate'] = 1e-4
         ret['momentum'] = 0.9
         ret['batch_size'] = 64
@@ -15,6 +15,8 @@ def get_hyper(name, loss, arch, dataset_name):
         if 'svhn' in dataset_name:
             ret['epochs'] = 60
         elif 'cifar' in dataset_name:
+            ret['epochs'] = 120
+        elif 'mnist' in dataset_name or 'fashion' in dataset_name:
             ret['epochs'] = 120
         else:
             ret['epochs'] = 200

@@ -1,7 +1,7 @@
 python ./main.py --experiment experiment01 \
   --norm inf --eps 0.1 \
-  --dataset fashion \
-  --model ce-tor-ResNet50 \
+  --dataset mnist \
+  --model advce-tor-ResNet50 \
   --attack pgd \
   --random_seed 0
 
