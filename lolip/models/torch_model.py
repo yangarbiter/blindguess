@@ -170,12 +170,13 @@ class TorchModel(BaseEstimator):
 
                 if self.tst_ds is not None:
                     tst_loss, tst_acc = 0., 0.
-                    for tx, ty in test_loader:
-                        tx, ty = tx.to(self.device), ty.to(self.device)
-                        outputs = self.model(tx)
-                        loss = loss_fn(outputs, ty)
-                        tst_loss += loss.item()
-                        tst_acc += (outputs.argmax(dim=1)==ty).sum().float().item()
+                    with torch.no_grad():
+                        for tx, ty in test_loader:
+                            tx, ty = tx.to(self.device), ty.to(self.device)
+                            outputs = self.model(tx)
+                            loss = loss_fn(outputs, ty)
+                            tst_loss += loss.item()
+                            tst_acc += (outputs.argmax(dim=1)==ty).sum().float().item()
                     history[-1]['tst_loss'] = tst_loss / len(test_loader.dataset)
                     history[-1]['tst_acc'] = tst_acc / len(test_loader.dataset)
                     print('             test loss: {:.3f}, test acc: {:.3f}'.format(

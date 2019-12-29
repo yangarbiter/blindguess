@@ -34,10 +34,10 @@ class CNN001(nn.Module):
         #output = F.log_softmax(x, dim=1)
         return x
 
-class SmallCNN(nn.Module):
+class CNN002(nn.Module):
     """https://github.com/yaodongyu/TRADES/blob/e20f7b9b99c79ed3cf0d1bb12a47c229ebcac24a/models/small_cnn.py#L5"""
     def __init__(self, n_classes, drop=0.5):
-        super(SmallCNN, self).__init__()
+        super(CNN002, self).__init__()
 
         self.num_channels = 1
 

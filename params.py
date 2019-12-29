@@ -29,6 +29,22 @@ class mnistLip(ExpExperiments):
             'attack': ['pgd'],
             'random_seed': random_seed,
         })
+        arch = "CNN002"
+        grid_params.append({
+            'dataset': ['mnist', 'fashion'],
+            'model': [
+                f'ce-tor-{arch}',
+                f'trades10ce-tor-{arch}',
+                f'curece-tor-{arch}',
+                f'advce-tor-{arch}',
+                f'llrce-tor-{arch}',
+                f'gr4ce-tor-{arch}',
+            ],
+            'eps': [0.1],
+            'norm': ['inf'],
+            'attack': ['pgd'],
+            'random_seed': random_seed,
+        })
         arch = "ResNet50"
         grid_params.append({
             'dataset': ['fashion'],

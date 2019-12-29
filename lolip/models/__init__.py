@@ -38,14 +38,15 @@ def get_hyper(name, loss, arch, dataset_name):
     if DEBUG:
         ret['epochs'] = 2
 
-    if 'lr1em4' in name:
-        ret['learning_rate'] = 1e-4
-    elif 'lr1em3' in name:
-        ret['learning_rate'] = 1e-3
-    elif 'lr1em2' in name:
-        ret['learning_rate'] = 1e-3
-    elif 'lr1em1' in name:
-        ret['learning_rate'] = 1e-3
+    if name is not None:
+        if 'lr1em4' in name:
+            ret['learning_rate'] = 1e-4
+        elif 'lr1em3' in name:
+            ret['learning_rate'] = 1e-3
+        elif 'lr1em2' in name:
+            ret['learning_rate'] = 1e-3
+        elif 'lr1em1' in name:
+            ret['learning_rate'] = 1e-3
     
 
     return ret

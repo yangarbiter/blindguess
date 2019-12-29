@@ -1,7 +1,8 @@
 python ./main.py --experiment experiment01 \
+  --no-hooks \
   --norm inf --eps 0.1 \
   --dataset mnist \
-  --model advce-tor-ResNet50 \
+  --model advce-tor-CNN002 \
   --attack pgd \
   --random_seed 0
 
