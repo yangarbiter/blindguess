@@ -21,7 +21,7 @@ def get_hyper(name, loss, arch, dataset_name):
         else:
             ret['epochs'] = 200
 
-        if 'fashion' in dataset_name and 'adv' in loss:
+        if 'adv' in loss:
             ret['learning_rate'] = 1e-3
         elif 'cifar' in dataset_name and 'cure' in loss:
             ret['learning_rate'] = 1e-5
@@ -48,7 +48,6 @@ def get_hyper(name, loss, arch, dataset_name):
         elif 'lr1em1' in name:
             ret['learning_rate'] = 1e-3
     
-
     return ret
 
 class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):

@@ -51,8 +51,8 @@ def run_experiment01(auto_var):
 
     attack_model = auto_var.get_var("attack", model=model, n_classes=n_classes)
     with Stopwatch("Attacking"):
-        adv_trnX = attack_model.perturb(trnX)
-        adv_tstX = attack_model.perturb(tstX)
+        adv_trnX = attack_model.perturb(trnX, trny)
+        adv_tstX = attack_model.perturb(tstX, tsty)
     result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
     result['adv_tst_acc'] = (model.predict(adv_tstX) == tsty).mean()
     print(f"adv trn acc: {result['adv_trn_acc']}")

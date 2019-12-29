@@ -24,27 +24,35 @@ class MultiTarget(AttackModel):
     return torch.from_numpy(X.transpose(0, 3, 1, 2)).float()
 
   def perturb(self, X, y=None, eps=None):
+    """
+    y: correct: label
+    """
+    #self.model_fn.eval()
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    dataset = torch.utils.data.TensorDataset(self._preprocess_x(X))
+    dataset = torch.utils.data.TensorDataset(
+      self._preprocess_x(X), torch.from_numpy(y).long())
     loader = torch.utils.data.DataLoader(dataset,
-        batch_size=self.batch_size, shuffle=False, num_workers=1)
+      batch_size=self.batch_size, shuffle=False, num_workers=1)
 
     ret = []
-    for [x] in loader:
-      x = x.to(device)
+    for [x, y] in loader:
+      x, y = x.to(device), y.to(device)
+
+      pred = self.model_fn(x)[:, y]
 
       r = []
       scores = []
       for j in range(self.n_classes):
         yp = j * torch.ones(self.batch_size).long().to(device)
-        r.append(self.attack_fn(x=x, y=yp).detach().cpu().numpy())
-        self.model_fn(r[-1])[:, yp]
-      r = np.array(r).T
+        adv_x = self.attack_fn(x=x, y=yp).detach()
+        scores.append((self.model_fn(adv_x)[:, yp] - pred).cpu().numpy())
+        r.append(adv_x.cpu().numpy())
+      scores = np.array(scores)
+      r = np.array(r)
+
+      idx = scores.argmax(axis=0)
 
       for i in range(self.batch_size):
-        pred = self.model_fn(torch.Tensor(r[i]).to(device)).argmax(1).cpu().numpy()
-        s
-
-        ret.append(x[np.where(pred != y[i])[0]].cpu().numpy())
+        ret.append(r[i, idx[i]])
 
     return np.concatenate(ret, axis=0).transpose(0, 2, 3, 1)
