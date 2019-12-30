@@ -1,5 +1,4 @@
 import os
-from functools import partial
 
 from bistiming import Stopwatch
 import numpy as np
@@ -51,8 +50,8 @@ def run_experiment01(auto_var):
 
     attack_model = auto_var.get_var("attack", model=model, n_classes=n_classes)
     with Stopwatch("Attacking"):
-        adv_trnX = attack_model.perturb(trnX, trny)
-        adv_tstX = attack_model.perturb(tstX, tsty)
+        adv_trnX = attack_model.perturb(trnX)
+        adv_tstX = attack_model.perturb(tstX)
     result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
     result['adv_tst_acc'] = (model.predict(adv_tstX) == tsty).mean()
     print(f"adv trn acc: {result['adv_trn_acc']}")
@@ -71,8 +70,4 @@ def run_experiment01(auto_var):
     print(f"avg tst lip: {result['avg_tst_lip']}")
 
     print(result)
-
-    #import torch
-    #from lolip.utils import local_lip
-    #local_lip(model.model, torch.from_numpy(tstX.transpose(0, 3, 1, 2)).cuda().float(), torch.from_numpy(tst_lip.transpose(0, 3, 1, 2)).cuda().float())
     return result
