@@ -27,7 +27,7 @@ class MultiTarget(AttackModel):
     """
     y: correct: label
     """
-    #self.model_fn.eval()
+    self.model_fn.eval()
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     dataset = torch.utils.data.TensorDataset(
       self._preprocess_x(X), torch.from_numpy(y).long())
@@ -36,23 +36,23 @@ class MultiTarget(AttackModel):
 
     ret = []
     for [x, y] in loader:
-      x, y = x.to(device), y.to(device)
+      x = x.to(device)
 
-      pred = self.model_fn(x)[:, y]
+      pred = self.model_fn(x).detach().cpu().numpy()
+      pred = np.array([pred[i, yi] for i, yi in enumerate(y)])
 
       r = []
       scores = []
       for j in range(self.n_classes):
-        yp = j * torch.ones(self.batch_size).long().to(device)
+        yp = j * torch.ones(len(x)).long().to(device)
         adv_x = self.attack_fn(x=x, y=yp).detach()
-        scores.append((self.model_fn(adv_x)[:, yp] - pred).cpu().numpy())
+        scores.append(self.model_fn(adv_x)[:, j].detach().cpu().numpy() - pred)
         r.append(adv_x.cpu().numpy())
       scores = np.array(scores)
-      r = np.array(r)
-
       idx = scores.argmax(axis=0)
 
-      for i in range(self.batch_size):
-        ret.append(r[i, idx[i]])
+      r = np.array(r)
+      for i in range(len(x)):
+        ret.append(r[idx[i], i])
 
-    return np.concatenate(ret, axis=0).transpose(0, 2, 3, 1)
+    return np.array(ret).transpose(0, 2, 3, 1)

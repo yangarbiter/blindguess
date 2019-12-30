@@ -67,7 +67,7 @@ class ProjectedGradientDescent(AttackModel):
     ret = []
     for [x] in loader:
       x = x.to(device)
-      ret.append(self.attack_fn(x=x, y=y).detach().cpu().numpy())
+      ret.append(self.attack_fn(x=x).detach().cpu().numpy())
     return np.concatenate(ret, axis=0).transpose(0, 2, 3, 1)
 
 
