@@ -115,5 +115,5 @@ def estimate_local_lip_v2(model, X, top_norm, btm_norm,
         total_loss += local_lip(model, x, x_adv, top_norm, btm_norm, reduction='sum').item()
 
         ret.append(x_adv.detach().cpu().numpy().transpose(0, 2, 3, 1))
-    ret = total_loss / len(X)
-    return ret, np.concatenate(ret, axis=0)
+    ret_v = total_loss / len(X)
+    return ret_v, np.concatenate(ret, axis=0)

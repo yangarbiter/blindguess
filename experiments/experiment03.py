@@ -36,11 +36,13 @@ def run_experiment03(auto_var):
     print(f"test acc: {result['tst_acc']}")
 
     with Stopwatch("Estimating trn Lip"):
-        trn_lip = estimate_local_lip_v2(model.model, trnX, top_norm=2, btm_norm=norm,
+        trn_lip, _ = estimate_local_lip_v2(model.model, trnX, top_norm=2, btm_norm=norm,
                                      epsilon=auto_var.get_var("eps"))
+        result['avg_trn_lip'] = trn_lip
     with Stopwatch("Estimating tst Lip"):
-        tst_lip = estimate_local_lip_v2(model.model, tstX, top_norm=2, btm_norm=norm,
+        tst_lip, _ = estimate_local_lip_v2(model.model, tstX, top_norm=2, btm_norm=norm,
                                      epsilon=auto_var.get_var("eps"))
+        result['avg_tst_lip'] = tst_lip
     print(f"avg trn lip: {result['avg_trn_lip']}")
     print(f"avg tst lip: {result['avg_tst_lip']}")
 
