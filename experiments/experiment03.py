@@ -35,18 +35,18 @@ def run_experiment03(auto_var):
     print(f"train acc: {result['trn_acc']}")
     print(f"test acc: {result['tst_acc']}")
 
-    #with Stopwatch("Estimating trn Lip (L1)"):
-    #    trn_lip_1, pert = estimate_local_lip_v2(model.model, trnX, top_norm=1, btm_norm=norm,
-    #                                 epsilon=auto_var.get_var("eps"))
-    #    result['trn_lip_1_pert'] = pert
-    #    result['avg_trn_lip_1'] = trn_lip_1
-    #with Stopwatch("Estimating tst Lip (L1)"):
-    #    tst_lip_1, pert = estimate_local_lip_v2(model.model, tstX, top_norm=1, btm_norm=norm,
-    #                                 epsilon=auto_var.get_var("eps"))
-    #    result['tst_lip_1_pert'] = pert
-    #    result['avg_tst_lip_1'] = tst_lip_1
-    #print(f"avg trn lip (L1): {result['avg_trn_lip_1']}")
-    #print(f"avg tst lip (L1): {result['avg_tst_lip_1']}")
+    with Stopwatch("Estimating trn Lip (L1)"):
+        trn_lip_1, pert = estimate_local_lip_v2(model.model, trnX, top_norm=1, btm_norm=norm,
+                                     epsilon=auto_var.get_var("eps"))
+        result['trn_lip_1_pert'] = pert
+        result['avg_trn_lip_1'] = trn_lip_1
+    with Stopwatch("Estimating tst Lip (L1)"):
+        tst_lip_1, pert = estimate_local_lip_v2(model.model, tstX, top_norm=1, btm_norm=norm,
+                                     epsilon=auto_var.get_var("eps"))
+        result['tst_lip_1_pert'] = pert
+        result['avg_tst_lip_1'] = tst_lip_1
+    print(f"avg trn lip (L1): {result['avg_trn_lip_1']}")
+    print(f"avg tst lip (L1): {result['avg_tst_lip_1']}")
 
     with Stopwatch("Estimating trn Lip (KL)"):
         trn_lip_kl, pert = estimate_local_lip_v2(model.model, trnX, top_norm='kl', btm_norm=norm,

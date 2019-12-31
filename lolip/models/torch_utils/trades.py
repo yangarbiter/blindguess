@@ -33,7 +33,10 @@ def trades_loss(model,
                 device="gpu"):
     # define KL-loss
     #criterion_kl = nn.KLDivLoss(size_average=False)
-    criterion_kl = nn.KLDivLoss(reduction='sum')
+    if version == "plus":
+        criterion_kl = nn.KLDivLoss(reduction='none')
+    else:
+        criterion_kl = nn.KLDivLoss(reduction='sum')
     model.eval()
     batch_size = len(x_natural)
     # generate adversarial example
@@ -45,7 +48,7 @@ def trades_loss(model,
                 loss_kl = criterion_kl(F.log_softmax(model(x_adv), dim=1),
                                        F.softmax(model(x_natural), dim=1))
                 if version == "plus":
-                    loss_kl = loss_kl / torch.norm(x_adv - x_natural, p=np.inf)
+                    loss_kl = torch.sum(loss_kl, dim=1) / torch.norm(x_adv - x_natural, p=np.inf, dim=1)
             grad = torch.autograd.grad(loss_kl, [x_adv])[0]
             x_adv = x_adv.detach() + step_size * torch.sign(grad.detach())
             x_adv = torch.min(torch.max(x_adv, x_natural - epsilon), x_natural + epsilon)
@@ -66,7 +69,7 @@ def trades_loss(model,
                 loss = (-1) * criterion_kl(F.log_softmax(model(adv), dim=1),
                                            F.softmax(model(x_natural), dim=1))
                 if version == "plus":
-                    loss_kl = loss_kl / torch.norm(x_adv - x_natural, p=np.inf)
+                    loss_kl = torch.sum(loss_kl, dim=1) / torch.norm(x_adv - x_natural, p=2, dim=1)
             loss.backward()
             # renorming gradient
             grad_norms = delta.grad.view(batch_size, -1).norm(p=2, dim=1)
