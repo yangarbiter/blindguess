@@ -30,7 +30,10 @@ def run_experiment02(auto_var):
     model_path[0] = 'pgd'
     model_path = '-'.join(model_path)
     model_path = os.path.join('./models', model_path + '.pt')
-    result['model_path'] = model_path
+    try:
+        result['model_path'] = model_path % model.epochs
+    except:
+        result['model_path'] = model_path
 
     model.load(result['model_path'])
     model.model.cuda()
