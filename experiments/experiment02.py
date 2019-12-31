@@ -10,6 +10,23 @@ from lolip.utils import estimate_local_lip_v2
 from lolip.variables import get_file_name
 
 
+def load_model(auto_var, trnX, trny, tstX, tsty):
+    model = auto_var.get_var("model", trnX=trnX, trny=trny)
+    model.tst_ds = (tstX, tsty)
+    model_path = get_file_name(auto_var).split("-")
+    model_path[0] = 'pgd'
+    model_path = '-'.join(model_path)
+    model_path = os.path.join('./models', model_path + '.pt')
+    try:
+        model_path = model_path % model.epochs
+    except:
+        model_path = model_path
+
+    model.load(model_path)
+    model.model.cuda()
+    return model_path, model
+
+
 def calc_lip(model, X, Xp, top_norm, btm_norm):
     top = np.linalg.norm(model.predict_real(X)-model.predict_real(Xp), ord=top_norm, axis=1)
     down = np.linalg.norm(X.reshape(len(Xp), -1)-Xp.reshape(len(Xp), -1), ord=btm_norm, axis=1)
@@ -24,19 +41,7 @@ def run_experiment02(auto_var):
     n_classes = len(np.unique(trny))
 
     result = {}
-    model = auto_var.get_var("model", trnX=trnX, trny=trny)
-    model.tst_ds = (tstX, tsty)
-    model_path = get_file_name(auto_var).split("-")
-    model_path[0] = 'pgd'
-    model_path = '-'.join(model_path)
-    model_path = os.path.join('./models', model_path + '.pt')
-    try:
-        result['model_path'] = model_path % model.epochs
-    except:
-        result['model_path'] = model_path
-
-    model.load(result['model_path'])
-    model.model.cuda()
+    result['model_path'], model = load_model(auto_var, trnX, trny, tstX, tsty)
 
     result['trn_acc'] = (model.predict(trnX) == trny).mean()
     result['tst_acc'] = (model.predict(tstX) == tsty).mean()

@@ -6,7 +6,6 @@ import torch
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.utils.data as data_utils
 from tqdm import tqdm
 
 import numpy as np
@@ -61,12 +60,12 @@ class TorchModel(BaseEstimator):
     def _get_dataset(self, X, y=None):
         X = self._preprocess_x(X)
         if y is None:
-            return data_utils.TensorDataset(torch.from_numpy(X).float())
+            return torch.utils.data.TensorDataset(torch.from_numpy(X).float())
         if 'mse' in self.loss_name:
             Y = self.lbl_enc.transform(y.reshape(-1, 1))
-            dataset = data_utils.TensorDataset(torch.from_numpy(X).float(), torch.from_numpy(Y).float())
+            dataset = torch.utils.data.TensorDataset(torch.from_numpy(X).float(), torch.from_numpy(Y).float())
         else:
-            dataset = data_utils.TensorDataset(torch.from_numpy(X).float(), torch.from_numpy(y).long())
+            dataset = torch.utils.data.TensorDataset(torch.from_numpy(X).float(), torch.from_numpy(y).long())
         return dataset
 
     def _preprocess_x(self, X):
@@ -200,7 +199,7 @@ class TorchModel(BaseEstimator):
     def _prep_pred(self, X):
         X = self._preprocess_x(X)
         self.model.eval()
-        dataset = data_utils.TensorDataset(torch.from_numpy(X).float())
+        dataset = torch.utils.data.TensorDataset(torch.from_numpy(X).float())
         loader = torch.utils.data.DataLoader(dataset,
             batch_size=self.batch_size, shuffle=False, num_workers=2)
         return loader
