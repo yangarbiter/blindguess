@@ -37,12 +37,14 @@ def run_experiment01(auto_var):
     model.tst_ds = (tstX, tsty)
     result['model_path'] = os.path.join('./models', get_file_name(auto_var) + '-ep%04d.pt')
     if None:
+        result['model_path'] = result['model_path'] % model.epochs
         model.load(result['model_path'])
         model.model.to(device)
     else:
         with Stopwatch("Fitting Model"):
             history = model.fit(trnX, trny)
         model.save(result['model_path'])
+        result['model_path'] = result['model_path'] % model.epochs
         result['history'] = history
 
     result['trn_acc'] = (model.predict(trnX) == trny).mean()
