@@ -28,7 +28,9 @@ def trades_loss(model,
                 step_size=0.003,
                 epsilon=0.031,
                 perturb_steps=10,
-                beta=1.0):
+                beta=1.0,
+                version=None,
+                device="gpu"):
     # define KL-loss
     #criterion_kl = nn.KLDivLoss(size_average=False)
     criterion_kl = nn.KLDivLoss(reduction='sum')
@@ -36,18 +38,20 @@ def trades_loss(model,
     batch_size = len(x_natural)
     # generate adversarial example
     if norm == np.inf:
-        x_adv = x_natural.detach() + 0.001 * torch.randn(x_natural.shape).cuda().detach()
+        x_adv = x_natural.detach() + 0.001 * torch.randn(x_natural.shape).to(device).detach()
         for _ in range(perturb_steps):
             x_adv.requires_grad_()
             with torch.enable_grad():
                 loss_kl = criterion_kl(F.log_softmax(model(x_adv), dim=1),
                                        F.softmax(model(x_natural), dim=1))
+                if version == "plus":
+                    loss_kl = loss_kl / torch.norm(x_adv - x_natural, p=np.inf)
             grad = torch.autograd.grad(loss_kl, [x_adv])[0]
             x_adv = x_adv.detach() + step_size * torch.sign(grad.detach())
             x_adv = torch.min(torch.max(x_adv, x_natural - epsilon), x_natural + epsilon)
             x_adv = torch.clamp(x_adv, 0.0, 1.0)
     elif norm == 2:
-        delta = 0.001 * torch.randn(x_natural.shape).cuda().detach()
+        delta = 0.001 * torch.randn(x_natural.shape).to(device).detach()
         delta = Variable(delta.data, requires_grad=True)
 
         # Setup optimizers
@@ -61,6 +65,8 @@ def trades_loss(model,
             with torch.enable_grad():
                 loss = (-1) * criterion_kl(F.log_softmax(model(adv), dim=1),
                                            F.softmax(model(x_natural), dim=1))
+                if version == "plus":
+                    loss_kl = loss_kl / torch.norm(x_adv - x_natural, p=np.inf)
             loss.backward()
             # renorming gradient
             grad_norms = delta.grad.view(batch_size, -1).norm(p=2, dim=1)

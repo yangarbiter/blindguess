@@ -110,9 +110,15 @@ class TorchModel(BaseEstimator):
                         steps = 20
                     else:
                         steps = 10
+                    
+                    version = None
+                    if 'ptrades' in self.loss_name:
+                        version = "plus"
+
                     outputs, loss = trades_loss(
                         self.model, loss_fn, x, y, norm=self.norm, optimizer=self.optimizer,
-                        step_size=self.eps*2/steps, epsilon=self.eps, perturb_steps=steps, beta=beta
+                        step_size=self.eps*2/steps, epsilon=self.eps, perturb_steps=steps, beta=beta,
+                        version=version, device=self.device
                     )
                 elif 'llr' in self.loss_name:
                     if 'llr65' in self.loss_name:
