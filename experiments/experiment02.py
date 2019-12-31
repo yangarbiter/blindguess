@@ -1,5 +1,6 @@
 import os
 
+import torch
 from bistiming import Stopwatch
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
