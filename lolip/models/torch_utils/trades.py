@@ -50,6 +50,7 @@ def trades_loss(model,
                 if version == "plus":
                     loss_kl = torch.sum(loss_kl, dim=1) \
                             / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=np.inf, dim=1)
+                    loss_kl = torch.sum(loss_kl)
             grad = torch.autograd.grad(loss_kl, [x_adv])[0]
             x_adv = x_adv.detach() + step_size * torch.sign(grad.detach())
             x_adv = torch.min(torch.max(x_adv, x_natural - epsilon), x_natural + epsilon)
