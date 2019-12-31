@@ -7,6 +7,7 @@ from mkdir_p import mkdir_p
 from lolip.variables import auto_var, get_file_name
 from params import (
     mnistLip,
+    mnistOtherLips,
     cifarLip,
     svhnLip,
 )
@@ -19,6 +20,7 @@ DEBUG = True if os.environ.get('DEBUG', False) else False
 def main(auto_var):
     experiments = [
         mnistLip(),
+        mnistOtherLips(),
         cifarLip(),
         svhnLip(),
     ]

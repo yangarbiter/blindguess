@@ -3,6 +3,52 @@ from utils import ExpExperiments
 
 random_seed = list(range(1))
 
+class mnistOtherLips(ExpExperiments):
+    def __new__(cls, *args, **kwargs):
+        cls.name = "mnist"
+        cls.experiment_fn = 'experiment03'
+        grid_params = []
+        arch = "CNN001"
+        grid_params.append({
+            'dataset': ['mnist', 'fashion'],
+            'model': [
+                f'ce-tor-{arch}',
+                f'tradesce-tor-{arch}',
+                f'trades10ce-tor-{arch}',
+                f'trades20ce-tor-{arch}',
+                f'ptrades10ce-tor-{arch}',
+                f'curece-tor-{arch}',
+                f'cure68ce-tor-{arch}',
+                f'advce-tor-{arch}',
+                f'llr65ce-tor-{arch}',
+                f'llrce-tor-{arch}',
+                f'gr4ce-tor-{arch}',
+            ],
+            'eps': [0.1],
+            'norm': ['inf'],
+            'attack': ['pgd'],
+            'random_seed': random_seed,
+        })
+        arch = "CNN002"
+        grid_params.append({
+            'dataset': ['mnist', 'fashion'],
+            'model': [
+                f'ce-tor-{arch}',
+                f'trades10ce-tor-{arch}',
+                f'curece-tor-{arch}',
+                f'advce-tor-{arch}',
+                f'llrce-tor-{arch}',
+                f'gr4ce-tor-{arch}',
+            ],
+            'eps': [0.1],
+            'norm': ['inf'],
+            'attack': ['pgd'],
+            'random_seed': random_seed,
+        })
+        cls.grid_params = grid_params
+        return ExpExperiments.__new__(cls, *args, **kwargs)
+
+
 class mnistLip(ExpExperiments):
     def __new__(cls, *args, **kwargs):
         cls.name = "mnist"
