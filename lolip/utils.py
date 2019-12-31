@@ -8,24 +8,34 @@ import torch.utils.data as data_utils
 
 
 def local_lip(model, x, xp, top_norm, btm_norm, reduction='mean'):
-    top = torch.flatten(model(x), start_dim=1) - torch.flatten(model(xp), start_dim=1)
+    model.eval()
     down = torch.flatten(x - xp, start_dim=1)
-    if reduction == 'mean':
-        return torch.mean(
-            torch.norm(top, dim=1, p=top_norm) / torch.norm(down + 1e-6, dim=1, p=btm_norm))
-    elif reduction == 'sum':
-        return torch.sum(
-            torch.norm(top, dim=1, p=top_norm) / torch.norm(down + 1e-6, dim=1, p=btm_norm))
+    if top_norm == "kl":
+        top = torch.flatten(F.softmax(model(x)), start_dim=1) \
+              - torch.flatten(F.softmax(model(xp)), start_dim=1)
+
+        criterion_kl = nn.KLDivLoss(reduction=reduction)
+        top = criterion_kl(F.log_softmax(model(x), dim=1),
+                           F.softmax(model(xp), dim=1))
+        #top = torch.flatten(top, start_dim=1)
+        return top / torch.norm(down + 1e-6, dim=1, p=btm_norm)
     else:
-        raise ValueError(f"Not supported reduction: {reduction}")
+        top = torch.flatten(model(x), start_dim=1) - torch.flatten(model(xp), start_dim=1)
+        if reduction == 'mean':
+            return torch.mean(
+                torch.norm(top, dim=1, p=top_norm) / torch.norm(down + 1e-6, dim=1, p=btm_norm))
+        elif reduction == 'sum':
+            return torch.sum(
+                torch.norm(top, dim=1, p=top_norm) / torch.norm(down + 1e-6, dim=1, p=btm_norm))
+        else:
+            raise ValueError(f"Not supported reduction: {reduction}")
 
 def preprocess_x(x):
     return torch.from_numpy(x.transpose(0, 3, 1, 2)).float()
 
 def estimate_local_lip(model, X, top_norm, btm_norm,
-        batch_size=16, perturb_steps=10, step_size=0.003, epsilon=0.01):
+        batch_size=16, perturb_steps=10, step_size=0.003, epsilon=0.01, device="cuda"):
     model.eval()
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
     dataset = data_utils.TensorDataset(preprocess_x(X))
     loader = torch.utils.data.DataLoader(dataset,
         batch_size=batch_size, shuffle=False, num_workers=2)
@@ -36,7 +46,7 @@ def estimate_local_lip(model, X, top_norm, btm_norm,
         x = x.to(device)
         # generate adversarial example
         if btm_norm in [2, np.inf]:
-            delta = 0.001 * torch.randn(x.shape).cuda().detach()
+            delta = 0.001 * torch.randn(x.shape).to(device).detach()
             delta = torch.autograd.Variable(delta.data, requires_grad=True)
 
             # Setup optimizers
@@ -69,9 +79,9 @@ def estimate_local_lip(model, X, top_norm, btm_norm,
     return np.concatenate(ret, axis=0)
 
 def estimate_local_lip_v2(model, X, top_norm, btm_norm,
-        batch_size=16, perturb_steps=10, step_size=0.003, epsilon=0.01):
+        batch_size=16, perturb_steps=10, step_size=0.003, epsilon=0.01,
+        device="cuda"):
     model.eval()
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
     dataset = data_utils.TensorDataset(preprocess_x(X))
     loader = torch.utils.data.DataLoader(dataset,
         batch_size=batch_size, shuffle=False, num_workers=2)
@@ -82,7 +92,7 @@ def estimate_local_lip_v2(model, X, top_norm, btm_norm,
         x = x.to(device)
         # generate adversarial example
         if btm_norm in [2, np.inf]:
-            x_adv = x + 0.001 * torch.randn(x.shape).cuda()
+            x_adv = x + 0.001 * torch.randn(x.shape).to(device)
 
             # Setup optimizers
             optimizer = optim.SGD([x_adv], lr=step_size)

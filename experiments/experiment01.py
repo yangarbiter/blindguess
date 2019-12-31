@@ -15,6 +15,7 @@ def calc_lip(model, X, Xp, top_norm, btm_norm):
     return np.mean(top / (down+1e-6))
 
 def run_experiment01(auto_var):
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
     _ = set_random_seed(auto_var)
     norm = auto_var.get_var("norm")
     trnX, trny, tstX, tsty = auto_var.get_var("dataset")
@@ -33,10 +34,10 @@ def run_experiment01(auto_var):
     result = {}
     model = auto_var.get_var("model", trnX=trnX, trny=trny)
     model.tst_ds = (tstX, tsty)
-    result['model_path'] = os.path.join('./models', get_file_name(auto_var) + '.pt')
+    result['model_path'] = os.path.join('./models', get_file_name(auto_var) + '-ep%04d.pt')
     if None:
         model.load(result['model_path'])
-        model.model.cuda()
+        model.model.to(device)
     else:
         with Stopwatch("Fitting Model"):
             history = model.fit(trnX, trny)
@@ -60,11 +61,11 @@ def run_experiment01(auto_var):
 
     with Stopwatch("Estimating trn Lip"):
         trn_lip = estimate_local_lip_v2(model.model, trnX, top_norm=2, btm_norm=norm,
-                                     epsilon=auto_var.get_var("eps"))
+                                     epsilon=auto_var.get_var("eps"), device=device)
     result['avg_trn_lip'] = calc_lip(model, trnX, trn_lip, top_norm=2, btm_norm=norm).mean()
     with Stopwatch("Estimating tst Lip"):
         tst_lip = estimate_local_lip_v2(model.model, tstX, top_norm=2, btm_norm=norm,
-                                     epsilon=auto_var.get_var("eps"))
+                                     epsilon=auto_var.get_var("eps"), device=device)
     result['avg_tst_lip'] = calc_lip(model, tstX, tst_lip, top_norm=2, btm_norm=norm).mean()
     print(f"avg trn lip: {result['avg_trn_lip']}")
     print(f"avg tst lip: {result['avg_tst_lip']}")

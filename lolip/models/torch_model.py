@@ -51,6 +51,7 @@ class TorchModel(BaseEstimator):
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         self.tst_ds = None
+        self.start_epoch = 1
 
         ### Attack ####
         self.eps = eps
@@ -90,7 +91,7 @@ class TorchModel(BaseEstimator):
             test_loader = torch.utils.data.DataLoader(dataset,
                 batch_size=16, shuffle=False, num_workers=1)
 
-        for epoch in range(1, self.epochs+1):
+        for epoch in range(self.start_epoch, self.epochs+1):
             train_loss = 0.
             train_acc = 0.
             for x, y in tqdm(train_loader, desc=f"Epoch {epoch}"):
@@ -157,6 +158,7 @@ class TorchModel(BaseEstimator):
                     train_acc += (outputs.argmax(dim=1)==y).sum().float().item()
 
             scheduler.step()
+            self.start_epoch = epoch
 
             if (epoch - 1) % log_interval == 0:
                 self.model.eval()
@@ -223,9 +225,20 @@ class TorchModel(BaseEstimator):
         return np.concatenate(ret, axis=0)
 
     def save(self, path):
-        torch.save(self.model.state_dict(), path)
+        #torch.save(self.model.state_dict(), path)
+        torch.save({
+            'epoch': self.start_epoch,
+            'model_state_dict': self.model.state_dict(),
+            'optimizer_state_dict': self.optimizer.state_dict(),
+        }, path % self.start_epoch)
 
     def load(self, path):
         self.model = globals()[self.architecture](self.n_classes)
-        self.model.load_state_dict(torch.load(path))
+        loaded = torch.load(path)
+        if 'epoch' in loaded:
+            self.start_epoch = loaded['epoch']
+            self.model.load_state_dict(loaded['model_state_dict'])
+            self.optimizer.load_state_dict(loaded['optimizer_state_dict'])
+        else:
+            self.model.load_state_dict(torch.load(path))
         self.model.eval()

@@ -12,7 +12,7 @@ from lolip.variables import auto_var, get_file_name
 from autovar import AutoVar
 from autovar.hooks import get_ext
 
-from experiments import run_experiment01, run_experiment02
+from experiments import run_experiment01, run_experiment02, run_experiment03
 
 logging.basicConfig(level=0)
 tex_base = "./tex_files"
@@ -47,7 +47,7 @@ class ExpExperiments(Experiments):
         return Experiments.__new__(cls, *args, **kwargs)
 
 def get_result(auto_var):
-    file_name = get_file_name(auto_var).replace("_", "-")
+    file_name = get_file_name(auto_var)
     file_format = auto_var.settings['file_format']
     file_path = os.path.join(auto_var.settings['result_file_dir'],
                              f"{file_name}.{get_ext(file_format)}")

@@ -97,3 +97,8 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
         x_train, x_test = x_train.astype(np.float32) / 255, x_test.astype(np.float32) / 255
 
         return x_train, y_train, x_test, y_test
+
+    @register_var(argument=r"staircase(?P<n_samples>[0-9]+)", shown_name="staircase")
+    @staticmethod
+    def staircase(auto_var, inter_var, n_samples):
+        pass
