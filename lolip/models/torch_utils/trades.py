@@ -49,7 +49,7 @@ def trades_loss(model,
                                        F.softmax(model(x_natural), dim=1))
                 if version == "plus":
                     loss_kl = torch.sum(loss_kl, dim=1) \
-                            / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=np.inf, dim=1)
+                            / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
                     loss_kl = torch.sum(loss_kl)
             grad = torch.autograd.grad(loss_kl, [x_adv])[0]
             x_adv = x_adv.detach() + step_size * torch.sign(grad.detach())
@@ -72,7 +72,8 @@ def trades_loss(model,
                                            F.softmax(model(x_natural), dim=1))
                 if version == "plus":
                     loss_kl = torch.sum(loss_kl, dim=1) \
-                            / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=2, dim=1)
+                            / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
+                    loss_kl = torch.sum(loss_kl)
             loss.backward()
             # renorming gradient
             grad_norms = delta.grad.view(batch_size, -1).norm(p=2, dim=1)
@@ -98,7 +99,14 @@ def trades_loss(model,
     #outputs = F.softmax(model(x_natural), dim=1)
     outputs = model(x_natural)
     loss_natural = loss_fn(outputs, y)
-    loss_robust = (1.0 / batch_size) * criterion_kl(F.log_softmax(model(x_adv), dim=1),
-                                                    F.softmax(model(x_natural), dim=1))
+    if version == "plus":
+        loss_kl = criterion_kl(F.log_softmax(model(x_adv), dim=1),
+                                F.softmax(model(x_natural), dim=1))
+        loss_kl = torch.sum(loss_kl, dim=1) \
+                / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
+        loss_robust = (1.0 / batch_size) * torch.sum(loss_kl)
+    else:
+        loss_robust = (1.0 / batch_size) * criterion_kl(F.log_softmax(model(x_adv), dim=1),
+                                                        F.softmax(model(x_natural), dim=1))
     loss = loss_natural + beta * loss_robust
     return outputs, loss

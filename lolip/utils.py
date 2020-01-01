@@ -12,8 +12,8 @@ def local_lip(model, x, xp, top_norm, btm_norm, reduction='mean'):
     down = torch.flatten(x - xp, start_dim=1)
     if top_norm == "kl":
         criterion_kl = nn.KLDivLoss(reduction='none')
-        top = criterion_kl(F.log_softmax(model(x), dim=1),
-                           F.softmax(model(xp), dim=1))
+        top = criterion_kl(F.log_softmax(model(xp), dim=1),
+                           F.softmax(model(x), dim=1))
         ret = torch.sum(top, dim=1) / torch.norm(down + 1e-6, dim=1, p=btm_norm)
     else:
         top = torch.flatten(model(x), start_dim=1) - torch.flatten(model(xp), start_dim=1)
