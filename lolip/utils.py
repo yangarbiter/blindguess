@@ -18,6 +18,7 @@ def local_lip(model, x, xp, top_norm, btm_norm, reduction='mean'):
     else:
         top = torch.flatten(model(x), start_dim=1) - torch.flatten(model(xp), start_dim=1)
         ret = torch.norm(top, dim=1, p=top_norm) / torch.norm(down + 1e-6, dim=1, p=btm_norm)
+
     if reduction == 'mean':
         return torch.mean(ret)
     elif reduction == 'sum':

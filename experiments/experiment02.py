@@ -16,11 +16,10 @@ def load_model(auto_var, trnX, trny, tstX, tsty):
     model_path = get_file_name(auto_var).split("-")
     model_path[0] = 'pgd'
     model_path = '-'.join(model_path)
-    model_path = os.path.join('./models', model_path + '.pt')
-    try:
-        model_path = model_path % model.epochs
-    except:
-        model_path = model_path
+    if os.path.exists(os.path.join('./models', model_path + '-ep%04d.pt') % model.epochs):
+        model_path = os.path.join('./models', model_path + '-ep%04d.pt') % model.epochs
+    else:
+        model_path = os.path.join('./models', model_path + '.pt')
 
     model.load(model_path)
     model.model.cuda()
