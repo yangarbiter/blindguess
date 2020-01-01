@@ -8,6 +8,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from .utils import set_random_seed
 from lolip.utils import estimate_local_lip_v2
 from lolip.variables import get_file_name
+from .experiment02 import load_model
 
 
 def run_experiment03(auto_var):
@@ -19,16 +20,17 @@ def run_experiment03(auto_var):
     n_classes = len(np.unique(trny))
 
     result = {}
-    model = auto_var.get_var("model", trnX=trnX, trny=trny)
-    model.tst_ds = (tstX, tsty)
-    model_path = get_file_name(auto_var).split("-")
-    model_path[0] = 'pgd'
-    model_path = '-'.join(model_path)
-    model_path = os.path.join('./models', model_path + '.pt')
-    result['model_path'] = model_path
+    result['model_path'], model = load_model(auto_var, trnX, trny, tstX, tsty)
 
-    model.load(result['model_path'])
-    model.model.cuda()
+    #model = auto_var.get_var("model", trnX=trnX, trny=trny)
+    #model.tst_ds = (tstX, tsty)
+    #model_path = get_file_name(auto_var).split("-")
+    #model_path[0] = 'pgd'
+    #model_path = '-'.join(model_path)
+    #model_path = os.path.join('./models', model_path + '.pt')
+    #result['model_path'] = model_path
+    #model.load(result['model_path'])
+    #model.model.cuda()
 
     result['trn_acc'] = (model.predict(trnX) == trny).mean()
     result['tst_acc'] = (model.predict(tstX) == tsty).mean()
