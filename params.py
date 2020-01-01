@@ -36,6 +36,7 @@ class mnistOtherLips(ExpExperiments):
             'model': [
                 f'ce-tor-{arch}',
                 f'trades10ce-tor-{arch}',
+                f'ptrades20ce-tor-{arch}',
                 f'curece-tor-{arch}',
                 f'advce-tor-{arch}',
                 f'llrce-tor-{arch}',
@@ -65,6 +66,7 @@ class mnistLip(ExpExperiments):
                 f'trades10ce-tor-{arch}',
                 f'trades20ce-tor-{arch}',
                 f'ptrades10ce-tor-{arch}',
+                f'ptrades20ce-tor-{arch}',
                 f'curece-tor-{arch}',
                 f'cure68ce-tor-{arch}',
                 f'advce-tor-{arch}',
@@ -83,6 +85,7 @@ class mnistLip(ExpExperiments):
             'model': [
                 f'ce-tor-{arch}',
                 f'trades10ce-tor-{arch}',
+                f'ptrades20ce-tor-{arch}',
                 f'curece-tor-{arch}',
                 f'advce-tor-{arch}',
                 f'advce-tor-{arch}-lrem3',
