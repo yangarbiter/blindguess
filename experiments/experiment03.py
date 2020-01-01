@@ -54,7 +54,7 @@ def run_experiment03(auto_var):
         result['trn_lip_kl_pert'] = pert
         result['avg_trn_lip_kl'] = trn_lip_kl
     with Stopwatch("Estimating tst Lip (KL)"):
-        tst_lip_kl, pert = estimate_local_lip_v2(model.model, tstX, top_norm=1, btm_norm=norm,
+        tst_lip_kl, pert = estimate_local_lip_v2(model.model, tstX, top_norm='kl', btm_norm=norm,
                                      epsilon=auto_var.get_var("eps"))
         result['tst_lip_kl_pert'] = pert
         result['avg_tst_lip_kl'] = tst_lip_kl

@@ -72,7 +72,7 @@ def get_result(auto_var):
     return ret
 
 def params_to_dataframe(grid_param, columns: List[Union[tuple, str]],
-                        proc_fns: Optional[List[Union[Callable, None]]] = None,
+                        proc_fns: Optional[List[Union[Callable]]] = None,
                         file_format=None, result_file_dir=None, logging_level=logging.INFO):
     #{'file_format': 'pickle', 'result_file_dir': './results/normal'}
     auto_var.set_logging_level(logging_level)
