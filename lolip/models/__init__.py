@@ -27,6 +27,8 @@ def get_hyper(name, loss, arch, dataset_name):
             ret['learning_rate'] = 1e-5
         elif 'llr' in loss:
             ret['learning_rate'] = 1e-3
+        elif 'cure' in loss:
+            ret['learning_rate'] = 1e-3
         else:
             ret['learning_rate'] = 1e-2
         ret['batch_size'] = 64
