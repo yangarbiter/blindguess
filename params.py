@@ -24,6 +24,7 @@ class mnistOtherLips(ExpExperiments):
                 f'llr65ce-tor-{arch}',
                 f'llrce-tor-{arch}',
                 f'gr4ce-tor-{arch}',
+                f'advkld-tor-{arch}',
             ],
             'eps': [0.1],
             'norm': ['inf'],
@@ -41,6 +42,7 @@ class mnistOtherLips(ExpExperiments):
                 f'advce-tor-{arch}',
                 f'llrce-tor-{arch}',
                 f'gr4ce-tor-{arch}',
+                f'advkld-tor-{arch}',
             ],
             'eps': [0.1],
             'norm': ['inf'],
@@ -73,6 +75,8 @@ class mnistLip(ExpExperiments):
                 f'llr65ce-tor-{arch}',
                 f'llrce-tor-{arch}',
                 f'gr4ce-tor-{arch}',
+                f'kld-tor-{arch}',
+                f'advkld-tor-{arch}',
             ],
             'eps': [0.1],
             'norm': ['inf'],
@@ -88,9 +92,11 @@ class mnistLip(ExpExperiments):
                 f'ptrades20ce-tor-{arch}',
                 f'curece-tor-{arch}',
                 f'advce-tor-{arch}',
-                f'advce-tor-{arch}-lrem3',
+                #f'advce-tor-{arch}-lrem3',
                 f'llrce-tor-{arch}',
                 f'gr4ce-tor-{arch}',
+                f'kld-tor-{arch}',
+                f'advkld-tor-{arch}',
             ],
             'eps': [0.1],
             'norm': ['inf'],
@@ -138,6 +144,30 @@ class svhnLip(ExpExperiments):
                 'curece-tor-WRN_40_10',
                 'advce-tor-WRN_40_10',
                 'llrce-tor-WRN_40_10',
+                'gr4ce-tor-WRN_40_10',
+                'advkld-tor-WRN_40_10',
+            ],
+            'eps': [0.031],
+            'norm': ['inf'],
+            'attack': ['pgd'],
+            'random_seed': random_seed,
+        })
+        cls.grid_params = grid_params
+        return ExpExperiments.__new__(cls, *args, **kwargs)
+
+class svhnOtherLips(ExpExperiments):
+    def __new__(cls, *args, **kwargs):
+        cls.name = "svhn"
+        cls.experiment_fn = 'experiment03'
+        grid_params = []
+        grid_params.append({
+            'dataset': ['svhn'],
+            'model': [
+                'ce-tor-WRN_40_10',
+                'trades6ce-tor-WRN_40_10',
+                'curece-tor-WRN_40_10',
+                'advce-tor-WRN_40_10',
+                'llrce-tor-WRN_40_10',
             ],
             'eps': [0.031],
             'norm': ['inf'],
@@ -161,6 +191,7 @@ class cifarLip(ExpExperiments):
                 'curece-tor-WRN_40_10',
                 'advce-tor-WRN_40_10',
                 'llrce-tor-WRN_40_10',
+                'gr4ce-tor-WRN_40_10',
             ],
             'eps': [0.031],
             'norm': ['inf'],
@@ -178,5 +209,27 @@ class cifarLip(ExpExperiments):
         #    'attack': ['pgd'],
         #    'random_seed': random_seed,
         #})
+        cls.grid_params = grid_params
+        return ExpExperiments.__new__(cls, *args, **kwargs)
+
+class cifarOtherLips(ExpExperiments):
+    def __new__(cls, *args, **kwargs):
+        cls.name = "cifar"
+        cls.experiment_fn = 'experiment03'
+        grid_params = []
+        grid_params.append({
+            'dataset': ['cifar10'],
+            'model': [
+                'ce-tor-WRN_40_10',
+                'trades6ce-tor-WRN_40_10',
+                'curece-tor-WRN_40_10',
+                'advce-tor-WRN_40_10',
+                'llrce-tor-WRN_40_10',
+            ],
+            'eps': [0.031],
+            'norm': ['inf'],
+            'attack': ['pgd'],
+            'random_seed': random_seed,
+        })
         cls.grid_params = grid_params
         return ExpExperiments.__new__(cls, *args, **kwargs)
