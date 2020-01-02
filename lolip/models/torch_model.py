@@ -132,6 +132,8 @@ class TorchModel(BaseEstimator):
                 elif 'cure' in self.loss_name:
                     if 'cure68' in self.loss_name:
                         h, lambda_ = 6.0, 8.0
+                    elif 'cure14' in self.loss_name:
+                        h, lambda_ = 1.25, 4.0
                     else:
                         h, lambda_ = 3.0, 4.0
 
@@ -140,6 +142,10 @@ class TorchModel(BaseEstimator):
                 elif 'gr' in self.loss_name:
                     if 'gr4' in self.loss_name:
                         lambd = 4.0
+                    elif 'gr1e3' in self.loss_name:
+                        lambd = 1e3
+                    elif 'gr1e2' in self.loss_name:
+                        lambd = 1e2
                     else:
                         lambd = 1.0
                     outputs, loss = gradient_regularization(

@@ -26,11 +26,6 @@ def load_model(auto_var, trnX, trny, tstX, tsty):
     return model_path, model
 
 
-def calc_lip(model, X, Xp, top_norm, btm_norm):
-    top = np.linalg.norm(model.predict_real(X)-model.predict_real(Xp), ord=top_norm, axis=1)
-    down = np.linalg.norm(X.reshape(len(Xp), -1)-Xp.reshape(len(Xp), -1), ord=btm_norm, axis=1)
-    return np.mean(top / (down+1e-6))
-
 def run_experiment02(auto_var):
     _ = set_random_seed(auto_var)
     #norm = auto_var.get_var("norm")

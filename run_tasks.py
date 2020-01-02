@@ -9,7 +9,9 @@ from params import (
     mnistLip,
     mnistOtherLips,
     cifarLip,
+    cifarOtherLips,
     svhnLip,
+    svhnOtherLips,
 )
 from utils import setup_experiments
 
@@ -22,7 +24,9 @@ def main(auto_var):
         mnistLip(),
         mnistOtherLips(),
         cifarLip(),
+        cifarOtherLips(),
         svhnLip(),
+        svhnOtherLips(),
     ]
     grid_params = []
     for exp in experiments:
