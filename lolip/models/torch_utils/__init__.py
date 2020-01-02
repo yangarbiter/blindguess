@@ -1,5 +1,7 @@
+import torch
 from torch import optim
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.optim.lr_scheduler import MultiStepLR
 
 from .optimizer_nadam import Nadam
@@ -19,11 +21,28 @@ def get_optimizer(model, optimizer: str, learning_rate: float, momentum):
         raise ValueError(f"Not supported optimizer {optimizer}")
     return ret
 
+
+class CustomKLDivLoss(nn.KLDivLoss):
+    __constants__ = ['reduction']
+
+    def __init__(self, size_average=None, reduce=None, reduction='mean'):
+        super(CustomKLDivLoss, self).__init__(size_average, reduce, reduction)
+
+    def forward(self, inputs, target):
+        nb_classes = inputs.shape[1]
+        y_onehot = torch.zeros_like(inputs) + 1e-6
+        y_onehot = y_onehot.scatter_(1, target.unsqueeze(1), 1 - (1e-6*(nb_classes-1)))
+
+        return F.kl_div(F.log_softmax(inputs, dim=1),
+                        y_onehot, reduction=self.reduction)
+
 def get_loss(loss_name: str):
     if 'ce' in loss_name:
         ret = nn.CrossEntropyLoss(reduction='sum')
     elif 'mse' in loss_name:
         ret = nn.MSELoss(reduction='sum')
+    elif 'kld' in loss_name:
+        ret = CustomKLDivLoss(reduction='sum')
     else:
         raise ValueError(f"Not supported loss {loss_name}")
     return ret
