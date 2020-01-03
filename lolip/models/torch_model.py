@@ -100,6 +100,10 @@ class TorchModel(BaseEstimator):
                 if 'trades' in self.loss_name:
                     if 'trades10' in self.loss_name:
                         beta = 10.0
+                    elif 'trades20' in self.loss_name:
+                        beta = 20.0
+                    elif 'trades16' in self.loss_name:
+                        beta = 16.0
                     elif 'trades6' in self.loss_name:
                         beta = 6.0
                     else:
@@ -244,12 +248,11 @@ class TorchModel(BaseEstimator):
         }, path % self.start_epoch)
 
     def load(self, path):
-        self.model = globals()[self.architecture](self.n_classes)
         loaded = torch.load(path)
         if 'epoch' in loaded:
             self.start_epoch = loaded['epoch']
             self.model.load_state_dict(loaded['model_state_dict'])
             self.optimizer.load_state_dict(loaded['optimizer_state_dict'])
         else:
-            self.model.load_state_dict(torch.load(path))
+            self.model.load_state_dict(loaded)
         self.model.eval()

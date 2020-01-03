@@ -102,3 +102,24 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
     @staticmethod
     def staircase(auto_var, inter_var, n_samples):
         pass
+
+    @register_var(argument=r"tinyimgnet", shown_name="tinyimgnet")
+    @staticmethod
+    def tinyimgnet(auto_var, inter_var):
+        from torchvision.datasets import ImageFolder
+        ImageFolder("./data/")
+
+
+    @register_var(argument=r"halfmoon_(?P<n_samples>\d+)", shown_name="halfmoon")
+    @staticmethod
+    def halfmoon(auto_var, inter_var, n_samples):
+        """halfmoon dataset, n_samples gives the number of samples"""
+        from sklearn.datasets import make_moons
+        from sklearn.model_selection import train_test_split
+
+        n_samples = int(n_samples)
+        random_seed = auto_var.get_var("random_seed")
+        X, y = make_moons(n_samples=n_samples, noise=0.25, random_state=random_seed)
+        trnX, trny, tstX, tsty = train_test_split(X, y, random_state=random_seed)
+
+        return trnX, trny, tstX, tsty

@@ -28,8 +28,7 @@ def run_experiment01(auto_var):
     #tstX -= 0.5
     #img_shape = trnX.shape[1:]
     #scaler = StandardScaler(with_std=False)
-    #trnX = scaler.fit_transform(trnX.reshape(len(trnX), -1)).reshape(
-    #        (len(trnX), ) + img_shape)
+    #trnX = scaler.fit_transform(trnX.reshape(len(trnX), -1)).reshape((len(trnX), ) + img_shape)
     #tstX = scaler.transform(tstX.reshape(len(tstX), -1)).reshape((len(tstX), ) + img_shape)
 
     result = {}
