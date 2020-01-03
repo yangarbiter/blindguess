@@ -51,6 +51,35 @@ class mnistOtherLips(ExpExperiments):
         cls.grid_params = grid_params
         return ExpExperiments.__new__(cls, *args, **kwargs)
 
+class noisyMnistLip(ExpExperiments):
+    def __new__(cls, *args, **kwargs):
+        cls.name = "noisymnist"
+        cls.experiment_fn = 'experiment01'
+        grid_params = []
+        arch = "CNN002"
+        grid_params.append({
+            'dataset': ['noisymnist-0.15', 'noisyfashion-0.1'],
+            'model': [
+                f'ce-tor-{arch}',
+                #f'trades6ce-tor-{arch}',
+                f'trades10ce-tor-{arch}',
+                #f'trades20ce-tor-{arch}',
+                f'ptrades6ce-tor-{arch}',
+                #f'curece-tor-{arch}',
+                #f'cure14ce-tor-{arch}',
+                f'advce-tor-{arch}',
+                #f'llrce-tor-{arch}',
+                #f'gr4ce-tor-{arch}',
+                #f'kld-tor-{arch}',
+                f'advkld-tor-{arch}',
+            ],
+            'eps': [0.1],
+            'norm': ['inf'],
+            'attack': ['pgd'],
+            'random_seed': random_seed,
+        })
+        cls.grid_params = grid_params
+        return ExpExperiments.__new__(cls, *args, **kwargs)
 
 class mnistLip(ExpExperiments):
     def __new__(cls, *args, **kwargs):

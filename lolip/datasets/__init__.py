@@ -103,6 +103,32 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
     def staircase(auto_var, inter_var, n_samples):
         pass
 
+    @register_var(argument=r"noisyfashion-(?P<noisy_level>0\.\d+|\d+)", shown_name="noisyfashion")
+    @staticmethod
+    def noisyfashion(auto_var, noisy_level):
+        noisy_level = float(noisy_level)
+        trnX, trny, tstX, tsty = auto_var.get_var_with_argument("dataset", "fashion")
+        flips = int(len(trny) * noisy_level)
+
+        random_state = np.random.RandomState(auto_var.get_var("random_seed"))
+        idx = random_state.choice(np.arange(len(trny)), size=flips, replace=False)
+        trny[idx] = random_state.choice(np.arange(10), size=flips)
+
+        return trnX, trny, tstX, tsty
+
+    @register_var(argument=r"noisymnist-(?P<noisy_level>0\.\d+|\d+)", shown_name="noisymnist")
+    @staticmethod
+    def noisymnist(auto_var, noisy_level):
+        noisy_level = float(noisy_level)
+        trnX, trny, tstX, tsty = auto_var.get_var_with_argument("dataset", "mnist")
+        flips = int(len(trny) * noisy_level)
+
+        random_state = np.random.RandomState(auto_var.get_var("random_seed"))
+        idx = random_state.choice(np.arange(len(trny)), size=flips, replace=False)
+        trny[idx] = random_state.choice(np.arange(10), size=flips)
+
+        return trnX, trny, tstX, tsty
+
     @register_var(argument=r"tinyimgnet", shown_name="tinyimgnet")
     @staticmethod
     def tinyimgnet(auto_var, inter_var):
