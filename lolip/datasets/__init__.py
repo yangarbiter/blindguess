@@ -109,6 +109,8 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
         noisy_level = float(noisy_level)
         trnX, trny, tstX, tsty = auto_var.get_var_with_argument("dataset", "fashion")
         flips = int(len(trny) * noisy_level)
+        trny = np.copy(trny)
+        trny.setflags(write=1)
 
         random_state = np.random.RandomState(auto_var.get_var("random_seed"))
         idx = random_state.choice(np.arange(len(trny)), size=flips, replace=False)
