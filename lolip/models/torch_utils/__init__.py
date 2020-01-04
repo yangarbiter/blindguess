@@ -36,13 +36,13 @@ class CustomKLDivLoss(nn.KLDivLoss):
         return F.kl_div(F.log_softmax(inputs, dim=1),
                         y_onehot, reduction=self.reduction)
 
-def get_loss(loss_name: str):
+def get_loss(loss_name: str, reduction='sum'):
     if 'ce' in loss_name:
-        ret = nn.CrossEntropyLoss(reduction='sum')
+        ret = nn.CrossEntropyLoss(reduction=reduction)
     elif 'mse' in loss_name:
-        ret = nn.MSELoss(reduction='sum')
+        ret = nn.MSELoss(reduction=reduction)
     elif 'kld' in loss_name:
-        ret = CustomKLDivLoss(reduction='sum')
+        ret = CustomKLDivLoss(reduction=reduction)
     else:
         raise ValueError(f"Not supported loss {loss_name}")
     return ret

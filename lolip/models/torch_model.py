@@ -16,6 +16,7 @@ from ..attacks.torch.projected_gradient_descent import projected_gradient_descen
 from .torch_utils.trades import trades_loss
 from .torch_utils.llr import locally_linearity_regularization
 from .torch_utils.cure import cure_loss
+from .torch_utils.lip_loss import lip_loss
 from .torch_utils.gradient_regularization import gradient_regularization
 
 DEBUG = int(os.getenv("DEBUG", 0))
@@ -76,7 +77,10 @@ class TorchModel(BaseEstimator):
         log_interval = 1
 
         history = []
-        loss_fn = get_loss(self.loss_name)
+        if 'lipl' in self.loss_name:
+            loss_fn = get_loss(self.loss_name, reduction="none")
+        else:
+            loss_fn = get_loss(self.loss_name, reduction="sum")
         scheduler = get_scheduler(self.optimizer, n_epochs=self.epochs)
 
         dataset = self._get_dataset(X, y)
@@ -123,6 +127,17 @@ class TorchModel(BaseEstimator):
                         step_size=self.eps*2/steps, epsilon=self.eps, perturb_steps=steps, beta=beta,
                         version=version, device=self.device
                     )
+                elif 'lipl' in self.loss_name:
+                    if 'K20' in self.loss_name:
+                        steps = 20
+                    else:
+                        steps = 10
+                    loss = lip_loss(
+                        self.model, loss_fn, x, y, nb_classes=self.n_classes, norm=self.norm,
+                        optimizer=self.optimizer, step_size=self.eps*2/steps, epsilon=self.eps,
+                        perturb_steps=steps, device=self.device
+                    )
+                    outputs = self.model(x)
                 elif 'llr' in self.loss_name:
                     if 'llr65' in self.loss_name:
                         lambd, mu = 6.0, 5.0
@@ -191,7 +206,10 @@ class TorchModel(BaseEstimator):
                         for tx, ty in test_loader:
                             tx, ty = tx.to(self.device), ty.to(self.device)
                             outputs = self.model(tx)
-                            loss = loss_fn(outputs, ty)
+                            if loss_fn.reduction == 'none':
+                                loss = torch.sum(loss_fn(outputs, ty))
+                            else:
+                                loss = loss_fn(outputs, ty)
                             tst_loss += loss.item()
                             tst_acc += (outputs.argmax(dim=1)==ty).sum().float().item()
                     history[-1]['tst_loss'] = tst_loss / len(test_loader.dataset)

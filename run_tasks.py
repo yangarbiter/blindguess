@@ -8,10 +8,10 @@ from lolip.variables import auto_var, get_file_name
 from params import (
     noisyMnistLip,
     mnistLip,
-    mnistOtherLips,
     cifarLip,
-    cifarOtherLips,
     svhnLip,
+    mnistOtherLips,
+    cifarOtherLips,
     svhnOtherLips,
 )
 from utils import setup_experiments
@@ -22,13 +22,12 @@ DEBUG = True if os.environ.get('DEBUG', False) else False
 
 def main(auto_var):
     experiments = [
-        noisyMnistLip(),
+        svhnOtherLips(),
+        cifarOtherLips(),
         mnistLip(),
         mnistOtherLips(),
         cifarLip(),
-        cifarOtherLips(),
         svhnLip(),
-        svhnOtherLips(),
     ]
     grid_params = []
     for exp in experiments:

@@ -90,6 +90,7 @@ class mnistLip(ExpExperiments):
         grid_params.append({
             'dataset': ['mnist', 'fashion'],
             'model': [
+                f'liplkld-tor-{arch}',
                 f'ce-tor-{arch}',
                 #f'tradesce-tor-{arch}',
                 f'trades6ce-tor-{arch}',
@@ -116,6 +117,7 @@ class mnistLip(ExpExperiments):
         grid_params.append({
             'dataset': ['mnist', 'fashion'],
             'model': [
+                f'liplkld-tor-{arch}',
                 f'ce-tor-{arch}',
                 f'trades10ce-tor-{arch}',
                 f'trades20ce-tor-{arch}',
