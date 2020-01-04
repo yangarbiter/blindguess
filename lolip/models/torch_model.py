@@ -112,12 +112,12 @@ class TorchModel(BaseEstimator):
                         beta = 6.0
                     else:
                         beta = 1.0
-                    
+
                     if 'K20' in self.loss_name:
                         steps = 20
                     else:
                         steps = 10
-                    
+
                     version = None
                     if 'ptrades' in self.loss_name:
                         version = "plus"
@@ -125,6 +125,7 @@ class TorchModel(BaseEstimator):
                         version = "plussum"
                     elif 'strades' in self.loss_name:
                         version = "sum"
+                    #import ipdb; ipdb.set_trace()
 
                     outputs, loss = trades_loss(
                         self.model, loss_fn, x, y, norm=self.norm, optimizer=self.optimizer,

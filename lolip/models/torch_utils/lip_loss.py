@@ -109,7 +109,7 @@ def lip_loss(model,
     loss_kl = loss_fn(model(x_adv), y)
     #loss_kl = torch.sum(loss_kl, dim=1) \
     #        / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
-    if len(loss_kl.shape) == 2:
+    if len(loss_kl.shape) == 2: # kld loss
         loss_kl = torch.sum(loss_kl, dim=1) \
                 / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
     else:
