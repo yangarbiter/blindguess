@@ -122,7 +122,7 @@ class TorchModel(BaseEstimator):
                     if 'ptrades' in self.loss_name:
                         version = "plus"
                     elif 'pstrades' in self.loss_name:
-                        version = "sumplus"
+                        version = "plussum"
                     elif 'strades' in self.loss_name:
                         version = "sum"
 

@@ -179,9 +179,8 @@ class svhnLip(ExpExperiments):
             'dataset': ['svhn'],
             'model': [
                 'ce-tor-WRN_40_10',
-                'trades384ce-tor-WRN_40_10',
+                'strades6ce-tor-WRN_40_10',
                 'trades6ce-tor-WRN_40_10',
-                'trades10ce-tor-WRN_40_10',
                 'ptrades10ce-tor-WRN_40_10',
                 'curece-tor-WRN_40_10',
                 'advce-tor-WRN_40_10-lrem2',
@@ -231,8 +230,8 @@ class cifarLip(ExpExperiments):
             'dataset': ['cifar10'],
             'model': [
                 'ce-tor-WRN_40_10',
+                'strades6ce-tor-WRN_40_10',
                 'trades6ce-tor-WRN_40_10',
-                'trades384ce-tor-WRN_40_10',
                 'curece-tor-WRN_40_10',
                 'advce-tor-WRN_40_10-lrem2',
                 'llrce-tor-WRN_40_10',
