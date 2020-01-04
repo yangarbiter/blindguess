@@ -45,8 +45,14 @@ def lip_loss(model,
                 #loss_kl = criterion_kl(F.log_softmax(model(x_adv), dim=1),
                 #                       one_hot(y, nb_classes))
                 loss_kl = loss_fn(model(x_adv), y)
-                loss_kl = torch.sum(loss_kl, dim=1) \
-                        / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
+                #loss_kl = torch.sum(loss_kl, dim=1) \
+                #        / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
+                if len(loss_kl.shape) == 2:
+                    loss_kl = torch.sum(loss_kl, dim=1) \
+                            / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
+                else:
+                    loss_kl = torch.sum(loss_kl) \
+                            / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
                 loss_kl = torch.sum(loss_kl)
             grad = torch.autograd.grad(loss_kl, [x_adv])[0]
             x_adv = x_adv.detach() + step_size * torch.sign(grad.detach())
@@ -60,7 +66,7 @@ def lip_loss(model,
         optimizer_delta = optim.SGD([delta], lr=epsilon / perturb_steps * 2)
 
         for _ in range(perturb_steps):
-            adv = x_natural + delta
+            x_adv = x_natural + delta
 
             # optimize
             optimizer_delta.zero_grad()
@@ -68,9 +74,13 @@ def lip_loss(model,
                 #loss = (-1) * criterion_kl(F.log_softmax(model(adv), dim=1),
                 #                           one_hot(y, nb_classes))
                 loss_kl = (-1) * loss_fn(model(x_adv), y)
-                loss_kl = torch.sum(loss_kl, dim=1) \
-                        / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
-                loss_kl = torch.sum(loss_kl)
+                if len(loss_kl.shape) == 2:
+                    loss_kl = torch.sum(loss_kl, dim=1) \
+                            / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
+                else:
+                    loss_kl = torch.sum(loss_kl) \
+                            / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
+                loss = torch.sum(loss_kl)
             loss.backward()
             # renorming gradient
             grad_norms = delta.grad.view(batch_size, -1).norm(p=2, dim=1)
@@ -97,8 +107,14 @@ def lip_loss(model,
     #loss_kl = criterion_kl(F.log_softmax(model(x_adv), dim=1),
     #                       one_hot(y, nb_classes))
     loss_kl = loss_fn(model(x_adv), y)
-    loss_kl = torch.sum(loss_kl, dim=1) \
-            / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
-    loss_robust = (1.0 / batch_size) * torch.sum(loss_kl)
+    #loss_kl = torch.sum(loss_kl, dim=1) \
+    #        / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
+    if len(loss_kl.shape) == 2:
+        loss_kl = torch.sum(loss_kl, dim=1) \
+                / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
+    else:
+        loss_kl = torch.sum(loss_kl) \
+                / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
+    loss_robust = torch.sum(loss_kl)
 
     return loss_robust

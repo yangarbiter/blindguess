@@ -121,6 +121,10 @@ class TorchModel(BaseEstimator):
                     version = None
                     if 'ptrades' in self.loss_name:
                         version = "plus"
+                    elif 'pstrades' in self.loss_name:
+                        version = "sumplus"
+                    elif 'strades' in self.loss_name:
+                        version = "sum"
 
                     outputs, loss = trades_loss(
                         self.model, loss_fn, x, y, norm=self.norm, optimizer=self.optimizer,

@@ -15,7 +15,7 @@ class mnistOtherLips(ExpExperiments):
                 f'ce-tor-{arch}',
                 #f'tradesce-tor-{arch}',
                 f'trades10ce-tor-{arch}',
-                f'trades20ce-tor-{arch}',
+                #f'trades20ce-tor-{arch}',
                 f'ptrades6ce-tor-{arch}',
                 f'curece-tor-{arch}',
                 #f'cure68ce-tor-{arch}',
@@ -90,7 +90,10 @@ class mnistLip(ExpExperiments):
         grid_params.append({
             'dataset': ['mnist', 'fashion'],
             'model': [
+                f'strades6ce-tor-{arch}',
+                f'stradesce-tor-{arch}',
                 f'liplkld-tor-{arch}',
+                f'liplce-tor-{arch}',
                 f'ce-tor-{arch}',
                 #f'tradesce-tor-{arch}',
                 f'trades6ce-tor-{arch}',
@@ -117,7 +120,10 @@ class mnistLip(ExpExperiments):
         grid_params.append({
             'dataset': ['mnist', 'fashion'],
             'model': [
+                f'strades6ce-tor-{arch}',
+                f'stradesce-tor-{arch}',
                 f'liplkld-tor-{arch}',
+                f'liplce-tor-{arch}',
                 f'ce-tor-{arch}',
                 f'trades10ce-tor-{arch}',
                 f'trades20ce-tor-{arch}',
@@ -173,6 +179,7 @@ class svhnLip(ExpExperiments):
             'dataset': ['svhn'],
             'model': [
                 'ce-tor-WRN_40_10',
+                'trades384ce-tor-WRN_40_10',
                 'trades6ce-tor-WRN_40_10',
                 'trades10ce-tor-WRN_40_10',
                 'ptrades10ce-tor-WRN_40_10',
@@ -225,6 +232,7 @@ class cifarLip(ExpExperiments):
             'model': [
                 'ce-tor-WRN_40_10',
                 'trades6ce-tor-WRN_40_10',
+                'trades384ce-tor-WRN_40_10',
                 'curece-tor-WRN_40_10',
                 'advce-tor-WRN_40_10-lrem2',
                 'llrce-tor-WRN_40_10',

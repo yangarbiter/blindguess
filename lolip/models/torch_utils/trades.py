@@ -25,7 +25,7 @@ def trades_loss(model,
                 device="gpu"):
     # define KL-loss
     #criterion_kl = nn.KLDivLoss(size_average=False)
-    if version == "plus":
+    if "plus" in version:
         criterion_kl = nn.KLDivLoss(reduction='none')
     else:
         criterion_kl = nn.KLDivLoss(reduction='sum')
@@ -39,7 +39,7 @@ def trades_loss(model,
             with torch.enable_grad():
                 loss_kl = criterion_kl(F.log_softmax(model(x_adv), dim=1),
                                        F.softmax(model(x_natural), dim=1))
-                if version == "plus":
+                if "plus" in version:
                     loss_kl = torch.sum(loss_kl, dim=1) \
                             / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
                     loss_kl = torch.sum(loss_kl)
@@ -62,10 +62,10 @@ def trades_loss(model,
             with torch.enable_grad():
                 loss = (-1) * criterion_kl(F.log_softmax(model(adv), dim=1),
                                            F.softmax(model(x_natural), dim=1))
-                if version == "plus":
+                if "plus" in version:
                     loss_kl = torch.sum(loss_kl, dim=1) \
                             / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
-                    loss_kl = torch.sum(loss_kl)
+                    loss = torch.sum(loss_kl)
             loss.backward()
             # renorming gradient
             grad_norms = delta.grad.view(batch_size, -1).norm(p=2, dim=1)
@@ -91,7 +91,7 @@ def trades_loss(model,
     #outputs = F.softmax(model(x_natural), dim=1)
     outputs = model(x_natural)
     loss_natural = loss_fn(outputs, y)
-    if version == "plus":
+    if "plus" in version:
         loss_kl = criterion_kl(F.log_softmax(model(x_adv), dim=1),
                                 F.softmax(model(x_natural), dim=1))
         loss_kl = torch.sum(loss_kl, dim=1) \
@@ -100,5 +100,9 @@ def trades_loss(model,
     else:
         loss_robust = (1.0 / batch_size) * criterion_kl(F.log_softmax(model(x_adv), dim=1),
                                                         F.softmax(model(x_natural), dim=1))
-    loss = loss_natural + beta * loss_robust
+    import ipdb; ipdb.set_trace()
+    if "sum" in version:
+        loss = loss_natural + beta * batch_size * loss_robust
+    else:
+        loss = loss_natural + beta * loss_robust
     return outputs, loss
