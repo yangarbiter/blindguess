@@ -100,7 +100,6 @@ def trades_loss(model,
     else:
         loss_robust = (1.0 / batch_size) * criterion_kl(F.log_softmax(model(x_adv), dim=1),
                                                         F.softmax(model(x_natural), dim=1))
-    import ipdb; ipdb.set_trace()
     if "sum" in version:
         loss = loss_natural + beta * batch_size * loss_robust
     else:
