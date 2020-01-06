@@ -23,6 +23,8 @@ def get_hyper(name, loss, arch, dataset_name):
 
         if 'adv' in loss:
             ret['learning_rate'] = 1e-3
+        elif 'pstrades' in loss:
+            ret['learning_rate'] = 1e-5
         elif 'cure' in loss:
             ret['learning_rate'] = 1e-5
         elif 'llr' in loss:
