@@ -73,6 +73,7 @@ class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
         params['n_classes'] = n_classes
         params['train_type'] = train
         params['architecture'] = arch
+        #params['n_channels'] = n_channels
         #params['ckpt_dir'] = f"./checkpoints/{auto_var.get_variable_name('model')}"
         #if hyper == "gd":
         #    params['batch_size'] = len(trnX)

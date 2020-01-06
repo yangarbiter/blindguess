@@ -24,8 +24,8 @@ DEBUG = int(os.getenv("DEBUG", 0))
 
 class TorchModel(BaseEstimator):
     def __init__(self, lbl_enc, n_features, n_classes, loss_name='ce',
-                learning_rate=1e-4, momentum=0.0, batch_size=256, epochs=20,
-                optimizer='sgd', architecture='arch_001', random_state=None,
+                n_channels=None, learning_rate=1e-4, momentum=0.0, batch_size=256,
+                epochs=20, optimizer='sgd', architecture='arch_001', random_state=None,
                 callbacks=None, train_type=None, eps:float=0.1, norm=np.inf):
         print(f'lr: {learning_rate}, opt: {optimizer}, loss: {loss_name}, '
               f'arch: {architecture}')
@@ -166,6 +166,8 @@ class TorchModel(BaseEstimator):
                 elif 'gr' in self.loss_name:
                     if 'gr4' in self.loss_name:
                         lambd = 4.0
+                    elif 'gr1e4' in self.loss_name:
+                        lambd = 1e4
                     elif 'gr1e3' in self.loss_name:
                         lambd = 1e3
                     elif 'gr1e2' in self.loss_name:

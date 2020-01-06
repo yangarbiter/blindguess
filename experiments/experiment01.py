@@ -23,6 +23,7 @@ def run_experiment01(auto_var):
     lbl_enc = OneHotEncoder(categories=[np.sort(np.unique(trny))], sparse=False).fit(trny.reshape(-1, 1))
     auto_var.set_intermidiate_variable("lbl_enc", lbl_enc)
     n_classes = len(np.unique(trny))
+    n_channels = trnX.shape[-1]
 
     #trnX -= 0.5
     #tstX -= 0.5
@@ -32,6 +33,7 @@ def run_experiment01(auto_var):
     #tstX = scaler.transform(tstX.reshape(len(tstX), -1)).reshape((len(tstX), ) + img_shape)
 
     result = {}
+    #model = auto_var.get_var("model", trnX=trnX, trny=trny, n_channels=n_channels)
     model = auto_var.get_var("model", trnX=trnX, trny=trny)
     model.tst_ds = (tstX, tsty)
     result['model_path'] = os.path.join('./models', get_file_name(auto_var) + '-ep%04d.pt')
