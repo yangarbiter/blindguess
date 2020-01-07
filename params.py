@@ -152,6 +152,7 @@ class mnistLip(ExpExperiments):
         grid_params.append({
             'dataset': ['mnist', 'fashion'],
             'model': [
+                f'strades10ce-tor-{arch}',
                 f'strades6ce-tor-{arch}',
                 f'stradesce-tor-{arch}',
                 f'pstrades6ce-tor-{arch}',
@@ -182,6 +183,7 @@ class mnistLip(ExpExperiments):
             'dataset': ['fashion'],
             'model': [
                 f'ce-tor-{arch}',
+                f'strades10ce-tor-{arch}',
                 f'strades6ce-tor-{arch}',
                 f'strades6ce-tor-{arch}-lrem3',
                 f'stradesce-tor-{arch}',
@@ -208,6 +210,7 @@ class svhnLip(ExpExperiments):
             'model': [
                 'ce-tor-WRN_40_10',
                 'strades6ce-tor-WRN_40_10',
+                'strades10ce-tor-WRN_40_10',
                 'pstrades6ce-tor-WRN_40_10',
                 #'trades6ce-tor-WRN_40_10',
                 'curece-tor-WRN_40_10',
@@ -235,6 +238,7 @@ class svhnOtherLips(ExpExperiments):
             'model': [
                 'ce-tor-WRN_40_10',
                 'strades6ce-tor-WRN_40_10',
+                'strades10ce-tor-WRN_40_10',
                 #'strades10ce-tor-WRN_40_10',
                 'pstrades6ce-tor-WRN_40_10',
                 'curece-tor-WRN_40_10',
