@@ -63,6 +63,7 @@ class mnistOtherLips(ExpExperiments):
             'model': [
                 f'ce-tor-{arch}',
                 f'strades6ce-tor-{arch}',
+                f'strades6ce-tor-{arch}-lrem3',
                 f'stradesce-tor-{arch}',
                 f'pstrades6ce-tor-{arch}',
                 f'pstradesce-tor-{arch}',
@@ -182,6 +183,7 @@ class mnistLip(ExpExperiments):
             'model': [
                 f'ce-tor-{arch}',
                 f'strades6ce-tor-{arch}',
+                f'strades6ce-tor-{arch}-lrem3',
                 f'stradesce-tor-{arch}',
                 f'pstrades6ce-tor-{arch}',
                 f'pstradesce-tor-{arch}',
