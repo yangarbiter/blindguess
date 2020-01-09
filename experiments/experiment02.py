@@ -16,10 +16,11 @@ def load_model(auto_var, trnX, trny, tstX, tsty):
     model_path = get_file_name(auto_var).split("-")
     model_path[0] = 'pgd'
     model_path = '-'.join(model_path)
-    if os.path.exists(os.path.join('./models', model_path + '-ep%04d.pt') % model.epochs):
-        model_path = os.path.join('./models', model_path + '-ep%04d.pt') % model.epochs
-    else:
-        model_path = os.path.join('./models', model_path + '.pt')
+    #if os.path.exists(os.path.join('./models', model_path + '-ep%04d.pt') % model.epochs):
+    #    model_path = os.path.join('./models', model_path + '-ep%04d.pt') % model.epochs
+    #else:
+    #    model_path = os.path.join('./models', model_path + '.pt')
+    model_path = os.path.join('./models', model_path + '-ep%04d.pt') % 2
 
     model.load(model_path)
     model.model.cuda()
@@ -44,9 +45,13 @@ def run_experiment02(auto_var):
 
     attack_model = auto_var.get_var("attack", model=model, n_classes=n_classes)
     with Stopwatch("Attacking"):
-        adv_trnX = attack_model.perturb(trnX, trny)
+        if len(trnX) < 90000:
+            adv_trnX = attack_model.perturb(trnX, trny)
         adv_tstX = attack_model.perturb(tstX, tsty)
-    result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
+    if len(trnX) < 90000:
+        result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
+    else:
+        result['adv_trn_acc'] = np.nan
     result['adv_tst_acc'] = (model.predict(adv_tstX) == tsty).mean()
     print(f"adv trn acc: {result['adv_trn_acc']}")
     print(f"adv tst acc: {result['adv_tst_acc']}")

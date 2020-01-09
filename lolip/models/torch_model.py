@@ -43,7 +43,8 @@ class TorchModel(BaseEstimator):
         if torch.cuda.is_available():
             model = model.cuda()
 
-        if multigpu:
+        self.multigpu = multigpu
+        if self.multigpu:
             model = torch.nn.DataParallel(model, device_ids=[0, 1])
 
         self.optimizer = get_optimizer(model, optimizer, learning_rate, momentum)
@@ -279,9 +280,13 @@ class TorchModel(BaseEstimator):
 
     def save(self, path):
         #torch.save(self.model.state_dict(), path)
+        if self.multigpu:
+            model_state_dict = self.model.module.state_dict()
+        else:
+            model_state_dict = self.model.state_dict()
         torch.save({
             'epoch': self.start_epoch,
-            'model_state_dict': self.model.state_dict(),
+            'model_state_dict': model_state_dict,
             'optimizer_state_dict': self.optimizer.state_dict(),
         }, path % self.start_epoch)
 

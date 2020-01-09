@@ -34,7 +34,7 @@ def run_experiment01(auto_var):
 
     result = {}
     #model = auto_var.get_var("model", trnX=trnX, trny=trny, n_channels=n_channels)
-    multigpu = True if len(trnX) > 90000 and torch.cuda.device_count() >= 2 else False
+    multigpu = True if len(trnX) > 90000 and torch.cuda.device_count() > 1 else False
     model = auto_var.get_var("model", trnX=trnX, trny=trny, multigpu=multigpu)
     model.tst_ds = (tstX, tsty)
     result['model_path'] = os.path.join('./models', get_file_name(auto_var) + '-ep%04d.pt')
@@ -56,18 +56,25 @@ def run_experiment01(auto_var):
 
     attack_model = auto_var.get_var("attack", model=model, n_classes=n_classes)
     with Stopwatch("Attacking"):
-        adv_trnX = attack_model.perturb(trnX, trny)
+        if len(trnX) <= 90000:
+            adv_trnX = attack_model.perturb(trnX, trny)
         adv_tstX = attack_model.perturb(tstX, tsty)
-    result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
+    if len(trnX) <= 90000:
+        result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
+    else:
+        result['adv_trn_acc'] = np.nan
     result['adv_tst_acc'] = (model.predict(adv_tstX) == tsty).mean()
     print(f"adv trn acc: {result['adv_trn_acc']}")
     print(f"adv tst acc: {result['adv_tst_acc']}")
     del attack_model
 
-    with Stopwatch("Estimating trn Lip"):
-        _, trn_lip = estimate_local_lip_v2(model.model, trnX, top_norm=2, btm_norm=norm,
-                                     epsilon=auto_var.get_var("eps"), device=device)
-    result['avg_trn_lip'] = calc_lip(model, trnX, trn_lip, top_norm=2, btm_norm=norm).mean()
+    if len(trnX) <= 90000:
+        with Stopwatch("Estimating trn Lip"):
+            _, trn_lip = estimate_local_lip_v2(model.model, trnX, top_norm=2, btm_norm=norm,
+                                        epsilon=auto_var.get_var("eps"), device=device)
+        result['avg_trn_lip'] = calc_lip(model, trnX, trn_lip, top_norm=2, btm_norm=norm).mean()
+    else:
+        result['avg_trn_lip'] = np.nan
     with Stopwatch("Estimating tst Lip"):
         _, tst_lip = estimate_local_lip_v2(model.model, tstX, top_norm=2, btm_norm=norm,
                                      epsilon=auto_var.get_var("eps"), device=device)
