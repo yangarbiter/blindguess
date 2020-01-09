@@ -24,12 +24,12 @@ DEBUG = True if os.environ.get('DEBUG', False) else False
 def main(auto_var):
     experiments = [
         mnistLip(),
-        tinyLip(),
+        cifarLip(),
+        cifarOtherLips(),
+        mnistOtherLips(),
+        #tinyLip(),
         #svhnOtherLips(),
-        #mnistOtherLips(),
         #svhnLip(),
-        #cifarLip(),
-        #cifarOtherLips(),
     ]
     grid_params = []
     for exp in experiments:

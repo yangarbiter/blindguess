@@ -10,7 +10,7 @@ class mnistOtherLips(ExpExperiments):
         grid_params = []
         arch = "CNN001"
         grid_params.append({
-            'dataset': ['mnist', 'fashion'],
+            'dataset': ['mnist'],
             'model': [
                 f'strades6ce-tor-{arch}',
                 f'stradesce-tor-{arch}',
@@ -37,7 +37,7 @@ class mnistOtherLips(ExpExperiments):
         })
         arch = "CNN002"
         grid_params.append({
-            'dataset': ['mnist', 'fashion'],
+            'dataset': ['mnist'],
             'model': [
                 f'strades6ce-tor-{arch}',
                 #f'strades6ce-tor-{arch}-lrem3',
@@ -118,7 +118,7 @@ class mnistLip(ExpExperiments):
         grid_params = []
         arch = "CNN001"
         grid_params.append({
-            'dataset': ['mnist', 'fashion'],
+            'dataset': ['mnist'],
             'model': [
                 f'strades6ce-tor-{arch}',
                 f'stradesce-tor-{arch}',
@@ -151,7 +151,7 @@ class mnistLip(ExpExperiments):
         })
         arch = "CNN002"
         grid_params.append({
-            'dataset': ['mnist', 'fashion'],
+            'dataset': ['mnist'],
             'model': [
                 f'strades10ce-tor-{arch}',
                 f'strades6ce-tor-{arch}',
