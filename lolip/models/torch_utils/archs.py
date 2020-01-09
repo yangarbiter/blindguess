@@ -43,10 +43,10 @@ class CNN001(nn.Module):
 
 class CNN002(nn.Module):
     """https://github.com/yaodongyu/TRADES/blob/e20f7b9b99c79ed3cf0d1bb12a47c229ebcac24a/models/small_cnn.py#L5"""
-    def __init__(self, n_classes, drop=0.5):
+    def __init__(self, n_classes, drop=0.5, n_channels=1):
         super(CNN002, self).__init__()
 
-        self.num_channels = 1
+        self.num_channels = n_channels
 
         activ = nn.ReLU(True)
 
