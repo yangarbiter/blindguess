@@ -14,8 +14,8 @@ class mnistOtherLips(ExpExperiments):
             'model': [
                 f'strades6ce-tor-{arch}',
                 f'stradesce-tor-{arch}',
-                f'pstrades6ce-tor-{arch}',
-                f'pstradesce-tor-{arch}',
+                #f'pstrades6ce-tor-{arch}',
+                #f'pstradesce-tor-{arch}',
                 f'ce-tor-{arch}',
                 #f'tradesce-tor-{arch}',
                 f'trades10ce-tor-{arch}',
@@ -28,7 +28,7 @@ class mnistOtherLips(ExpExperiments):
                 #f'llr65ce-tor-{arch}',
                 f'llrce-tor-{arch}',
                 f'gr1e3ce-tor-{arch}',
-                f'advkld-tor-{arch}',
+                #f'advkld-tor-{arch}',
             ],
             'eps': [0.1],
             'norm': ['inf'],
@@ -40,10 +40,10 @@ class mnistOtherLips(ExpExperiments):
             'dataset': ['mnist', 'fashion'],
             'model': [
                 f'strades6ce-tor-{arch}',
-                f'strades6ce-tor-{arch}-lrem3',
+                #f'strades6ce-tor-{arch}-lrem3',
                 f'stradesce-tor-{arch}',
-                f'pstrades6ce-tor-{arch}',
-                f'pstradesce-tor-{arch}',
+                #f'pstrades6ce-tor-{arch}',
+                #f'pstradesce-tor-{arch}',
                 f'ce-tor-{arch}',
                 #f'trades10ce-tor-{arch}',
                 #f'ptrades10ce-tor-{arch}',
@@ -51,31 +51,31 @@ class mnistOtherLips(ExpExperiments):
                 f'advce-tor-{arch}',
                 f'llrce-tor-{arch}',
                 f'gr1e3ce-tor-{arch}',
-                f'advkld-tor-{arch}',
+                #f'advkld-tor-{arch}',
             ],
             'eps': [0.1],
             'norm': ['inf'],
             'attack': ['pgd'],
             'random_seed': random_seed,
         })
-        arch = "ResNet50"
-        grid_params.append({
-            'dataset': ['fashion'],
-            'model': [
-                f'ce-tor-{arch}',
-                f'strades6ce-tor-{arch}',
-                f'strades6ce-tor-{arch}-lrem3',
-                f'stradesce-tor-{arch}',
-                f'pstrades6ce-tor-{arch}',
-                f'pstradesce-tor-{arch}',
-                f'advce-tor-{arch}',
-                #f'cure14ce-tor-{arch}',
-            ],
-            'eps': [0.1],
-            'norm': ['inf'],
-            'attack': ['pgd'],
-            'random_seed': random_seed,
-        })
+        #arch = "ResNet50"
+        #grid_params.append({
+        #    'dataset': ['fashion'],
+        #    'model': [
+        #        f'ce-tor-{arch}',
+        #        f'strades6ce-tor-{arch}',
+        #        f'strades6ce-tor-{arch}-lrem3',
+        #        f'stradesce-tor-{arch}',
+        #        f'pstrades6ce-tor-{arch}',
+        #        f'pstradesce-tor-{arch}',
+        #        f'advce-tor-{arch}',
+        #        #f'cure14ce-tor-{arch}',
+        #    ],
+        #    'eps': [0.1],
+        #    'norm': ['inf'],
+        #    'attack': ['pgd'],
+        #    'random_seed': random_seed,
+        #})
         cls.grid_params = grid_params
         return ExpExperiments.__new__(cls, *args, **kwargs)
 
@@ -122,8 +122,8 @@ class mnistLip(ExpExperiments):
             'model': [
                 f'strades6ce-tor-{arch}',
                 f'stradesce-tor-{arch}',
-                f'pstrades6ce-tor-{arch}',
-                f'pstradesce-tor-{arch}',
+                #f'pstrades6ce-tor-{arch}',
+                #f'pstradesce-tor-{arch}',
                 #f'liplkld-tor-{arch}',
                 #f'liplce-tor-{arch}',
                 f'ce-tor-{arch}',
@@ -141,8 +141,8 @@ class mnistLip(ExpExperiments):
                 f'llrce-tor-{arch}',
                 #f'gr4ce-tor-{arch}',
                 f'gr1e3ce-tor-{arch}',
-                f'kld-tor-{arch}',
-                f'advkld-tor-{arch}',
+                #f'kld-tor-{arch}',
+                #f'advkld-tor-{arch}',
             ],
             'eps': [0.1],
             'norm': ['inf'],
@@ -179,25 +179,25 @@ class mnistLip(ExpExperiments):
             'attack': ['pgd'],
             'random_seed': random_seed,
         })
-        arch = "ResNet50"
-        grid_params.append({
-            'dataset': ['fashion'],
-            'model': [
-                f'ce-tor-{arch}',
-                f'strades10ce-tor-{arch}',
-                f'strades6ce-tor-{arch}',
-                f'strades6ce-tor-{arch}-lrem3',
-                f'stradesce-tor-{arch}',
-                f'pstrades6ce-tor-{arch}',
-                f'pstradesce-tor-{arch}',
-                f'advce-tor-{arch}',
-                #f'cure14ce-tor-{arch}',
-            ],
-            'eps': [0.1],
-            'norm': ['inf'],
-            'attack': ['pgd'],
-            'random_seed': random_seed,
-        })
+        #arch = "ResNet50"
+        #grid_params.append({
+        #    'dataset': ['fashion'],
+        #    'model': [
+        #        f'ce-tor-{arch}',
+        #        f'strades10ce-tor-{arch}',
+        #        f'strades6ce-tor-{arch}',
+        #        f'strades6ce-tor-{arch}-lrem3',
+        #        f'stradesce-tor-{arch}',
+        #        f'pstrades6ce-tor-{arch}',
+        #        f'pstradesce-tor-{arch}',
+        #        f'advce-tor-{arch}',
+        #        #f'cure14ce-tor-{arch}',
+        #    ],
+        #    'eps': [0.1],
+        #    'norm': ['inf'],
+        #    'attack': ['pgd'],
+        #    'random_seed': random_seed,
+        #})
         cls.grid_params = grid_params
         return ExpExperiments.__new__(cls, *args, **kwargs)
 
@@ -212,7 +212,7 @@ class svhnLip(ExpExperiments):
                 'ce-tor-WRN_40_10',
                 'strades6ce-tor-WRN_40_10',
                 'strades10ce-tor-WRN_40_10',
-                'pstrades6ce-tor-WRN_40_10',
+                #'pstrades6ce-tor-WRN_40_10',
                 #'trades6ce-tor-WRN_40_10',
                 'curece-tor-WRN_40_10',
                 #'cure14ce-tor-WRN_40_10',
@@ -266,13 +266,30 @@ class cifarLip(ExpExperiments):
             'model': [
                 'ce-tor-WRN_40_10',
                 'strades6ce-tor-WRN_40_10',
-                'trades6ce-tor-WRN_40_10',
+                'stradesce-tor-WRN_40_10',
+                #'trades6ce-tor-WRN_40_10',
                 #'curece-tor-WRN_40_10',
                 'cure14ce-tor-WRN_40_10',
                 'advce-tor-WRN_40_10',
                 #'advce-tor-WRN_40_10-lrem2',
                 'llrce-tor-WRN_40_10',
                 'gr1e3ce-tor-WRN_40_10',
+            ],
+            'eps': [0.031],
+            'norm': ['inf'],
+            'attack': ['pgd'],
+            'random_seed': random_seed,
+        })
+        grid_params.append({
+            'dataset': ['cifar10'],
+            'model': [
+                'aug01-ce-tor-WRN_40_10',
+                'aug01-strades6ce-tor-WRN_40_10',
+                'aug01-stradesce-tor-WRN_40_10',
+                'aug01-cure14ce-tor-WRN_40_10',
+                'aug01-advce-tor-WRN_40_10',
+                'aug01-llrce-tor-WRN_40_10',
+                'aug01-gr1e3ce-tor-WRN_40_10',
             ],
             'eps': [0.031],
             'norm': ['inf'],
@@ -302,8 +319,9 @@ class cifarOtherLips(ExpExperiments):
             'dataset': ['cifar10'],
             'model': [
                 'ce-tor-WRN_40_10',
+                'stradesce-tor-WRN_40_10',
                 'strades6ce-tor-WRN_40_10',
-                'trades6ce-tor-WRN_40_10',
+                #'trades6ce-tor-WRN_40_10',
                 'cure14ce-tor-WRN_40_10',
                 'advce-tor-WRN_40_10',
                 #'advce-tor-WRN_40_10-lrem2',

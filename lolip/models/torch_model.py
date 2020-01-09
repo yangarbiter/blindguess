@@ -11,7 +11,7 @@ from torchvision.datasets import VisionDataset
 
 import numpy as np
 from sklearn.base import BaseEstimator
-from .torch_utils import get_optimizer, get_loss, get_scheduler
+from .torch_utils import get_optimizer, get_loss, get_scheduler, CustomTensorDataset
 from .torch_utils.archs import *
 from ..attacks.torch.projected_gradient_descent import projected_gradient_descent
 from .torch_utils.trades import trades_loss
@@ -19,6 +19,7 @@ from .torch_utils.llr import locally_linearity_regularization
 from .torch_utils.cure import cure_loss
 from .torch_utils.lip_loss import lip_loss
 from .torch_utils.gradient_regularization import gradient_regularization
+from .torch_utils import data_augs
 
 DEBUG = int(os.getenv("DEBUG", 0))
 
@@ -27,9 +28,10 @@ class TorchModel(BaseEstimator):
     def __init__(self, lbl_enc, n_features, n_classes, loss_name='ce',
                 n_channels=None, learning_rate=1e-4, momentum=0.0, batch_size=256,
                 epochs=20, optimizer='sgd', architecture='arch_001', random_state=None,
-                callbacks=None, train_type=None, eps:float=0.1, norm=np.inf, multigpu=False):
+                callbacks=None, train_type=None, eps:float=0.1, norm=np.inf,
+                multigpu=False, dataaug=None):
         print(f'lr: {learning_rate}, opt: {optimizer}, loss: {loss_name}, '
-              f'arch: {architecture}')
+              f'arch: {architecture}, dataaug: {dataaug}')
         self.n_features = n_features
         self.n_classes = n_classes
         self.batch_size = batch_size
@@ -38,6 +40,7 @@ class TorchModel(BaseEstimator):
         self.epochs = epochs
         self.lbl_enc = lbl_enc
         self.loss_name = loss_name
+        self.dataaug = dataaug
 
         model = globals()[self.architecture](n_classes=self.n_classes, n_channels=n_channels)
         if torch.cuda.is_available():
@@ -52,7 +55,7 @@ class TorchModel(BaseEstimator):
 
         #self.callbacks=callbacks
         self.random_state = random_state
-        self.train_type = train_type
+        #self.train_type = train_type
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         self.tst_ds = None
@@ -65,13 +68,24 @@ class TorchModel(BaseEstimator):
 
     def _get_dataset(self, X, y=None):
         X = self._preprocess_x(X)
+
+        if self.dataaug is None:
+            transform = None
+        else:
+            if y is None:
+                transform = getattr(data_augs, self.dataaug)()[1]
+            else:
+                transform = getattr(data_augs, self.dataaug)()[0]
+
         if y is None:
-            return torch.utils.data.TensorDataset(torch.from_numpy(X).float())
+            return CustomTensorDataset((torch.from_numpy(X).float(), ), transform=transform)
         if 'mse' in self.loss_name:
             Y = self.lbl_enc.transform(y.reshape(-1, 1))
-            dataset = torch.utils.data.TensorDataset(torch.from_numpy(X).float(), torch.from_numpy(Y).float())
+            dataset = CustomTensorDataset(
+                (torch.from_numpy(X).float(), torch.from_numpy(Y).float()), transform=transform)
         else:
-            dataset = torch.utils.data.TensorDataset(torch.from_numpy(X).float(), torch.from_numpy(y).long())
+            dataset = CustomTensorDataset(
+                (torch.from_numpy(X).float(), torch.from_numpy(y).long()), transform=transform)
         return dataset
 
     def _preprocess_x(self, X):
@@ -89,7 +103,7 @@ class TorchModel(BaseEstimator):
         scheduler = get_scheduler(self.optimizer, n_epochs=self.epochs)
 
         train_loader = torch.utils.data.DataLoader(dataset,
-            batch_size=self.batch_size, shuffle=True, num_workers=1)
+            batch_size=self.batch_size, shuffle=True, num_workers=4)
 
         test_loader = None
         if self.tst_ds is not None:
@@ -98,8 +112,9 @@ class TorchModel(BaseEstimator):
             else:
                 tstX, tsty = self.tst_ds
                 dataset = self._get_dataset(tstX, tsty)
+
             test_loader = torch.utils.data.DataLoader(dataset,
-                batch_size=16, shuffle=False, num_workers=1)
+                batch_size=16, shuffle=False, num_workers=4)
 
         for epoch in range(self.start_epoch, self.epochs+1):
             train_loss = 0.
@@ -246,11 +261,15 @@ class TorchModel(BaseEstimator):
         if isinstance(X, VisionDataset):
             dataset = X
         else:
+            if self.dataaug is None:
+                transform = None
+            else:
+                transform = getattr(data_augs, self.dataaug)()[1]
             X = self._preprocess_x(X)
             self.model.eval()
-            dataset = torch.utils.data.TensorDataset(torch.from_numpy(X).float())
+            dataset = CustomTensorDataset((torch.from_numpy(X).float(), ), transform=transform)
         loader = torch.utils.data.DataLoader(dataset,
-            batch_size=self.batch_size, shuffle=False, num_workers=2)
+            batch_size=self.batch_size, shuffle=False, num_workers=4)
         return loader
 
     def predict(self, X):

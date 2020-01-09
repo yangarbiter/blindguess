@@ -65,12 +65,12 @@ class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
     """Model Variable Class"""
     var_name = "model"
 
-    @register_var(argument=r'(?P<train>[a-zA-Z0-9]+-)?(?P<loss>[a-zA-Z0-9]+)-tor-(?P<arch>[a-zA-Z0-9_]+)(?P<hyper>-[a-zA-Z0-9]+)?')
+    @register_var(argument=r'(?P<dataaug>[a-zA-Z0-9]+-)?(?P<loss>[a-zA-Z0-9]+)-tor-(?P<arch>[a-zA-Z0-9_]+)(?P<hyper>-[a-zA-Z0-9]+)?')
     @staticmethod
-    def torch_model(auto_var, inter_var, train, loss, arch, hyper, trnX, trny, n_channels, multigpu=False):
+    def torch_model(auto_var, inter_var, dataaug, loss, arch, hyper, trnX, trny, n_channels, multigpu=False):
         from .torch_model import TorchModel
 
-        train = train[:-1] if train else None
+        dataaug = dataaug[:-1] if dataaug else None
 
         n_features = trnX.shape[1:]
         n_classes = len(set(trny))
@@ -82,10 +82,11 @@ class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
         params['loss_name'] = loss
         params['n_features'] = n_features
         params['n_classes'] = n_classes
-        params['train_type'] = train
+        params['train_type'] = None
         params['architecture'] = arch
         params['multigpu'] = multigpu
         params['n_channels'] = n_channels
+        params['dataaug'] = dataaug
         #params['ckpt_dir'] = f"./checkpoints/{auto_var.get_variable_name('model')}"
         #if hyper == "gd":
         #    params['batch_size'] = len(trnX)

@@ -133,6 +133,35 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
 
         return trnX, trny, tstX, tsty
 
+    @register_var(argument=r"tinyimgnet224", shown_name="tinyimgnet")
+    @staticmethod
+    def tinyimgnet224(auto_var, inter_var):
+        from torchvision.datasets import ImageFolder
+        from PIL import Image
+
+        trn_ds = ImageFolder("./data/tiny-imagenet-200/train/")
+        trnX, trny = [], []
+        for x, y in trn_ds:
+            trnX.append(np.array(x.resize((224, 224))))
+            trny.append(y)
+        trnX, trny = np.array(trnX, np.float) / 255, np.array(trny, int)
+
+        tst_ds = ImageFolder("./data/tiny-imagenet-200/val/")
+        name_to_label = {}
+        with open("./data/tiny-imagenet-200/val/val_annotations.txt", "r") as f:
+            for line in f.readlines():
+                name_to_label[line.split("\t")[0]] = line.split("\t")[1]
+
+        tstX, tsty = [], []
+        for fn, _ in tst_ds.imgs:
+            label = name_to_label[fn.split("/")[-1]]
+            im = Image.open(fn).convert('RGB')
+            tstX.append(np.array(im.resize((224, 224))))
+            tsty.append(trn_ds.class_to_idx[label])
+        tstX, tsty = np.array(tstX, np.float) / 255, np.array(tsty, int)
+
+        return trnX, trny, tstX, tsty
+
     @register_var(argument=r"tinyimgnet", shown_name="tinyimgnet")
     @staticmethod
     def tinyimgnet(auto_var, inter_var):
