@@ -15,7 +15,8 @@ def gradient_regularization(model, loss_fn, optimizer, x, y, lambd):
         x.requires_grad_(False)
         return ret
 
-    regularization = torch.norm(model_grad(x), p=2)
+    regularization = torch.norm(model_grad(x).flatten(start_dim=1), dim=1, p=2)**2
+    regularization = torch.sum(regularization)
 
     optimizer.zero_grad()
     outputs = model(x)

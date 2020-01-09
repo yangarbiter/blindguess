@@ -23,8 +23,8 @@ DEBUG = True if os.environ.get('DEBUG', False) else False
 
 def main(auto_var):
     experiments = [
+        mnistLip(),
         tinyLip(),
-        #mnistLip(),
         #svhnOtherLips(),
         #mnistOtherLips(),
         #svhnLip(),
