@@ -92,7 +92,6 @@ class WideResNet(nn.Module):
         return self.fc(out)
 
 class WRN_40_10(WideResNet):
-    def __init__(self, depth=40, n_classes=10, widen_factor=10, dropRate=0.0):
+    def __init__(self, depth=40, n_classes=10, widen_factor=10, dropRate=0.0, n_channels=3):
         super().__init__(depth=depth, n_classes=n_classes,
                 widen_factor=widen_factor, dropRate=dropRate)
-

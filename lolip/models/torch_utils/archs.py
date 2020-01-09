@@ -8,17 +8,17 @@ from torchvision.models import wide_resnet50_2, wide_resnet101_2
 from .wideresnet import *
 from .resnet import resnet50
 
-def tWRN50_2(n_classes):
+def tWRN50_2(n_classes, n_channels):
     return wide_resnet50_2(num_classes=n_classes)
 
-def tWRN101_2(n_classes):
+def tWRN101_2(n_classes, n_channels):
     return wide_resnet50_2(num_classes=n_classes)
 
-def ResNet50(n_classes):
-    return resnet50(pretrained=False, n_channels=1, num_classes=n_classes)
+def ResNet50(n_classes, n_channels):
+    return resnet50(pretrained=False, n_channels=n_channels, num_classes=n_classes)
 
 class CNN001(nn.Module):
-    def __init__(self, n_classes):
+    def __init__(self, n_classes, n_channels=None):
         super(CNN001, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, 3, 1)
         self.conv2 = nn.Conv2d(32, 64, 3, 1)
