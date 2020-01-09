@@ -33,9 +33,9 @@ def run_experiment01(auto_var):
     #tstX = scaler.transform(tstX.reshape(len(tstX), -1)).reshape((len(tstX), ) + img_shape)
 
     result = {}
-    #model = auto_var.get_var("model", trnX=trnX, trny=trny, n_channels=n_channels)
     multigpu = True if len(trnX) > 90000 and torch.cuda.device_count() > 1 else False
-    model = auto_var.get_var("model", trnX=trnX, trny=trny, multigpu=multigpu)
+    #multigpu = False
+    model = auto_var.get_var("model", trnX=trnX, trny=trny, multigpu=multigpu, n_channels=n_channels)
     model.tst_ds = (tstX, tsty)
     result['model_path'] = os.path.join('./models', get_file_name(auto_var) + '-ep%04d.pt')
     if None:

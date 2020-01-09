@@ -16,7 +16,7 @@ def get_hyper(name, loss, arch, dataset_name):
         #elif 'ResNet' in arch:
         ret['batch_size'] = 128
         ret['epochs'] = 60
-        ret['learning_rate'] = 1e-2
+        ret['learning_rate'] = 1e-4
 
     elif 'ResNet' in arch or 'WRN' in arch:
         if 'tinyimgnet' in dataset_name:
@@ -58,7 +58,7 @@ def get_hyper(name, loss, arch, dataset_name):
             ret['learning_rate'] = 1e-3
         elif 'lr1em1' in name:
             ret['learning_rate'] = 1e-3
-    
+
     return ret
 
 class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):

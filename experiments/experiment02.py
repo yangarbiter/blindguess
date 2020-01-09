@@ -10,8 +10,8 @@ from lolip.utils import estimate_local_lip_v2
 from lolip.variables import get_file_name
 
 
-def load_model(auto_var, trnX, trny, tstX, tsty):
-    model = auto_var.get_var("model", trnX=trnX, trny=trny)
+def load_model(auto_var, trnX, trny, tstX, tsty, n_channels):
+    model = auto_var.get_var("model", trnX=trnX, trny=trny, n_channels=n_channels)
     model.tst_ds = (tstX, tsty)
     model_path = get_file_name(auto_var).split("-")
     model_path[0] = 'pgd'
@@ -34,9 +34,10 @@ def run_experiment02(auto_var):
     lbl_enc = OneHotEncoder(categories=[np.sort(np.unique(trny))], sparse=False).fit(trny.reshape(-1, 1))
     auto_var.set_intermidiate_variable("lbl_enc", lbl_enc)
     n_classes = len(np.unique(trny))
+    n_channels = trnX.shape[-1]
 
     result = {}
-    result['model_path'], model = load_model(auto_var, trnX, trny, tstX, tsty)
+    result['model_path'], model = load_model(auto_var, trnX, trny, tstX, tsty, n_channels)
 
     result['trn_acc'] = (model.predict(trnX) == trny).mean()
     result['tst_acc'] = (model.predict(tstX) == tsty).mean()
