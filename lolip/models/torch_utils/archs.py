@@ -3,9 +3,16 @@ from collections import OrderedDict
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torchvision.models import wide_resnet50_2, wide_resnet101_2
 
 from .wideresnet import *
 from .resnet import resnet50
+
+def tWRN50_2(n_classes):
+    return wide_resnet50_2(num_classes=n_classes)
+
+def tWRN101_2(n_classes):
+    return wide_resnet50_2(num_classes=n_classes)
 
 def ResNet50(n_classes):
     return resnet50(pretrained=False, n_channels=1, num_classes=n_classes)

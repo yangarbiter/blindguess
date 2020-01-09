@@ -1,4 +1,6 @@
 import numpy as np
+import torchvision.transforms as transforms
+from torchvision.datasets import ImageFolder
 
 from autovar.base import RegisteringChoiceType, register_var, VariableClass
 
@@ -135,7 +137,46 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
     @staticmethod
     def tinyimgnet(auto_var, inter_var):
         from torchvision.datasets import ImageFolder
-        ImageFolder("./data/")
+
+        trn_ds = ImageFolder("./data/tiny-imagenet-200/train/")
+        trnX, trny = [], []
+        for x, y in trn_ds:
+            trnX.append(np.array(x))
+            trny.append(y)
+        trnX, trny = np.array(trnX, np.float) / 255, np.array(trny, int)
+
+        tst_ds = ImageFolder("./data/tiny-imagenet-200/val/")
+        tstX, tsty = [], []
+        for x, y in tst_ds:
+            tstX.append(np.array(x))
+            tsty.append(y)
+        tstX, tsty = np.array(tstX, np.float) / 255, np.array(tsty, int)
+
+        return trnX, trny, tstX, tsty
+
+    @register_var(argument=r"resImgnet", shown_name="Restricted ImageNet")
+    @staticmethod
+    def resImgnet(auto_var, inter_var):
+        normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                     std=[0.229, 0.224, 0.225])
+        trn_ds = ImageFolder(
+            "/tmp2/RestrictedImgNet/train",
+            transform=transforms.Compose([
+                transforms.Resize(256),
+                transforms.CenterCrop(224),
+                transforms.ToTensor(),
+                normalize,
+            ]))
+        tst_ds = ImageFolder(
+            "/tmp2/RestrictedImgNet/val",
+            transform=transforms.Compose([
+                transforms.Resize(256),
+                transforms.CenterCrop(224),
+                transforms.ToTensor(),
+                normalize,
+            ]))
+        return trn_ds, tst_ds
+
 
 
     @register_var(argument=r"halfmoon_(?P<n_samples>\d+)", shown_name="halfmoon")

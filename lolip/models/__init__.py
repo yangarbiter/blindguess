@@ -11,8 +11,15 @@ def get_hyper(name, loss, arch, dataset_name):
         ret['learning_rate'] = 1e-4
         ret['momentum'] = 0.9
         ret['batch_size'] = 64
+    elif 'tinyimgnet' in dataset_name and 'tWRN' in arch:
+        ret['epochs'] = 60
+        ret['learning_rate'] = 1e-2
+        ret['batch_size'] = 128
+
     elif 'ResNet' in arch or 'WRN' in arch:
-        if 'svhn' in dataset_name:
+        if 'tinyimgnet' in dataset_name:
+            ret['epochs'] = 60
+        elif 'svhn' in dataset_name:
             ret['epochs'] = 60
         elif 'cifar' in dataset_name:
             ret['epochs'] = 120
@@ -58,7 +65,7 @@ class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
 
     @register_var(argument=r'(?P<train>[a-zA-Z0-9]+-)?(?P<loss>[a-zA-Z0-9]+)-tor-(?P<arch>[a-zA-Z0-9_]+)(?P<hyper>-[a-zA-Z0-9]+)?')
     @staticmethod
-    def torch_model(auto_var, inter_var, train, loss, arch, hyper, trnX, trny):
+    def torch_model(auto_var, inter_var, train, loss, arch, hyper, trnX, trny, multigpu=False):
         from .torch_model import TorchModel
 
         train = train[:-1] if train else None
@@ -75,6 +82,7 @@ class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
         params['n_classes'] = n_classes
         params['train_type'] = train
         params['architecture'] = arch
+        params['multigpu'] = multigpu
         #params['n_channels'] = n_channels
         #params['ckpt_dir'] = f"./checkpoints/{auto_var.get_variable_name('model')}"
         #if hyper == "gd":

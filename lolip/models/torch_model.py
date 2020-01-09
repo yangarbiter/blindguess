@@ -7,6 +7,7 @@ from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
 from tqdm import tqdm
+from torchvision.datasets import VisionDataset
 
 import numpy as np
 from sklearn.base import BaseEstimator
@@ -26,7 +27,7 @@ class TorchModel(BaseEstimator):
     def __init__(self, lbl_enc, n_features, n_classes, loss_name='ce',
                 n_channels=None, learning_rate=1e-4, momentum=0.0, batch_size=256,
                 epochs=20, optimizer='sgd', architecture='arch_001', random_state=None,
-                callbacks=None, train_type=None, eps:float=0.1, norm=np.inf):
+                callbacks=None, train_type=None, eps:float=0.1, norm=np.inf, multigpu=False):
         print(f'lr: {learning_rate}, opt: {optimizer}, loss: {loss_name}, '
               f'arch: {architecture}')
         self.n_features = n_features
@@ -41,6 +42,9 @@ class TorchModel(BaseEstimator):
         model = globals()[self.architecture](n_classes=self.n_classes)
         if torch.cuda.is_available():
             model = model.cuda()
+
+        if multigpu:
+            model = torch.nn.DataParallel(model, device_ids=[0, 1])
 
         self.optimizer = get_optimizer(model, optimizer, learning_rate, momentum)
         self.model = model
@@ -72,7 +76,7 @@ class TorchModel(BaseEstimator):
     def _preprocess_x(self, X):
         return X.transpose(0, 3, 1, 2)
 
-    def fit(self, X, y, sample_weight=None):
+    def fit_dataset(self, dataset):
         verbose = 0 if not DEBUG else 1
         log_interval = 1
 
@@ -83,14 +87,16 @@ class TorchModel(BaseEstimator):
             loss_fn = get_loss(self.loss_name, reduction="sum")
         scheduler = get_scheduler(self.optimizer, n_epochs=self.epochs)
 
-        dataset = self._get_dataset(X, y)
         train_loader = torch.utils.data.DataLoader(dataset,
             batch_size=self.batch_size, shuffle=True, num_workers=1)
 
         test_loader = None
         if self.tst_ds is not None:
-            tstX, tsty = self.tst_ds
-            dataset = self._get_dataset(tstX, tsty)
+            if isinstance(self.tst_ds, VisionDataset):
+                dataset = self.tst_ds
+            else:
+                tstX, tsty = self.tst_ds
+                dataset = self._get_dataset(tstX, tsty)
             test_loader = torch.utils.data.DataLoader(dataset,
                 batch_size=16, shuffle=False, num_workers=1)
 
@@ -230,11 +236,18 @@ class TorchModel(BaseEstimator):
         gc.collect()
 
         return history
+
+    def fit(self, X, y, sample_weight=None):
+        dataset = self._get_dataset(X, y)
+        return self.fit_dataset(dataset)
     
     def _prep_pred(self, X):
-        X = self._preprocess_x(X)
-        self.model.eval()
-        dataset = torch.utils.data.TensorDataset(torch.from_numpy(X).float())
+        if isinstance(X, VisionDataset):
+            dataset = X
+        else:
+            X = self._preprocess_x(X)
+            self.model.eval()
+            dataset = torch.utils.data.TensorDataset(torch.from_numpy(X).float())
         loader = torch.utils.data.DataLoader(dataset,
             batch_size=self.batch_size, shuffle=False, num_workers=2)
         return loader

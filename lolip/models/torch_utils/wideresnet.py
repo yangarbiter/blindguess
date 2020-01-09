@@ -87,6 +87,7 @@ class WideResNet(nn.Module):
         out = self.block3(out)
         out = self.relu(self.bn1(out))
         out = F.avg_pool2d(out, 8)
+        import ipdb; ipdb.set_trace()
         out = out.view(-1, self.nChannels)
         return self.fc(out)
 
@@ -94,3 +95,4 @@ class WRN_40_10(WideResNet):
     def __init__(self, depth=40, n_classes=10, widen_factor=10, dropRate=0.0):
         super().__init__(depth=depth, n_classes=n_classes,
                 widen_factor=widen_factor, dropRate=dropRate)
+

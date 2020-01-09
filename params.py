@@ -40,6 +40,7 @@ class mnistOtherLips(ExpExperiments):
             'dataset': ['mnist', 'fashion'],
             'model': [
                 f'strades6ce-tor-{arch}',
+                f'strades6ce-tor-{arch}-lrem3',
                 f'stradesce-tor-{arch}',
                 f'pstrades6ce-tor-{arch}',
                 f'pstradesce-tor-{arch}',
@@ -301,11 +302,36 @@ class cifarOtherLips(ExpExperiments):
             'dataset': ['cifar10'],
             'model': [
                 'ce-tor-WRN_40_10',
+                'strades6ce-tor-WRN_40_10',
                 'trades6ce-tor-WRN_40_10',
                 'cure14ce-tor-WRN_40_10',
                 'advce-tor-WRN_40_10',
                 #'advce-tor-WRN_40_10-lrem2',
                 'llrce-tor-WRN_40_10',
+            ],
+            'eps': [0.031],
+            'norm': ['inf'],
+            'attack': ['pgd'],
+            'random_seed': random_seed,
+        })
+        cls.grid_params = grid_params
+        return ExpExperiments.__new__(cls, *args, **kwargs)
+
+class tinyLip(ExpExperiments):
+    def __new__(cls, *args, **kwargs):
+        cls.name = "tiny ImageNet"
+        cls.experiment_fn = 'experiment01'
+        grid_params = []
+        arch = "tWRN101_2"
+        grid_params.append({
+            'dataset': ['tinyimgnet'],
+            'model': [
+                f'ce-tor-{arch}',
+                f'strades6ce-tor-{arch}',
+                f'cure14ce-tor-{arch}',
+                f'advce-tor-{arch}-lrem2',
+                f'llrce-tor-{arch}',
+                #f'gr1e3ce-tor-{arch}',
             ],
             'eps': [0.031],
             'norm': ['inf'],
