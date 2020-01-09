@@ -154,8 +154,8 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
 
         tstX, tsty = [], []
         for fn, _ in tst_ds.imgs:
-            im = Image.open(fn)
             label = name_to_label[fn.split("/")[-1]]
+            im = Image.open(fn).convert('RGB')
             tstX.append(np.array(im))
             tsty.append(trn_ds.class_to_idx[label])
         tstX, tsty = np.array(tstX, np.float) / 255, np.array(tsty, int)
