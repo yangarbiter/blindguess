@@ -14,9 +14,9 @@ def get_hyper(name, loss, arch, dataset_name):
     elif 'tinyimgnet' in dataset_name:
         #if 'tWRN' in arch:
         #elif 'ResNet' in arch:
-        ret['batch_size'] = 128
+        ret['batch_size'] = 256
         ret['epochs'] = 60
-        ret['learning_rate'] = 1e-2
+        ret['learning_rate'] = 1e-3
 
     elif 'ResNet' in arch or 'WRN' in arch:
         if 'tinyimgnet' in dataset_name:
