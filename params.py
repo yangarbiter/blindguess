@@ -219,7 +219,7 @@ class svhnLip(ExpExperiments):
                 'advce-tor-WRN_40_10-lrem2',
                 'llrce-tor-WRN_40_10',
                 #'advkld-tor-WRN_40_10',
-                #'gr1e3ce-tor-WRN_40_10',
+                'gr1e3ce-tor-WRN_40_10',
             ],
             'eps': [0.031],
             'norm': ['inf'],
