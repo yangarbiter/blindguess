@@ -21,9 +21,11 @@ class CustomTensorDataset(Dataset):
         if self.transform:
             x = self.transform(x)
 
-        y = self.tensors[1][index]
+        if len(self.tensors) == 2:
+            y = self.tensors[1][index]
+            return (x, y)
 
-        return x, y
+        return (x, )
 
     def __len__(self):
         return self.tensors[0].size(0)
