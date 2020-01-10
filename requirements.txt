@@ -5,3 +5,5 @@ bistiming
 numpy
 cleverhans
 tqdm
+torch
+torchvision
