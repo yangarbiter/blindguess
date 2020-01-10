@@ -91,24 +91,12 @@ class CNN002(nn.Module):
 class MLP(nn.Module):
     """Basic MLP architecture."""
 
-    def __init__(self, n_features, n_classes):
+    def __init__(self, n_features, n_classes, n_channels=None):
         super(MLP, self).__init__()
-        self.hidden = nn.Linear(n_features, 256)
-        self.logits = nn.Linear(256, n_classes)
+        self.hidden = nn.Linear(n_features[0], 256)
+        self.fc = nn.Linear(256, n_classes)
 
     def forward(self, x):
         x = F.relu(self.hidden(x))
-        x = F.softmax(self.logits(x), dim=1)
-        return x
-
-class realMLP(nn.Module):
-
-    def __init__(self, n_features, n_classes):
-        super(realMLP, self).__init__()
-        self.hidden = nn.Linear(n_features, 256)
-        self.output = nn.Linear(256, n_classes)
-
-    def forward(self, x):
-        x = F.relu(self.hidden(x))
-        x = self.output(x)
+        x = self.fc(x)
         return x

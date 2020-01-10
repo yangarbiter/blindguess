@@ -214,18 +214,16 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
             ]))
         return trn_ds, tst_ds
 
-
-
-    @register_var(argument=r"halfmoon_(?P<n_samples>\d+)", shown_name="halfmoon")
+    @register_var(argument=r"halfmoon-(?P<n_samples>\d+)-(?P<noisy_level>0\.\d+|\d+)", shown_name="halfmoon")
     @staticmethod
-    def halfmoon(auto_var, inter_var, n_samples):
+    def halfmoon(auto_var, inter_var, n_samples, noisy_level):
         """halfmoon dataset, n_samples gives the number of samples"""
         from sklearn.datasets import make_moons
         from sklearn.model_selection import train_test_split
 
         n_samples = int(n_samples)
         random_seed = auto_var.get_var("random_seed")
-        X, y = make_moons(n_samples=n_samples, noise=0.25, random_state=random_seed)
-        trnX, trny, tstX, tsty = train_test_split(X, y, random_state=random_seed)
+        X, y = make_moons(n_samples=n_samples, noise=float(noisy_level), random_state=random_seed)
+        trnX, tstX, trny, tsty = train_test_split(X, y, random_state=random_seed)
 
         return trnX, trny, tstX, tsty

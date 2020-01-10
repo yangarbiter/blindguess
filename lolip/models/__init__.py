@@ -1,6 +1,8 @@
 import os
 
 from autovar.base import RegisteringChoiceType, VariableClass, register_var
+import numpy as np
+
 
 DEBUG = int(os.getenv("DEBUG", 0))
 
@@ -41,6 +43,10 @@ def get_hyper(name, loss, arch, dataset_name):
         else:
             ret['learning_rate'] = 1e-2
         ret['batch_size'] = 64
+    elif 'MLP' in arch:
+        ret['epochs'] = 60
+        ret['learning_rate'] = 1e-1
+        ret['batch_size'] = 128
     else:
         ret['epochs'] = 500
         ret['learning_rate'] = 1e-1
@@ -73,7 +79,7 @@ class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
         dataaug = dataaug[:-1] if dataaug else None
 
         n_features = trnX.shape[1:]
-        n_classes = len(set(trny))
+        n_classes = len(np.unique(trny))
         dataset_name = auto_var.get_variable_name('dataset')
 
         params: dict = get_hyper(hyper, loss, arch, dataset_name)

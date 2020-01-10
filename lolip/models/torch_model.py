@@ -1,6 +1,7 @@
 import gc
 import os
 from functools import partial
+import inspect
 
 import torch
 from torch.autograd import Variable
@@ -42,7 +43,11 @@ class TorchModel(BaseEstimator):
         self.loss_name = loss_name
         self.dataaug = dataaug
 
-        model = globals()[self.architecture](n_classes=self.n_classes, n_channels=n_channels)
+        arch_fn = globals()[self.architecture] 
+        if 'n_features' in inspect.getfullargspec(arch_fn)[0]:
+            model = arch_fn(n_features=n_features, n_classes=self.n_classes, n_channels=n_channels)
+        else:
+            model = arch_fn(n_classes=self.n_classes, n_channels=n_channels)
         if torch.cuda.is_available():
             model = model.cuda()
 
@@ -89,10 +94,16 @@ class TorchModel(BaseEstimator):
         return dataset
 
     def _preprocess_x(self, X):
-        return X.transpose(0, 3, 1, 2)
+        if len(X.shape) ==4:
+            return X.transpose(0, 3, 1, 2)
+        else:
+            return X
 
-    def fit_dataset(self, dataset):
-        verbose = 0 if not DEBUG else 1
+    def fit_dataset(self, dataset, verbose=None):
+        if verbose is None:
+            verbose = 0 if not DEBUG else 1
+        else:
+            verbose = verbose
         log_interval = 1
 
         history = []
@@ -253,9 +264,9 @@ class TorchModel(BaseEstimator):
 
         return history
 
-    def fit(self, X, y, sample_weight=None):
+    def fit(self, X, y, sample_weight=None, verbose=None):
         dataset = self._get_dataset(X, y)
-        return self.fit_dataset(dataset)
+        return self.fit_dataset(dataset, verbose=verbose)
     
     def _prep_pred(self, X):
         if isinstance(X, VisionDataset):

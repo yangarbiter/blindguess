@@ -9,7 +9,5 @@ def aug01():
         transforms.ToTensor(),
     ])
 
-    transform_test = transforms.Compose([
-        transforms.ToTensor(),
-    ])
+    transform_test = None
     return transform_train, transform_test
