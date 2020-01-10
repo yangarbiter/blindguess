@@ -199,6 +199,8 @@ class TorchModel(BaseEstimator):
                 elif 'gr' in self.loss_name:
                     if 'gr4' in self.loss_name:
                         lambd = 4.0
+                    elif 'gr1e5' in self.loss_name:
+                        lambd = 1e5
                     elif 'gr1e4' in self.loss_name:
                         lambd = 1e4
                     elif 'gr1e3' in self.loss_name:

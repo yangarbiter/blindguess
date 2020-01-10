@@ -18,9 +18,10 @@ def run_experiment03(auto_var):
     lbl_enc = OneHotEncoder(categories=[np.sort(np.unique(trny))], sparse=False).fit(trny.reshape(-1, 1))
     auto_var.set_intermidiate_variable("lbl_enc", lbl_enc)
     n_classes = len(np.unique(trny))
+    n_channels = trnX.shape[-1]
 
     result = {}
-    result['model_path'], model = load_model(auto_var, trnX, trny, tstX, tsty)
+    result['model_path'], model = load_model(auto_var, trnX, trny, tstX, tsty, n_channels=n_channels)
 
     #model = auto_var.get_var("model", trnX=trnX, trny=trny)
     #model.tst_ds = (tstX, tsty)
