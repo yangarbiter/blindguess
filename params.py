@@ -288,6 +288,7 @@ class cifarLip(ExpExperiments):
                 'aug01-strades6ce-tor-WRN_40_10',
                 'aug01-stradesce-tor-WRN_40_10',
                 'aug01-cure14ce-tor-WRN_40_10',
+                'aug01-cure14ce-tor-WRN_40_10-lrem4',
                 'aug01-advce-tor-WRN_40_10',
                 'aug01-llrce-tor-WRN_40_10',
                 'aug01-gr1e5ce-tor-WRN_40_10',
