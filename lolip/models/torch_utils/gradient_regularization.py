@@ -11,7 +11,7 @@ def gradient_regularization(model, loss_fn, optimizer, x, y, lambd):
         lx = loss_fn(model(x), y)
         lx.backward()
         ret = x.grad
-        x.grad.zero_()
+        #x.grad.zero_()
         x.requires_grad_(False)
         return ret
 

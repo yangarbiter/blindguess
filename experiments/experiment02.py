@@ -16,11 +16,11 @@ def load_model(auto_var, trnX, trny, tstX, tsty, n_channels):
     model_path = get_file_name(auto_var).split("-")
     model_path[0] = 'pgd'
     model_path = '-'.join(model_path)
-    #if os.path.exists(os.path.join('./models', model_path + '-ep%04d.pt') % model.epochs):
-    #    model_path = os.path.join('./models', model_path + '-ep%04d.pt') % model.epochs
-    #else:
-    #    model_path = os.path.join('./models', model_path + '.pt')
-    model_path = os.path.join('./models', model_path + '-ep%04d.pt') % 2
+    if os.path.exists(os.path.join('./models', model_path + '-ep%04d.pt') % model.epochs):
+        model_path = os.path.join('./models', model_path + '-ep%04d.pt') % model.epochs
+    else:
+        model_path = os.path.join('./models', model_path + '.pt')
+    #model_path = os.path.join('./models', model_path + '-ep%04d.pt') % 2
 
     model.load(model_path)
     model.model.cuda()
