@@ -181,6 +181,7 @@ class TorchModel(BaseEstimator):
                         lambd, mu = 6.0, 5.0
                     else:
                         lambd, mu = 4.0, 3.0
+
                     if 'sllr' in self.loss_name:
                         version = "sum"
                     else:
