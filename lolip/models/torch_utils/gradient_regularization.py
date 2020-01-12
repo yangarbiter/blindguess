@@ -12,11 +12,14 @@ def gradient_regularization(model, loss_fn, optimizer, x, y, lambd):
     x.requires_grad_(True)
     outputs = model(x)
     lx = loss_fn(outputs, y)
-    x_grad = grad(lx, x, retain_graph=True, create_graph=True)[0]
-    #x.requires_grad_(False)
+    #x_grad = grad(lx, x, retain_graph=True, create_graph=True)[0]
+    lx.backward(retain_graph=True)
+    x_grad = x.grad.data#.detach()
+    x.requires_grad_(False)
 
     regularization = x_grad**2
     regularization = torch.sum(regularization)
+    #print(regularization)
     #x.grad.zero_()
 
     #outputs = model(x)
