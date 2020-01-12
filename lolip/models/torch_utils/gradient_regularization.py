@@ -18,7 +18,7 @@ def gradient_regularization(model, loss_fn, optimizer, x, y, lambd):
     optimizer.zero_grad()
     x.requires_grad_(True)
     lx = loss_fn(model(x), y)
-    x_grad = grad(loss_fn, x, retain_graph=True)[0]
+    x_grad = grad(lx, x, retain_graph=True)[0]
     lx.backward()
     regularization = torch.norm(x_grad.flatten(start_dim=1), dim=1, p=2)**2
     regularization = torch.sum(regularization)
