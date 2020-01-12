@@ -158,8 +158,8 @@ class TorchModel(BaseEstimator):
                         version = "plussum"
                     elif 'strades' in self.loss_name:
                         version = "sum"
-                    #import ipdb; ipdb.set_trace()
 
+                    #print(f"TRADES version: {version}")
                     outputs, loss = trades_loss(
                         self.model, loss_fn, x, y, norm=self.norm, optimizer=self.optimizer,
                         step_size=self.eps*2/steps, epsilon=self.eps, perturb_steps=steps, beta=beta,
@@ -181,10 +181,14 @@ class TorchModel(BaseEstimator):
                         lambd, mu = 6.0, 5.0
                     else:
                         lambd, mu = 4.0, 3.0
+                    if 'sllr' in self.loss_name:
+                        version = "sum"
+                    else:
+                        version = None
                     outputs, loss = locally_linearity_regularization(
                         self.model, loss_fn, x, y, norm=self.norm, optimizer=self.optimizer,
                         step_size=self.eps/5, epsilon=self.eps, perturb_steps=10,
-                        lambd=lambd, mu=mu
+                        lambd=lambd, mu=mu, version=version
                     )
                 elif 'cure' in self.loss_name:
                     if 'cure68' in self.loss_name:
@@ -195,7 +199,12 @@ class TorchModel(BaseEstimator):
                         h, lambda_ = 3.0, 4.0
 
                     self.optimizer.zero_grad()
-                    outputs, loss = cure_loss(self.model, loss_fn, x, y, h=h, lambda_=lambda_)
+                    if 'scure' in self.loss_name:
+                        version = "sum"
+                    else:
+                        version = None
+                    #print(f"CURE version: {version}")
+                    outputs, loss = cure_loss(self.model, loss_fn, x, y, h=h, lambda_=lambda_, version=version)
                 elif 'gr' in self.loss_name:
                     if 'gr4' in self.loss_name:
                         lambd = 4.0

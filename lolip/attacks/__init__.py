@@ -34,3 +34,17 @@ class AttackVarClass(VariableClass, metaclass=RegisteringChoiceType):
             eps_iter=auto_var.get_var("eps")*2/nb_iter,
             nb_iter=nb_iter,
         )
+
+    @register_var()
+    @staticmethod
+    def hongmt(auto_var, model, n_classes):
+        from .torch.hong_mt import HongMultiTarget
+        nb_iter=20
+        return HongMultiTarget(
+            n_classes=n_classes,
+            model_fn=model.model,
+            norm=auto_var.get_var("norm"),
+            eps=auto_var.get_var("eps"),
+            eps_iter=int(auto_var.get_var("eps")*2/nb_iter),
+            nb_iter=nb_iter,
+        )

@@ -272,9 +272,12 @@ class cifarLip(ExpExperiments):
                 'ce-tor-WRN_40_10',
                 'strades6ce-tor-WRN_40_10',
                 'stradesce-tor-WRN_40_10',
-                #'trades6ce-tor-WRN_40_10',
+                'trades6ce-tor-WRN_40_10',
+                #'tradesce-tor-WRN_40_10',
                 #'curece-tor-WRN_40_10',
+                'scure14ce-tor-WRN_40_10-lrem4',
                 'cure14ce-tor-WRN_40_10',
+                #'cure14ce-tor-WRN_40_10-lrem4',
                 'advce-tor-WRN_40_10',
                 #'advce-tor-WRN_40_10-lrem2',
                 'llrce-tor-WRN_40_10',
@@ -291,8 +294,9 @@ class cifarLip(ExpExperiments):
                 'aug01-ce-tor-WRN_40_10',
                 'aug01-strades6ce-tor-WRN_40_10',
                 'aug01-stradesce-tor-WRN_40_10',
+                #'aug01-scure14ce-tor-WRN_40_10',
                 'aug01-cure14ce-tor-WRN_40_10',
-                'aug01-cure14ce-tor-WRN_40_10-lrem4',
+                #'aug01-cure14ce-tor-WRN_40_10-lrem4',
                 'aug01-advce-tor-WRN_40_10',
                 'aug01-llrce-tor-WRN_40_10',
                 'aug01-gr1e4ce-tor-WRN_40_10',
@@ -327,7 +331,8 @@ class cifarOtherLips(ExpExperiments):
                 'ce-tor-WRN_40_10',
                 'stradesce-tor-WRN_40_10',
                 'strades6ce-tor-WRN_40_10',
-                #'trades6ce-tor-WRN_40_10',
+                'trades6ce-tor-WRN_40_10',
+                'tradesce-tor-WRN_40_10',
                 'cure14ce-tor-WRN_40_10',
                 'advce-tor-WRN_40_10',
                 #'advce-tor-WRN_40_10-lrem2',
@@ -346,15 +351,16 @@ class tinyLip(ExpExperiments):
         cls.name = "tiny ImageNet"
         cls.experiment_fn = 'experiment01'
         grid_params = []
-        arch = "tWRN101_2"
+        #arch = "tWRN101_2"
+        arch = "WRN_40_10"
         grid_params.append({
             'dataset': ['tinyimgnet'],
             'model': [
-                f'ce-tor-{arch}',
-                f'strades6ce-tor-{arch}',
-                f'cure14ce-tor-{arch}',
-                f'advce-tor-{arch}-lrem2',
-                f'llrce-tor-{arch}',
+                f'aug01-ce-tor-{arch}',
+                f'aug01-strades6ce-tor-{arch}',
+                f'aug01-cure14ce-tor-{arch}',
+                f'aug01-advce-tor-{arch}-lrem2',
+                f'aug01-llrce-tor-{arch}',
                 #f'gr1e4ce-tor-{arch}',
             ],
             'eps': [0.031],

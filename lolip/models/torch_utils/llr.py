@@ -9,7 +9,7 @@ import torch.optim as optim
 def locally_linearity_regularization(model,
                 loss_fn, x, y, norm, optimizer,
                 step_size, epsilon=0.031, perturb_steps=10,
-                lambd=4.0, mu=3.0):
+                lambd=4.0, mu=3.0, version=None):
     model.eval()
     batch_size = len(x)
 
@@ -72,6 +72,9 @@ def locally_linearity_regularization(model,
     # calculate robust loss
     outputs = model(x)
     loss_natural = loss_fn(outputs, y)
-    loss = loss_natural + lambd * g(x, delta, mg) + mu * grad_dot(x, delta, mg)
+    if version == "sum":
+        loss = loss_natural + lambd * g(x, delta, mg) + mu * grad_dot(x, delta, mg) * len(x)
+    else:
+        loss = loss_natural + lambd * g(x, delta, mg) + mu * grad_dot(x, delta, mg)
 
     return outputs, loss
