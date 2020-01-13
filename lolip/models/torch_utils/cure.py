@@ -25,7 +25,7 @@ def find_z(model, loss_fn, inputs, targets, h):
     return z#, norm_grad
 
 
-def cure_loss(model, loss_fn, inputs, targets, h=3., lambda_=4):
+def cure_loss(model, loss_fn, inputs, targets, h=3., lambda_=4, version=None):
     z = find_z(model, loss_fn, inputs, targets, h)
 
     inputs.requires_grad_()
@@ -41,4 +41,7 @@ def cure_loss(model, loss_fn, inputs, targets, h=3., lambda_=4):
     reg = grad_diff.reshape(grad_diff.size(0), -1).norm(dim=1)
     model.zero_grad()
 
-    return outputs_orig, loss_orig + torch.sum(lambda_ * reg) / float(inputs.size(0))
+    if version == "sum":
+        return outputs_orig, loss_orig + torch.sum(lambda_ * reg)
+    else:
+        return outputs_orig, loss_orig + torch.sum(lambda_ * reg) / float(inputs.size(0))
