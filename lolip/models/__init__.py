@@ -65,6 +65,12 @@ def get_hyper(name, loss, arch, dataset_name):
         elif 'lr1em1' in name:
             ret['learning_rate'] = 1e-3
 
+    if name is not None:
+        if 'bs256' in name:
+            ret['batch_size'] = 256
+        elif 'bs128' in name:
+            ret['batch_size'] = 128
+
     return ret
 
 class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
