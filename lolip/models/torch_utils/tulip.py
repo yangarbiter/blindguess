@@ -1,4 +1,5 @@
 """
+SCALEABLE INPUT GRADIENT REGULARIZATION FOR ADVERSARIAL ROBUSTNESS
 https://github.com/cfinlay/tulip/blob/master/cifar10/train.py
 """
 
@@ -8,14 +9,17 @@ from torch import optim
 from torch.autograd import grad
 
 
-def tulip_loss(model_fn, loss_fn, x, y, step_size=1e-2, lambd=1.):
+def tulip_loss(model_fn, loss_fn, x, y, step_size=1e-0, lambd=1.):
     x.requires_grad_(True)
 
     outputs = model_fn(x)
     lx = loss_fn(outputs, y)
-    loss = lx.mean()
+    loss = lx.sum()
 
-    dx = grad(loss, x, retain_graph=True)[0]
+    loss.backward(retain_graph=True)
+    dx = x.grad.data#.detach()
+    #dx = grad(loss, x, retain_graph=True)[0]
+
     sh = dx.shape
     x.requires_grad_(False)
 
@@ -25,7 +29,7 @@ def tulip_loss(model_fn, loss_fn, x, y, step_size=1e-2, lambd=1.):
     #Nb, Nd = v.shape
 
     nv = v.norm(2, dim=-1, keepdim=True)
-    nz = nv.view(-1)>0
+    nz = nv.view(-1) > 0
     v[nz] = v[nz].div(nv[nz])
 
     v = v.view(sh)
@@ -45,7 +49,7 @@ def tulip_loss(model_fn, loss_fn, x, y, step_size=1e-2, lambd=1.):
                     # of the directional derivative of the loss
 
     dl2 = dl.pow(2)
-    tik_penalty = dl2.mean() / 2
+    tik_penalty = dl2.sum() / 2
 
     loss = loss + lambd * tik_penalty
 

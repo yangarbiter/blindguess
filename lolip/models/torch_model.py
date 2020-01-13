@@ -103,8 +103,6 @@ class TorchModel(BaseEstimator):
     def fit_dataset(self, dataset, verbose=None):
         if verbose is None:
             verbose = 0 if not DEBUG else 1
-        else:
-            verbose = verbose
         log_interval = 1
 
         history = []
@@ -169,6 +167,10 @@ class TorchModel(BaseEstimator):
                 elif 'tulip' in self.loss_name:
                     if 'tulipem1' in self.loss_name:
                         lambd = 1e-1
+                    if 'tulipem2' in self.loss_name:
+                        lambd = 1e-2
+                    if 'tulip0' in self.loss_name:
+                        lambd = 0
                     else:
                         lambd = 1
                     self.optimizer.zero_grad()
