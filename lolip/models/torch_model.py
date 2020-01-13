@@ -19,6 +19,7 @@ from .torch_utils.trades import trades_loss
 from .torch_utils.llr import locally_linearity_regularization
 from .torch_utils.cure import cure_loss
 from .torch_utils.lip_loss import lip_loss
+from .torch_utils.tulip import tulip_loss
 from .torch_utils.gradient_regularization import gradient_regularization
 from .torch_utils import data_augs
 
@@ -107,7 +108,7 @@ class TorchModel(BaseEstimator):
         log_interval = 1
 
         history = []
-        if 'lipl' in self.loss_name:
+        if 'lipl' in self.loss_name or 'tulip' in self.loss_name:
             loss_fn = get_loss(self.loss_name, reduction="none")
         else:
             loss_fn = get_loss(self.loss_name, reduction="sum")
@@ -165,6 +166,13 @@ class TorchModel(BaseEstimator):
                         step_size=self.eps*2/steps, epsilon=self.eps, perturb_steps=steps, beta=beta,
                         version=version, device=self.device
                     )
+                elif 'tulip' in self.loss_name:
+                    if 'tulipem1' in self.loss_name:
+                        lambd = 1e-1
+                    else:
+                        lambd = 1
+                    self.optimizer.zero_grad()
+                    outputs, loss = tulip_loss(self.model, loss_fn, x, y, lambd=1)
                 elif 'lipl' in self.loss_name:
                     if 'K20' in self.loss_name:
                         steps = 20

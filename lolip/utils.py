@@ -69,6 +69,45 @@ def estimate_local_lip_v2(model, X, top_norm, btm_norm,
     ret_v = total_loss / len(X)
     return ret_v, np.concatenate(ret, axis=0)
 
+def estimate_local_mse(model, X,
+        batch_size=16, perturb_steps=10, step_size=0.003, epsilon=0.01,
+        device="cuda"):
+    model.eval()
+    dataset = data_utils.TensorDataset(preprocess_x(X))
+    loader = torch.utils.data.DataLoader(dataset,
+        batch_size=batch_size, shuffle=False, num_workers=2)
+    
+    total_loss = 0.
+    ret = []
+    for [x] in loader:
+        x = x.to(device)
+        # generate adversarial example
+        x_adv = x + 0.001 * torch.randn(x.shape).to(device)
+
+        # Setup optimizers
+        optimizer = optim.SGD([x_adv], lr=step_size)
+
+        for _ in range(perturb_steps):
+            x_adv.requires_grad_(True)
+            optimizer.zero_grad()
+            with torch.enable_grad():
+                loss = nn.MSELoss()(model(x_adv), model(x))
+            loss.backward()
+            # renorming gradient
+            eta = step_size * x_adv.grad.data.sign().detach()
+            x_adv = x_adv.data.detach() + eta.detach()
+            eta = torch.clamp(x_adv.data - x.data, -epsilon, epsilon)
+            x_adv = x.data.detach() + eta.detach()
+            x_adv = torch.clamp(x_adv, 0, 1.0)
+
+        loss_adv = nn.MSELoss(reduction="sum")(model(x_adv), model(x))
+        loss_adv = torch.sqrt(loss_adv.detach()).sum()
+        total_loss += loss_adv.item()
+
+        ret.append(x_adv.detach().cpu().numpy().transpose(0, 2, 3, 1))
+    ret_v = total_loss / len(X)
+    return ret_v, np.concatenate(ret, axis=0)
+
 #def estimate_local_lip(model, X, top_norm, btm_norm,
 #        batch_size=16, perturb_steps=10, step_size=0.003, epsilon=0.01, device="cuda"):
 #    model.eval()

@@ -47,13 +47,13 @@ def run_experiment02(auto_var):
     attack_model = auto_var.get_var("attack", model=model, n_classes=n_classes)
     with Stopwatch("Attacking"):
         if len(trnX) < 90000:
-            adv_trnX = attack_model.perturb(trnX, trny)
-        adv_tstX = attack_model.perturb(tstX, tsty)
+            adv_trnX = attack_model.perturb(trnX[:100], trny[:100])
+        adv_tstX = attack_model.perturb(tstX[:1000], tsty[:1000])
     if len(trnX) < 90000:
-        result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
+        result['adv_trn_acc'] = (model.predict(adv_trnX) == trny[:100]).mean()
     else:
         result['adv_trn_acc'] = np.nan
-    result['adv_tst_acc'] = (model.predict(adv_tstX) == tsty).mean()
+    result['adv_tst_acc'] = (model.predict(adv_tstX[:1000]) == tsty[:1000]).mean()
     print(f"adv trn acc: {result['adv_trn_acc']}")
     print(f"adv tst acc: {result['adv_tst_acc']}")
     del attack_model

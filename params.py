@@ -3,6 +3,28 @@ from utils import ExpExperiments
 
 random_seed = list(range(1))
 
+class SanityChecks(ExpExperiments):
+    def __new__(cls, *args, **kwargs):
+        cls.name = "Sanity Checks"
+        cls.experiment_fn = 'sanity'
+        grid_params = []
+        arch = "WRN_40_10"
+        grid_params.append({
+            'dataset': ['cifar10'],
+            'model': [
+                f'aug01-ce-tor-{arch}',
+                f'aug01-strades6ce-tor-{arch}',
+                f'aug01-gr1e4-tor-{arch}',
+                f'aug01-advce-tor-{arch}',
+            ],
+            'eps': [0.031],
+            'norm': ['inf'],
+            'attack': ['pgd'],
+            'random_seed': random_seed,
+        })
+        cls.grid_params = grid_params
+        return ExpExperiments.__new__(cls, *args, **kwargs)
+
 class mnistOtherLips(ExpExperiments):
     def __new__(cls, *args, **kwargs):
         cls.name = "mnist"
@@ -131,6 +153,7 @@ class mnistLip(ExpExperiments):
                 #f'pstradesce-tor-{arch}',
                 #f'liplkld-tor-{arch}',
                 #f'liplce-tor-{arch}',
+                f'tulipce-tor-{arch}',
                 f'ce-tor-{arch}',
                 #f'tradesce-tor-{arch}',
                 #f'trades6ce-tor-{arch}',
@@ -167,6 +190,7 @@ class mnistLip(ExpExperiments):
                 #f'pstradesce-tor-{arch}',
                 #f'liplkld-tor-{arch}',
                 #f'liplce-tor-{arch}',
+                f'tulipce-tor-{arch}',
                 f'ce-tor-{arch}',
                 #f'trades10ce-tor-{arch}',
                 #f'trades20ce-tor-{arch}',
@@ -274,6 +298,7 @@ class cifarLip(ExpExperiments):
             'dataset': ['cifar10'],
             'model': [
                 'ce-tor-WRN_40_10',
+                'tulipce-tor-WRN_40_10',
                 'strades6ce-tor-WRN_40_10',
                 'stradesce-tor-WRN_40_10',
                 'trades6ce-tor-WRN_40_10',
@@ -343,6 +368,25 @@ class cifarOtherLips(ExpExperiments):
                 'advce-tor-WRN_40_10',
                 #'advce-tor-WRN_40_10-lrem2',
                 'llrce-tor-WRN_40_10',
+            ],
+            'eps': [0.031],
+            'norm': ['inf'],
+            'attack': ['pgd'],
+            'random_seed': random_seed,
+        })
+        grid_params.append({
+            'dataset': ['cifar10'],
+            'model': [
+                'aug01-ce-tor-WRN_40_10',
+                'aug01-strades6ce-tor-WRN_40_10',
+                'aug01-stradesce-tor-WRN_40_10',
+                #'aug01-scure14ce-tor-WRN_40_10',
+                'aug01-scure14ce-tor-WRN_40_10-lrem4',
+                'aug01-cure14ce-tor-WRN_40_10',
+                'aug01-advce-tor-WRN_40_10',
+                'aug01-llrce-tor-WRN_40_10',
+                'aug01-sllrce-tor-WRN_40_10',
+                'aug01-gr1e4ce-tor-WRN_40_10',
             ],
             'eps': [0.031],
             'norm': ['inf'],

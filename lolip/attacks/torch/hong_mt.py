@@ -38,10 +38,10 @@ class HongMultiTarget(AttackModel):
       x, y = x.to(device), y.to(device)
 
       advx = _mt_whitebox(
-          self.model_fn, x, y, epsilon=self.eps, num_steps=self.nb_iter, step_size=self.eps_iter)
+          self.model_fn, x, y, n_classes=self.n_classes,
+          epsilon=self.eps, num_steps=self.nb_iter, step_size=self.eps_iter)
 
-      for i in range(len(x)):
-        ret.append(advx)
+      ret.append(advx)
 
     return np.concatenate(ret, axis=0).transpose(0, 2, 3, 1)
 
@@ -50,19 +50,20 @@ class HongMultiTarget(AttackModel):
 def _mt_whitebox(model,
                 X,
                 y,
+                n_classes=10,
                 epsilon=0.031,
                 num_steps=20,
                 step_size=0.003):
     model.eval()
-    out = model(X)
+    #out = model(X)
     #err = (out.data.max(1)[1] != y.data).float().sum()
     batch_size = len(X)
 
     # define adversarial example
-    X_adv_list = [torch.zeros(X.size())] * 10
+    X_adv_list = [torch.zeros(X.size())] * n_classes
     loss_list = []
 
-    for idx in range(10):
+    for idx in range(n_classes):
         x_adv = X.detach()
         for _ in range(num_steps):
             x_adv.requires_grad_()

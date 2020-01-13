@@ -45,6 +45,6 @@ class AttackVarClass(VariableClass, metaclass=RegisteringChoiceType):
             model_fn=model.model,
             norm=auto_var.get_var("norm"),
             eps=auto_var.get_var("eps"),
-            eps_iter=int(auto_var.get_var("eps")*2/nb_iter),
+            eps_iter=auto_var.get_var("eps")*2/nb_iter,
             nb_iter=nb_iter,
         )
