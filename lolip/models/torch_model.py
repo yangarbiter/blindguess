@@ -32,7 +32,7 @@ class TorchModel(BaseEstimator):
                 callbacks=None, train_type=None, eps:float=0.1, norm=np.inf,
                 multigpu=False, dataaug=None):
         print(f'lr: {learning_rate}, opt: {optimizer}, loss: {loss_name}, '
-              f'arch: {architecture}, dataaug: {dataaug}')
+              f'arch: {architecture}, dataaug: {dataaug}, batch_size: {batch_size}')
         self.n_features = n_features
         self.n_classes = n_classes
         self.batch_size = batch_size
@@ -209,6 +209,8 @@ class TorchModel(BaseEstimator):
                 elif 'gr' in self.loss_name:
                     if 'gr4' in self.loss_name:
                         lambd = 4.0
+                    elif 'gr1e6' in self.loss_name:
+                        lambd = 1e6
                     elif 'gr1e5' in self.loss_name:
                         lambd = 1e5
                     elif 'gr1e4' in self.loss_name:
