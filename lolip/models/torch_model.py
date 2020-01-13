@@ -173,6 +173,15 @@ class TorchModel(BaseEstimator):
                         lambd = 0
                     else:
                         lambd = 1
+
+                    if 'ssem1' in self.loss_name:
+                        step_size = 1e-1
+                    elif 'ssem2' in self.loss_name:
+                        step_size = 1e-2
+                    elif 'ssem3' in self.loss_name:
+                        step_size = 1e-3
+                    else:
+                        step_size = 1e-0
                     self.optimizer.zero_grad()
                     outputs, loss = tulip_loss(self.model, loss_fn, x, y, lambd=1)
                 elif 'lipl' in self.loss_name:

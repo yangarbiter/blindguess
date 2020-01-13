@@ -298,7 +298,7 @@ class cifarLip(ExpExperiments):
             'dataset': ['cifar10'],
             'model': [
                 'ce-tor-WRN_40_10',
-                'tulipce-tor-WRN_40_10',
+                'tulipssem2ce-tor-WRN_40_10',
                 'strades6ce-tor-WRN_40_10',
                 'stradesce-tor-WRN_40_10',
                 'trades6ce-tor-WRN_40_10',
