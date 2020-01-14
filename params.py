@@ -323,7 +323,7 @@ class cifarLip(ExpExperiments):
             'dataset': ['cifar10'],
             'model': [
                 'aug01-ce-tor-WRN_40_10',
-                'aug01-tulipssem2ce-tor-WRN_40_10',
+                'aug01-tulipce-tor-WRN_40_10',
                 'aug01-strades6ce-tor-WRN_40_10',
                 'aug01-stradesce-tor-WRN_40_10',
                 #'aug01-scure14ce-tor-WRN_40_10',
@@ -364,10 +364,11 @@ class cifarOtherLips(ExpExperiments):
             'dataset': ['cifar10'],
             'model': [
                 'ce-tor-WRN_40_10',
+                'tulipce-tor-WRN_40_10',
                 'stradesce-tor-WRN_40_10',
                 'strades6ce-tor-WRN_40_10',
-                'trades6ce-tor-WRN_40_10',
-                'tradesce-tor-WRN_40_10',
+                #'trades6ce-tor-WRN_40_10',
+                #'tradesce-tor-WRN_40_10',
                 'cure14ce-tor-WRN_40_10',
                 'advce-tor-WRN_40_10',
                 #'advce-tor-WRN_40_10-lrem2',
@@ -382,7 +383,7 @@ class cifarOtherLips(ExpExperiments):
             'dataset': ['cifar10'],
             'model': [
                 'aug01-ce-tor-WRN_40_10',
-                'aug01-tulipssem2ce-tor-WRN_40_10',
+                'aug01-tulipssem1ce-tor-WRN_40_10',
                 'aug01-strades6ce-tor-WRN_40_10',
                 'aug01-stradesce-tor-WRN_40_10',
                 'aug01-scure14ce-tor-WRN_40_10-lrem2',
