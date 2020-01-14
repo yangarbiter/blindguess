@@ -384,7 +384,7 @@ class cifarOtherLips(ExpExperiments):
             'dataset': ['cifar10'],
             'model': [
                 'aug01-ce-tor-WRN_40_10',
-                'aug01-tulipssem1ce-tor-WRN_40_10',
+                'aug01-tulipce-tor-WRN_40_10',
                 'aug01-strades6ce-tor-WRN_40_10',
                 'aug01-stradesce-tor-WRN_40_10',
                 'aug01-scure14ce-tor-WRN_40_10-lrem2',
