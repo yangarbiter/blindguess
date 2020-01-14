@@ -329,7 +329,7 @@ class cifarLip(ExpExperiments):
                 #'aug01-scure14ce-tor-WRN_40_10',
                 'aug01-scure14ce-tor-WRN_40_10-lrem2',
                 'aug01-cure14ce-tor-WRN_40_10',
-                'aug01-advce-tor-WRN_40_10-lrem2bs256',
+                #'aug01-advce-tor-WRN_40_10-lrem2bs256',
                 'aug01-advce-tor-WRN_40_10-bs256',
                 'aug01-advce-tor-WRN_40_10',
                 'aug01-llrce-tor-WRN_40_10',
