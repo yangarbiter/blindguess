@@ -1,8 +1,13 @@
+import os
+
 import numpy as np
 import torchvision.transforms as transforms
 from torchvision.datasets import ImageFolder
 
 from autovar.base import RegisteringChoiceType, register_var, VariableClass
+
+
+DEBUG = int(os.environ.get('DEBUG', 0))
 
 class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
     """Defines the dataset to use"""
@@ -188,6 +193,12 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
             tstX.append(np.array(im))
             tsty.append(trn_ds.class_to_idx[label])
         tstX, tsty = np.array(tstX, np.float) / 255, np.array(tsty, int)
+
+
+        if DEBUG:
+            random_state = np.random.RandomState(auto_var.get_var("random_seed"))
+            idx = random_state.choice(np.arange(len(trny)), size=5000, replace=False)
+            return trnX[idx], trny[idx], tstX[:1000], tsty[:1000]
 
         return trnX, trny, tstX, tsty
 
