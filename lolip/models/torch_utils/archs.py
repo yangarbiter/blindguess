@@ -12,7 +12,7 @@ def tWRN50_2(n_classes, n_channels):
     return wide_resnet50_2(num_classes=n_classes)
 
 def tWRN101_2(n_classes, n_channels):
-    return wide_resnet50_2(num_classes=n_classes)
+    return wide_resnet101_2(num_classes=n_classes)
 
 def ResNet50(n_classes, n_channels):
     return resnet50(pretrained=False, n_channels=n_channels, num_classes=n_classes)
