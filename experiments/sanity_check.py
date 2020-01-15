@@ -20,7 +20,7 @@ def run_sanity(auto_var):
     n_classes = len(np.unique(trny))
     n_channels = trnX.shape[-1]
 
-    n_samples = 100
+    n_samples = 300
     trn_idx = np.arange(len(trnX))
     trn_idx = random_state.choice(trn_idx, size=n_samples, replace=False)
     tst_idx = np.arange(len(tstX))

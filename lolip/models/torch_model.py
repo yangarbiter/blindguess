@@ -110,7 +110,7 @@ class TorchModel(BaseEstimator):
             loss_fn = get_loss(self.loss_name, reduction="none")
         else:
             loss_fn = get_loss(self.loss_name, reduction="sum")
-        scheduler = get_scheduler(self.optimizer, n_epochs=self.epochs)
+        scheduler = get_scheduler(self.optimizer, n_epochs=self.epochs, loss_name=self.loss_name)
 
         train_loader = torch.utils.data.DataLoader(dataset,
             batch_size=self.batch_size, shuffle=True, num_workers=4)
@@ -213,6 +213,8 @@ class TorchModel(BaseEstimator):
                 elif 'cure' in self.loss_name:
                     if 'cure68' in self.loss_name:
                         h, lambda_ = 6.0, 8.0
+                    elif 'cure18' in self.loss_name:
+                        h, lambda_ = 1.5, 8.0
                     elif 'cure14' in self.loss_name:
                         h, lambda_ = 1.25, 4.0
                     else:
@@ -264,9 +266,11 @@ class TorchModel(BaseEstimator):
             self.start_epoch = epoch
 
             if (epoch - 1) % log_interval == 0:
+                print(f"current LR: {self.optimizer.state_dict()['param_groups'][0]['lr']}")
                 self.model.eval()
                 history.append({
                     'epoch': epoch,
+                    'lr': self.optimizer.state_dict()['param_groups'][0]['lr'],
                     'trn_loss': train_loss / len(train_loader.dataset),
                     'trn_acc': train_acc / len(train_loader.dataset),
                 })

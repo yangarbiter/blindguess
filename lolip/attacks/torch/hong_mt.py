@@ -6,7 +6,6 @@ import torch
 from torch.autograd import Variable
 
 from ..base import AttackModel
-from .projected_gradient_descent import projected_gradient_descent
 
 class HongMultiTarget(AttackModel):
 
