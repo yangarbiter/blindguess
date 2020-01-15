@@ -6,6 +6,7 @@ from torch.utils.data import Dataset
 from torch.optim.lr_scheduler import MultiStepLR
 
 from .optimizer_nadam import Nadam
+from .cure import CureMultiStepLR
 
 class CustomTensorDataset(Dataset):
     """TensorDataset with support of transforms.
@@ -71,15 +72,20 @@ def get_loss(loss_name: str, reduction='sum'):
         raise ValueError(f"Not supported loss {loss_name}")
     return ret
 
-def get_scheduler(optimizer, n_epochs: int):
-    if n_epochs <= 60:
-        scheduler = MultiStepLR(optimizer, milestones=[20, 40, 50], gamma=0.1)
-    elif n_epochs <= 80:
-        scheduler = MultiStepLR(optimizer, milestones=[30, 50, 70], gamma=0.1)
-    elif n_epochs <= 120:
-        scheduler = MultiStepLR(optimizer, milestones=[40, 80, 100], gamma=0.1)
-    elif n_epochs <= 160:
-        scheduler = MultiStepLR(optimizer, milestones=[40, 80, 120, 140], gamma=0.1)
+def get_scheduler(optimizer, n_epochs: int, loss_name=None):
+    if 'scure' in loss_name:
+        scheduler = CureMultiStepLR
     else:
-        scheduler = MultiStepLR(optimizer, milestones=[60, 100, 140, 180], gamma=0.1)
+        scheduler = MultiStepLR
+
+    if n_epochs <= 60:
+        scheduler = scheduler(optimizer, milestones=[20, 40, 50], gamma=0.1)
+    elif n_epochs <= 80:
+        scheduler = scheduler(optimizer, milestones=[30, 50, 70], gamma=0.1)
+    elif n_epochs <= 120:
+        scheduler = scheduler(optimizer, milestones=[40, 80, 100], gamma=0.1)
+    elif n_epochs <= 160:
+        scheduler = scheduler(optimizer, milestones=[40, 80, 120, 140], gamma=0.1)
+    else:
+        scheduler = scheduler(optimizer, milestones=[60, 100, 140, 180], gamma=0.1)
     return scheduler
