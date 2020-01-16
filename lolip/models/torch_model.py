@@ -31,7 +31,7 @@ class TorchModel(BaseEstimator):
                 n_channels=None, learning_rate=1e-4, momentum=0.0, batch_size=256,
                 epochs=20, optimizer='sgd', architecture='arch_001', random_state=None,
                 callbacks=None, train_type=None, eps:float=0.1, norm=np.inf,
-                multigpu=False, dataaug=None):
+                multigpu=False, dataaug=None, device=None):
         print(f'lr: {learning_rate}, opt: {optimizer}, loss: {loss_name}, '
               f'arch: {architecture}, dataaug: {dataaug}, batch_size: {batch_size}')
         self.n_features = n_features
@@ -44,12 +44,17 @@ class TorchModel(BaseEstimator):
         self.loss_name = loss_name
         self.dataaug = dataaug
 
+        if device is None:
+            self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        else:
+            self.device = device
+
         arch_fn = globals()[self.architecture] 
         if 'n_features' in inspect.getfullargspec(arch_fn)[0]:
             model = arch_fn(n_features=n_features, n_classes=self.n_classes, n_channels=n_channels)
         else:
             model = arch_fn(n_classes=self.n_classes, n_channels=n_channels)
-        if torch.cuda.is_available():
+        if self.device == 'cuda':
             model = model.cuda()
 
         self.multigpu = multigpu
@@ -62,7 +67,6 @@ class TorchModel(BaseEstimator):
         #self.callbacks=callbacks
         self.random_state = random_state
         #self.train_type = train_type
-        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
         self.tst_ds = None
         self.start_epoch = 1
@@ -262,15 +266,16 @@ class TorchModel(BaseEstimator):
                     train_loss += loss.item()
                     train_acc += (outputs.argmax(dim=1)==y).sum().float().item()
 
+            current_lr = self.optimizer.state_dict()['param_groups'][0]['lr']
             scheduler.step()
             self.start_epoch = epoch
 
             if (epoch - 1) % log_interval == 0:
-                print(f"current LR: {self.optimizer.state_dict()['param_groups'][0]['lr']}")
+                print(f"current LR: {current_lr}")
                 self.model.eval()
                 history.append({
                     'epoch': epoch,
-                    'lr': self.optimizer.state_dict()['param_groups'][0]['lr'],
+                    'lr': current_lr,
                     'trn_loss': train_loss / len(train_loader.dataset),
                     'trn_acc': train_acc / len(train_loader.dataset),
                 })

@@ -42,6 +42,8 @@ class CureMultiStepLR(_LRScheduler):
     def get_lr(self):
         if self.last_epoch == 0:
             return [1e-5 for base_lr in self.base_lrs]
+        elif self.last_epoch == 1:
+            return [1e-4 for base_lr in self.base_lrs]
         return [base_lr * self.gamma ** bisect_right(self.milestones, self.last_epoch)
                 for base_lr in self.base_lrs]
 
