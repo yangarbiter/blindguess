@@ -427,11 +427,11 @@ class tinyLip(ExpExperiments):
         grid_params.append({
             'dataset': ['tinyimgnet'],
             'model': [
-                f'aug01-ce-tor-{arch}',
-                f'aug01-strades6ce-tor-{arch}',
-                f'aug01-cure14ce-tor-{arch}',
-                f'aug01-advce-tor-{arch}-lrem2',
-                f'aug01-llrce-tor-{arch}',
+                f'aug02-ce-tor-{arch}',
+                f'aug02-strades6ce-tor-{arch}',
+                f'aug02-cure14ce-tor-{arch}',
+                f'aug02-advce-tor-{arch}-lrem2',
+                f'aug02-llrce-tor-{arch}',
                 #f'gr1e4ce-tor-{arch}',
             ],
             'eps': [0.031],
