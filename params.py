@@ -329,7 +329,6 @@ class cifarLip(ExpExperiments):
                 'aug01-stradesce-tor-WRN_40_10',
                 #'aug01-scure14ce-tor-WRN_40_10',
                 'aug01-scure14ce-tor-WRN_40_10-lrem4',
-                'aug01-scure18ce-tor-WRN_40_10',
                 'aug01-cure14ce-tor-WRN_40_10',
                 #'aug01-advce-tor-WRN_40_10-lrem2bs256',
                 'aug01-advce-tor-WRN_40_10-bs256',
@@ -402,7 +401,7 @@ class cifarOtherLips(ExpExperiments):
                 'aug01-tulipce-tor-WRN_40_10',
                 'aug01-strades6ce-tor-WRN_40_10',
                 'aug01-stradesce-tor-WRN_40_10',
-                'aug01-scure14ce-tor-WRN_40_10-lrem2',
+                'aug01-scure14ce-tor-WRN_40_10',
                 'aug01-cure14ce-tor-WRN_40_10',
                 'aug01-advce-tor-WRN_40_10-bs256',
                 'aug01-advce-tor-WRN_40_10',
@@ -423,8 +422,8 @@ class tinyLip(ExpExperiments):
         cls.name = "tiny ImageNet"
         cls.experiment_fn = 'experiment01'
         grid_params = []
-        #arch = "tWRN101_2"
-        arch = "WRN_40_10"
+        arch = "tWRN50_5"
+        #arch = "WRN_40_10"
         grid_params.append({
             'dataset': ['tinyimgnet'],
             'model': [
