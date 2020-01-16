@@ -13,13 +13,14 @@ class SanityChecks(ExpExperiments):
             'dataset': ['cifar10'],
             'model': [
                 f'aug01-ce-tor-{arch}',
+                f'aug01-stradesce-tor-{arch}',
                 f'aug01-strades6ce-tor-{arch}',
-                f'aug01-gr1e4-tor-{arch}',
-                f'aug01-advce-tor-{arch}',
+                f'aug01-gr1e4ce-tor-{arch}',
+                f'aug01-advce-tor-{arch}-bs256',
             ],
             'eps': [0.031],
             'norm': ['inf'],
-            'attack': ['pgd'],
+            'attack': ['hongpgd'],
             'random_seed': random_seed,
         })
         cls.grid_params = grid_params
@@ -327,7 +328,8 @@ class cifarLip(ExpExperiments):
                 'aug01-strades6ce-tor-WRN_40_10',
                 'aug01-stradesce-tor-WRN_40_10',
                 #'aug01-scure14ce-tor-WRN_40_10',
-                'aug01-scure14ce-tor-WRN_40_10-lrem2',
+                'aug01-scure14ce-tor-WRN_40_10-lrem4',
+                'aug01-scure18ce-tor-WRN_40_10',
                 'aug01-cure14ce-tor-WRN_40_10',
                 #'aug01-advce-tor-WRN_40_10-lrem2bs256',
                 'aug01-advce-tor-WRN_40_10-bs256',
@@ -342,6 +344,19 @@ class cifarLip(ExpExperiments):
             'attack': ['pgd'],
             'random_seed': random_seed,
         })
+        #arch = "ResNet152"
+        #grid_params.append({
+        #    'dataset': ['cifar10'],
+        #    'model': [
+        #        f'aug01-ce-tor-{arch}',
+        #        f'aug01-advce-tor-{arch}-lrem2',
+        #        f'aug01-stradesce-tor-{arch}',
+        #    ],
+        #    'eps': [0.031],
+        #    'norm': ['inf'],
+        #    'attack': ['pgd'],
+        #    'random_seed': random_seed,
+        #})
         #grid_params.append({
         #    'dataset': ['cifar10'],
         #    'model': [
