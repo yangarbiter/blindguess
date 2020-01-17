@@ -80,7 +80,7 @@ def get_scheduler(optimizer, n_epochs: int, loss_name=None):
 
     if n_epochs <= 30:
         scheduler = scheduler(optimizer, milestones=[10, 20, 25], gamma=0.1)
-    if n_epochs <= 60:
+    elif n_epochs <= 60:
         scheduler = scheduler(optimizer, milestones=[20, 40, 50], gamma=0.1)
     elif n_epochs <= 80:
         scheduler = scheduler(optimizer, milestones=[30, 50, 70], gamma=0.1)
