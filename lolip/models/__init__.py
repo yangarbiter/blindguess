@@ -13,10 +13,10 @@ def get_hyper(name, loss, arch, dataset_name):
         ret['learning_rate'] = 1e-4
         ret['momentum'] = 0.9
         ret['batch_size'] = 64
-    elif 'tinyimgnet' in dataset_name:
+    elif 'tinyImgnet' in dataset_name:
         #if 'tWRN' in arch:
         #elif 'ResNet' in arch:
-        ret['epochs'] = 60
+        ret['epochs'] = 30
         ret['learning_rate'] = 1e-2
         ret['batch_size'] = 64
 
