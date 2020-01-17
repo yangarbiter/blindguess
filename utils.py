@@ -37,7 +37,7 @@ def setup_experiments(auto_var):
             {'file_format': 'pickle', 'result_file_dir': f'./results/{exp_name}'})
     exp_name = 'restrictedImgnet'
     mkdir_p(f"./results/{exp_name}")
-    auto_var.register_experiment(f'{exp_name}', run_experiment03,
+    auto_var.register_experiment(f'{exp_name}', run_restrictedImgnet,
             {'file_format': 'pickle', 'result_file_dir': f'./results/{exp_name}'})
 
 
