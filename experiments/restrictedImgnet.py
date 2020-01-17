@@ -44,7 +44,7 @@ def run_restrictedImgnet(auto_var):
         result['history'] = history
 
     result['trn_acc'] = np.nan
-    result['tst_acc'] = (model.predict(tst_dsX) == tsty).mean()
+    result['tst_acc'] = (model.predict(tst_ds) == tsty).mean()
     print(f"train acc: {result['trn_acc']}")
     print(f"test acc: {result['tst_acc']}")
 
