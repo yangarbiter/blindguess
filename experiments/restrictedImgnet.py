@@ -26,8 +26,10 @@ def run_restrictedImgnet(auto_var):
 
     result = {}
     mock_trnX = np.concatenate([trn_ds[0][0], trn_ds[1][0]], axis=0)
-    mock_trny = np.concatenate([trn_ds[0][1], trn_ds[1][1]])
-    model = auto_var.get_var("model", trnX=mock_trnX, trny=mock_trny)
+    mock_trny = np.arange(n_classes)
+    multigpu = True
+    model = auto_var.get_var("model", trnX=mock_trnX, trny=mock_trny,
+                             multigpu=multigpu, n_channels=3)
     model.tst_ds = tst_ds
     result['model_path'] = os.path.join('./models', get_file_name(auto_var) + '-ep%04d.pt')
     if None:
