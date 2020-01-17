@@ -25,5 +25,9 @@ class AttackModel():
             return pert_X
 
     @abstractmethod
+    def perturb_ds(self, ds, eps):
+        pass
+
+    @abstractmethod
     def perturb(self, X, y, eps):
         pass

@@ -73,6 +73,16 @@ class ProjectedGradientDescent(AttackModel):
       ret.append(self.attack_fn(x=x, y=y).detach().cpu().numpy())
     return np.concatenate(ret, axis=0).transpose(0, 2, 3, 1)
 
+  def perturb_ds(self, ds, eps=None):
+    loader = torch.utils.data.DataLoader(ds,
+        batch_size=self.batch_size, shuffle=False, num_workers=2)
+
+    ret = []
+    for [x, y] in loader:
+      x, y = x.to(self.device), y.to(self.device)
+      ret.append(self.attack_fn(x=x, y=y).detach().cpu().numpy())
+    return np.concatenate(ret, axis=0).transpose(0, 2, 3, 1)
+
 
 def projected_gradient_descent(model_fn, x, eps, eps_iter, nb_iter, norm, loss_fn=None,
                                clip_min=None, clip_max=None, y=None, targeted=False,

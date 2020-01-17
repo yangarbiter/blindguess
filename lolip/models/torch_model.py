@@ -49,7 +49,7 @@ class TorchModel(BaseEstimator):
         else:
             self.device = device
 
-        arch_fn = globals()[self.architecture] 
+        arch_fn = globals()[self.architecture]
         if 'n_features' in inspect.getfullargspec(arch_fn)[0]:
             model = arch_fn(n_features=n_features, n_classes=self.n_classes, n_channels=n_channels)
         else:
@@ -146,6 +146,8 @@ class TorchModel(BaseEstimator):
                         beta = 16.0
                     elif 'trades6' in self.loss_name:
                         beta = 6.0
+                    elif 'trades.5' in self.loss_name:
+                        beta = 0.5
                     else:
                         beta = 1.0
 
@@ -251,7 +253,8 @@ class TorchModel(BaseEstimator):
                 else:
                     if 'adv' in self.loss_name:
                         x = projected_gradient_descent(self.model, x, y=y,
-                                clip_min=0, clip_max=1, eps_iter=self.eps/5,
+                                clip_min=0, clip_max=1,
+                                eps_iter=self.eps/5,
                                 eps=self.eps, norm=self.norm, nb_iter=10)
                     self.optimizer.zero_grad()
                     outputs = self.model(x)
@@ -309,7 +312,7 @@ class TorchModel(BaseEstimator):
     def fit(self, X, y, sample_weight=None, verbose=None):
         dataset = self._get_dataset(X, y)
         return self.fit_dataset(dataset, verbose=verbose)
-    
+
     def _prep_pred(self, X):
         if isinstance(X, VisionDataset):
             dataset = X
@@ -324,6 +327,16 @@ class TorchModel(BaseEstimator):
         loader = torch.utils.data.DataLoader(dataset,
             batch_size=self.batch_size, shuffle=False, num_workers=4)
         return loader
+
+    def predict_ds(self, ds):
+        loader = torch.utils.data.DataLoader(ds,
+            batch_size=self.batch_size, shuffle=False, num_workers=4)
+        ret = []
+        for x in loader:
+            x = x[0]
+            ret.append(self.model(x.to(self.device)).argmax(1).cpu().numpy())
+        del loader
+        return np.concatenate(ret)
 
     def predict(self, X):
         loader = self._prep_pred(X)
