@@ -26,9 +26,10 @@ def run_restrictedImgnet(auto_var):
 
     result = {}
     mock_trnX = np.concatenate([trn_ds[0][0], trn_ds[1][0]], axis=0)
-    mock_trny = np.arange(n_classes)
+    trny = np.array([x[1] for x in trn_ds])
+    tsty = np.array([x[1] for x in tst_ds])
     multigpu = True if torch.cuda.device_count() > 1 else False
-    model = auto_var.get_var("model", trnX=mock_trnX, trny=mock_trny,
+    model = auto_var.get_var("model", trnX=mock_trnX, trny=trny,
                              multigpu=multigpu, n_channels=3)
     model.tst_ds = tst_ds
     result['model_path'] = os.path.join('./models', get_file_name(auto_var) + '-ep%04d.pt')
@@ -43,7 +44,7 @@ def run_restrictedImgnet(auto_var):
         result['model_path'] = result['model_path'] % model.epochs
         result['history'] = history
 
-    result['trn_acc'] = np.nan
+    result['trn_acc'] = (model.predict_ds(trn_ds) == tsty).mean()
     result['tst_acc'] = (model.predict_ds(tst_ds) == tsty).mean()
     print(f"train acc: {result['trn_acc']}")
     print(f"test acc: {result['tst_acc']}")
