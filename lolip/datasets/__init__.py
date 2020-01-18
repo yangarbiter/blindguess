@@ -208,7 +208,7 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
         #normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
         #                             std=[0.229, 0.224, 0.225])
         trn_ds = ImageFolder(
-            "/tmp2/RestrictedImgNet/train",
+            "./data/RestrictedImgNet/train",
             transform=transforms.Compose([
                 transforms.RandomResizedCrop(112),
                 transforms.RandomHorizontalFlip(),
@@ -216,7 +216,7 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
                 #normalize,
             ]))
         tst_ds = ImageFolder(
-            "/tmp2/RestrictedImgNet/val",
+            "./data/RestrictedImgNet/val",
             transform=transforms.Compose([
                 transforms.Resize(128),
                 transforms.CenterCrop(112),
