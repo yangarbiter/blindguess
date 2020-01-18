@@ -33,6 +33,7 @@ def run_restrictedImgnet(auto_var):
     multigpu = True if torch.cuda.device_count() > 1 else False
     model = auto_var.get_var("model", trnX=mock_trnX, trny=trny,
                              multigpu=multigpu, n_channels=3)
+    model.num_workers = 8
     model.tst_ds = tst_ds
     result['model_path'] = os.path.join('./models', get_file_name(auto_var) + '-ep%04d.pt')
     if None:

@@ -31,9 +31,10 @@ class TorchModel(BaseEstimator):
                 n_channels=None, learning_rate=1e-4, momentum=0.0, batch_size=256,
                 epochs=20, optimizer='sgd', architecture='arch_001', random_state=None,
                 callbacks=None, train_type=None, eps:float=0.1, norm=np.inf,
-                multigpu=False, dataaug=None, device=None):
+                multigpu=False, dataaug=None, device=None, num_workers=4):
         print(f'lr: {learning_rate}, opt: {optimizer}, loss: {loss_name}, '
               f'arch: {architecture}, dataaug: {dataaug}, batch_size: {batch_size}')
+        self.num_workers = num_workers
         self.n_features = n_features
         self.n_classes = n_classes
         self.batch_size = batch_size
@@ -117,7 +118,7 @@ class TorchModel(BaseEstimator):
         scheduler = get_scheduler(self.optimizer, n_epochs=self.epochs, loss_name=self.loss_name)
 
         train_loader = torch.utils.data.DataLoader(dataset,
-            batch_size=self.batch_size, shuffle=True, num_workers=4)
+            batch_size=self.batch_size, shuffle=True, num_workers=self.num_workers)
 
         test_loader = None
         if self.tst_ds is not None:
@@ -128,7 +129,7 @@ class TorchModel(BaseEstimator):
                 dataset = self._get_dataset(tstX, tsty)
 
             test_loader = torch.utils.data.DataLoader(dataset,
-                batch_size=16, shuffle=False, num_workers=4)
+                batch_size=16, shuffle=False, num_workers=self.num_workers)
 
         for epoch in range(self.start_epoch, self.epochs+1):
             train_loss = 0.
@@ -260,7 +261,6 @@ class TorchModel(BaseEstimator):
                                 eps=self.eps, norm=self.norm, nb_iter=10)
                     self.optimizer.zero_grad()
                     outputs = self.model(x)
-                    #outputs = F.softmax(self.model(x), dim=1)
                     loss = loss_fn(outputs, y)
 
                 loss.backward()
@@ -327,12 +327,12 @@ class TorchModel(BaseEstimator):
             self.model.eval()
             dataset = CustomTensorDataset((torch.from_numpy(X).float(), ), transform=transform)
         loader = torch.utils.data.DataLoader(dataset,
-            batch_size=self.batch_size, shuffle=False, num_workers=4)
+            batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
         return loader
 
     def predict_ds(self, ds):
         loader = torch.utils.data.DataLoader(ds,
-            batch_size=self.batch_size, shuffle=False, num_workers=4)
+            batch_size=self.batch_size, shuffle=False, num_workers=self.num_workers)
         ret = []
         for x in loader:
             x = x[0]
