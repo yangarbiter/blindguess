@@ -26,8 +26,10 @@ def run_restrictedImgnet(auto_var):
 
     result = {}
     mock_trnX = np.concatenate([trn_ds[0][0], trn_ds[1][0]], axis=0)
-    trny = np.array([x[1] for x in trn_ds])
-    tsty = np.array([x[1] for x in tst_ds])
+    trny = np.array(trn_ds.targets)
+    tsty = np.array(tst_ds.targets)
+    #trny = np.array([x[1] for x in trn_ds])
+    #tsty = np.array([x[1] for x in tst_ds])
     multigpu = True if torch.cuda.device_count() > 1 else False
     model = auto_var.get_var("model", trnX=mock_trnX, trny=trny,
                              multigpu=multigpu, n_channels=3)
