@@ -46,10 +46,12 @@ class ProjectedGradientDescent(AttackModel):
 
   def __init__(self, model_fn, eps, eps_iter, nb_iter, norm, loss_fn=None,
                clip_min=None, clip_max=None, y=None, targeted=False,
-               batch_size=16, rand_init=True, rand_minmax=None, device=None):
+               batch_size=16, rand_init=True, rand_minmax=None, device=None,
+               preprocess_img=True):
     self.model_fn = model_fn
     self.eps = eps
     self.batch_size = batch_size
+    self.preprocess_img = preprocess_img
     self.attack_fn = partial(projected_gradient_descent, model_fn=model_fn,
       eps=eps, eps_iter=eps_iter, nb_iter=nb_iter, norm=norm, loss_fn=loss_fn,
       clip_min=clip_min, clip_max=clip_max, targeted=targeted, rand_init=rand_init,
@@ -60,7 +62,10 @@ class ProjectedGradientDescent(AttackModel):
       self.device=device
 
   def _preprocess_x(self, X):
-    return torch.from_numpy(X.transpose(0, 3, 1, 2)).float()
+    if self.preprocess_img == True:
+      return torch.from_numpy(X.transpose(0, 3, 1, 2)).float()
+    else:
+      return torch.from_numpy(X).float()
 
   def perturb(self, X, y, eps=None):
     dataset = data_utils.TensorDataset(self._preprocess_x(X), torch.from_numpy(y).long())
@@ -71,7 +76,10 @@ class ProjectedGradientDescent(AttackModel):
     for [x, y] in loader:
       x, y = x.to(self.device), y.to(self.device)
       ret.append(self.attack_fn(x=x, y=y).detach().cpu().numpy())
-    return np.concatenate(ret, axis=0).transpose(0, 2, 3, 1)
+    if self.preprocess_img == True:
+      return np.concatenate(ret, axis=0).transpose(0, 2, 3, 1)
+    else:
+      return np.concatenate(ret, axis=0)
 
   def perturb_ds(self, ds, eps=None):
     loader = torch.utils.data.DataLoader(ds,
@@ -81,7 +89,10 @@ class ProjectedGradientDescent(AttackModel):
     for [x, y] in loader:
       x, y = x.to(self.device), y.to(self.device)
       ret.append(self.attack_fn(x=x, y=y).detach().cpu().numpy())
-    return np.concatenate(ret, axis=0).transpose(0, 2, 3, 1)
+    if self.preprocess_img == True:
+      return np.concatenate(ret, axis=0).transpose(0, 2, 3, 1)
+    else:
+      return np.concatenate(ret, axis=0)
 
 
 def projected_gradient_descent(model_fn, x, eps, eps_iter, nb_iter, norm, loss_fn=None,

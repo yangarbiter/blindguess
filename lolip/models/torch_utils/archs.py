@@ -138,3 +138,20 @@ class LargeMLP(nn.Module):
         x = F.relu(self.hidden3(x))
         x = self.fc(x)
         return x
+
+class LargeMLPv2(nn.Module):
+    """Basic MLP architecture."""
+
+    def __init__(self, n_features, n_classes, n_channels=None):
+        super(LargeMLPv2, self).__init__()
+        self.hidden = nn.Linear(n_features[0], 384)
+        self.hidden2 = nn.Linear(384, 384)
+        self.hidden3 = nn.Linear(384, 384)
+        self.fc = nn.Linear(384, n_classes)
+
+    def forward(self, x):
+        x = F.relu(self.hidden(x))
+        x = F.relu(self.hidden2(x))
+        x = F.relu(self.hidden3(x))
+        x = self.fc(x)
+        return x

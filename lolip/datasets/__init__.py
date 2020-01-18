@@ -235,6 +235,7 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
         n_samples = int(n_samples)
         random_seed = auto_var.get_var("random_seed")
         X, y = make_moons(n_samples=n_samples, noise=float(noisy_level), random_state=random_seed)
-        trnX, tstX, trny, tsty = train_test_split(X, y, random_state=random_seed)
+        trnX, tstX, trny, tsty = train_test_split(X, y,
+                random_state=random_seed, test_size=0.25)
 
         return trnX, trny, tstX, tsty
