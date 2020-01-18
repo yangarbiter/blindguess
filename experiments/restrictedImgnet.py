@@ -44,7 +44,7 @@ def run_restrictedImgnet(auto_var):
         result['model_path'] = result['model_path'] % model.epochs
         result['history'] = history
 
-    result['trn_acc'] = (model.predict_ds(trn_ds) == tsty).mean()
+    result['trn_acc'] = (model.predict_ds(trn_ds) == trny).mean()
     result['tst_acc'] = (model.predict_ds(tst_ds) == tsty).mean()
     print(f"train acc: {result['trn_acc']}")
     print(f"test acc: {result['tst_acc']}")
@@ -52,7 +52,7 @@ def run_restrictedImgnet(auto_var):
     attack_model = auto_var.get_var("attack", model=model, n_classes=n_classes)
     with Stopwatch("Attacking"):
         #adv_trnX = attack_model.perturb(trnX, trny)
-        adv_tstX = attack_model.perturb(tstX, tsty)
+        adv_tstX = attack_model.perturb_ds(tst_ds) #tstX, tsty)
     result['adv_trn_acc'] = np.nan
     result['adv_tst_acc'] = (model.predict(adv_tstX) == tsty).mean()
     print(f"adv trn acc: {result['adv_trn_acc']}")
