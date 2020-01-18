@@ -33,13 +33,18 @@ def estimate_local_lip_v2(model, X, top_norm, btm_norm,
         batch_size=16, perturb_steps=10, step_size=0.003, epsilon=0.01,
         device="cuda"):
     model.eval()
-    dataset = data_utils.TensorDataset(preprocess_x(X))
-    loader = torch.utils.data.DataLoader(dataset,
-        batch_size=batch_size, shuffle=False, num_workers=2)
-    
+    if isinstance(X, torch.utils.data.Dataset):
+        loader = torch.utils.data.DataLoader(X,
+            batch_size=batch_size, shuffle=False, num_workers=2)
+    else:
+        dataset = data_utils.TensorDataset(preprocess_x(X))
+        loader = torch.utils.data.DataLoader(dataset,
+            batch_size=batch_size, shuffle=False, num_workers=2)
+
     total_loss = 0.
     ret = []
-    for [x] in loader:
+    for x in loader:
+        x = x[0]
         x = x.to(device)
         # generate adversarial example
         if btm_norm in [2, np.inf]:

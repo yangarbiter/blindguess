@@ -61,9 +61,9 @@ def run_restrictedImgnet(auto_var):
 
     result['avg_trn_lip'] = np.nan
     with Stopwatch("Estimating tst Lip"):
-        _, tst_lip = estimate_local_lip_v2(model.model, tstX, top_norm=2, btm_norm=norm,
+        tst_lip, _ = estimate_local_lip_v2(model.model, tst_ds, top_norm=2, btm_norm=norm,
                                      epsilon=auto_var.get_var("eps"), device=device)
-    result['avg_tst_lip'] = calc_lip(model, tstX, tst_lip, top_norm=2, btm_norm=norm).mean()
+    result['avg_tst_lip'] = tst_lip
     print(f"avg trn lip: {result['avg_trn_lip']}")
     print(f"avg tst lip: {result['avg_tst_lip']}")
 
