@@ -202,6 +202,29 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
 
         return trnX, trny, tstX, tsty
 
+    @register_var(argument=r"resImgnet112", shown_name="Restricted ImageNet")
+    @staticmethod
+    def resImgnet112(auto_var, inter_var):
+        #normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
+        #                             std=[0.229, 0.224, 0.225])
+        trn_ds = ImageFolder(
+            "/tmp2/RestrictedImgNet/train",
+            transform=transforms.Compose([
+                transforms.RandomResizedCrop(112),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                #normalize,
+            ]))
+        tst_ds = ImageFolder(
+            "/tmp2/RestrictedImgNet/val",
+            transform=transforms.Compose([
+                transforms.Resize(128),
+                transforms.CenterCrop(112),
+                transforms.ToTensor(),
+                #normalize,
+            ]))
+        return trn_ds, tst_ds
+
     @register_var(argument=r"resImgnet", shown_name="Restricted ImageNet")
     @staticmethod
     def resImgnet(auto_var, inter_var):
