@@ -130,7 +130,7 @@ class TorchModel(BaseEstimator):
                 ts_dataset = self._get_dataset(tstX, tsty)
 
             test_loader = torch.utils.data.DataLoader(ts_dataset,
-                batch_size=16, shuffle=False, num_workers=self.num_workers)
+                batch_size=32, shuffle=False, num_workers=self.num_workers)
 
         for epoch in range(self.start_epoch, self.epochs+1):
             train_loss = 0.
