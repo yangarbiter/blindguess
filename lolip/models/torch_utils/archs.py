@@ -109,6 +109,11 @@ class CNN002(nn.Module):
         logits = self.classifier(features.view(-1, 64 * 4 * 4))
         return logits
 
+class CNN003(CNN002):
+    def __init__(self, n_classes, drop=0.5, n_channels=1):
+        super().__init__(n_classes=n_classes, drop=0.5, n_channels=1)
+        self.gamma_var = nn.Parameter(torch.ones(1), requires_grad=True)
+
 class MLP(nn.Module):
     """Basic MLP architecture."""
 

@@ -20,6 +20,7 @@ from .torch_utils.llr import locally_linearity_regularization
 from .torch_utils.cure import cure_loss
 from .torch_utils.lip_loss import lip_loss
 from .torch_utils.tulip import tulip_loss
+from .torch_utils.rbf_weight import rbfw_loss
 from .torch_utils.gradient_regularization import gradient_regularization
 from .torch_utils import data_augs
 
@@ -62,7 +63,12 @@ class TorchModel(BaseEstimator):
         if self.multigpu:
             model = torch.nn.DataParallel(model, device_ids=[0, 1])
 
-        self.optimizer = get_optimizer(model, optimizer, learning_rate, momentum)
+        if 'rbfw' in self.loss_name:
+            #self.gamma_var = torch.ones(1, requires_grad=True).to(self.device)
+            self.gamma_var = model.gamma_var
+            self.optimizer = get_optimizer(model, optimizer, learning_rate, momentum, additional_vars=[self.gamma_var])
+        else:
+            self.optimizer = get_optimizer(model, optimizer, learning_rate, momentum)
         self.model = model
 
         #self.callbacks=callbacks
@@ -111,7 +117,7 @@ class TorchModel(BaseEstimator):
         log_interval = 1
 
         history = []
-        if 'lipl' in self.loss_name or 'tulip' in self.loss_name:
+        if 'lipl' in self.loss_name or 'tulip' in self.loss_name or 'rbfw' in self.loss_name:
             loss_fn = get_loss(self.loss_name, reduction="none")
         else:
             loss_fn = get_loss(self.loss_name, reduction="sum")
@@ -123,12 +129,12 @@ class TorchModel(BaseEstimator):
         test_loader = None
         if self.tst_ds is not None:
             if isinstance(self.tst_ds, VisionDataset):
-                dataset = self.tst_ds
+                ts_dataset = self.tst_ds
             else:
                 tstX, tsty = self.tst_ds
-                dataset = self._get_dataset(tstX, tsty)
+                ts_dataset = self._get_dataset(tstX, tsty)
 
-            test_loader = torch.utils.data.DataLoader(dataset,
+            test_loader = torch.utils.data.DataLoader(ts_dataset,
                 batch_size=16, shuffle=False, num_workers=self.num_workers)
 
         for epoch in range(self.start_epoch, self.epochs+1):
@@ -172,6 +178,11 @@ class TorchModel(BaseEstimator):
                         self.model, loss_fn, x, y, norm=self.norm, optimizer=self.optimizer,
                         step_size=self.eps*2/steps, epsilon=self.eps, perturb_steps=steps, beta=beta,
                         version=version, device=self.device
+                    )
+                elif 'rbfw' in self.loss_name:
+                    self.optimizer.zero_grad()
+                    outputs, loss = rbfw_loss(
+                        self.model, loss_fn, x, y, norm=self.norm, gamma=self.gamma_var,
                     )
                 elif 'tulip' in self.loss_name:
                     if 'tulipem1' in self.loss_name:
@@ -276,6 +287,8 @@ class TorchModel(BaseEstimator):
             self.start_epoch = epoch
 
             if (epoch - 1) % log_interval == 0:
+                if 'rbfw' in self.loss_name:
+                    print(f"current gamma: {self.gamma_var}")
                 print(f"current LR: {current_lr}")
                 self.model.eval()
                 history.append({

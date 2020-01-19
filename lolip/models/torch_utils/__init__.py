@@ -31,17 +31,22 @@ class CustomTensorDataset(Dataset):
     def __len__(self):
         return self.tensors[0].size(0)
 
-def get_optimizer(model, optimizer: str, learning_rate: float, momentum):
+def get_optimizer(model, optimizer: str, learning_rate: float, momentum, additional_vars=None):
+    if additional_vars is None:
+        parameters = model.parameters()
+    else:
+        parameters = [p for p in model.parameters()] + additional_vars
+
     if optimizer == 'nadam':
-        ret = Nadam(model.parameters(), lr=learning_rate)
+        ret = Nadam(parameters, lr=learning_rate)
     elif optimizer == 'adam':
-        ret = optim.Adam(model.parameters(), lr=learning_rate)
+        ret = optim.Adam(parameters, lr=learning_rate)
     elif optimizer == 'sgd':
-        ret = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
+        ret = optim.SGD(parameters, lr=learning_rate, momentum=momentum)
     elif optimizer == 'adagrad':
-        ret = optim.Adagrad(model.parameters(), lr=learning_rate, momentum=momentum)
+        ret = optim.Adagrad(parameters, lr=learning_rate, momentum=momentum)
     elif optimizer == 'rms':
-        ret = optim.RMSprop(model.parameters(), lr=learning_rate, momentum=momentum)
+        ret = optim.RMSprop(parameters, lr=learning_rate, momentum=momentum)
     else:
         raise ValueError(f"Not supported optimizer {optimizer}")
     return ret
@@ -82,6 +87,8 @@ def get_scheduler(optimizer, n_epochs: int, loss_name=None):
         scheduler = scheduler(optimizer, milestones=[40], gamma=0.1)
     elif n_epochs <= 60:
         scheduler = scheduler(optimizer, milestones=[20, 40, 50], gamma=0.1)
+    elif n_epochs <= 70:
+        scheduler = scheduler(optimizer, milestones=[40, 60], gamma=0.1)
     elif n_epochs <= 80:
         scheduler = scheduler(optimizer, milestones=[30, 50, 70], gamma=0.1)
     elif n_epochs <= 120:
