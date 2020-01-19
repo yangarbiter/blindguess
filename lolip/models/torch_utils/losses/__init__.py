@@ -32,9 +32,11 @@ def get_outputs_loss(model, optimizer, base_loss_fn, loss_name, x, y, reduction,
             steps = 10
 
         #print(f"TRADES version: {version}")
+        if clip_img:
+            clip_min, clip_max = 0, 1
         outputs, loss = trades_loss(
             model, base_loss_fn, x, y,
-            norm=norm, optimizer=optimizer,
+            norm=norm, optimizer=optimizer, clip_min=clip_min, clip_max=clip_max,
             step_size=eps*2/steps, epsilon=eps, perturb_steps=steps, beta=beta,
             device=device
         )
@@ -54,4 +56,5 @@ def get_outputs_loss(model, optimizer, base_loss_fn, loss_name, x, y, reduction,
         optimizer.zero_grad()
         outputs = model(x)
         loss = base_loss_fn(outputs, y)
+
     return outputs, loss

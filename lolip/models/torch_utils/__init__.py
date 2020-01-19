@@ -26,6 +26,11 @@ class CustomTensorDataset(Dataset):
             y = self.tensors[1][index]
             return (x, y)
 
+        if len(self.tensors) == 3:
+            y = self.tensors[1][index]
+            w = self.tensors[2][index]
+            return (x, y, w)
+
         return (x, )
 
     def __len__(self):

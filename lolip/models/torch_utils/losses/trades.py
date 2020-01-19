@@ -17,19 +17,16 @@ def trades_loss(model,
                 y,
                 norm,
                 optimizer,
+                clip_min=None,
+                clip_max=None,
                 step_size=0.003,
                 epsilon=0.031,
                 perturb_steps=10,
                 beta=1.0,
-                reduce='none',
-                version=None,
+                reduction='none',
                 device="gpu"):
     # define KL-loss
-    #criterion_kl = nn.KLDivLoss(size_average=False)
-    if version is not None and "plus" in version:
-        criterion_kl = nn.KLDivLoss(reduction='none')
-    else:
-        criterion_kl = nn.KLDivLoss(reduction='sum')
+    criterion_kl = nn.KLDivLoss(reduction='batchmean')
     model.eval()
     batch_size = len(x_natural)
     # generate adversarial example
@@ -40,14 +37,12 @@ def trades_loss(model,
             with torch.enable_grad():
                 loss_kl = criterion_kl(F.log_softmax(model(x_adv), dim=1),
                                        F.softmax(model(x_natural), dim=1))
-                if version is not None and "plus" in version:
-                    loss_kl = torch.sum(loss_kl, dim=1) \
-                            / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
-                    loss_kl = torch.sum(loss_kl)
+                loss = loss.mean()
             grad = torch.autograd.grad(loss_kl, [x_adv])[0]
             x_adv = x_adv.detach() + step_size * torch.sign(grad.detach())
             x_adv = torch.min(torch.max(x_adv, x_natural - epsilon), x_natural + epsilon)
-            x_adv = torch.clamp(x_adv, 0.0, 1.0)
+            if clip_min is not None and clip_max is not None:
+                x_adv = torch.clamp(x_adv, clip_min, clip_max)
     elif norm == 2:
         delta = 0.001 * torch.randn(x_natural.shape).to(device).detach()
         delta = Variable(delta.data, requires_grad=True)
@@ -63,10 +58,7 @@ def trades_loss(model,
             with torch.enable_grad():
                 loss = (-1) * criterion_kl(F.log_softmax(model(adv), dim=1),
                                            F.softmax(model(x_natural), dim=1))
-                if version is not None and "plus" in version:
-                    loss_kl = torch.sum(loss_kl, dim=1) \
-                            / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
-                    loss = torch.sum(loss_kl)
+                loss = loss.mean()
             loss.backward()
             # renorming gradient
             grad_norms = delta.grad.view(batch_size, -1).norm(p=2, dim=1)
@@ -78,31 +70,28 @@ def trades_loss(model,
 
             # projection
             delta.data.add_(x_natural)
-            delta.data.clamp_(0, 1).sub_(x_natural)
+            if clip_min is not None and clip_max is not None:
+                delta.data.clamp_(clip_min, clip_max).sub_(x_natural)
+            else:
+                delta.data.sub_(x_natural)
             delta.data.renorm_(p=2, dim=0, maxnorm=epsilon)
         x_adv = Variable(x_natural + delta, requires_grad=False)
     else:
-        x_adv = torch.clamp(x_adv, 0.0, 1.0)
+        raise ValueError(f"Not supported Norm {norm}")
     model.train()
 
-    x_adv = Variable(torch.clamp(x_adv, 0.0, 1.0), requires_grad=False)
+    if clip_min is not None and clip_max is not None:
+        x_adv = torch.clamp(x_adv, clip_min, clip_max)
+
+    x_adv = Variable(x_adv, requires_grad=False)
     # zero gradient
     optimizer.zero_grad()
     # calculate robust loss
-    #outputs = F.softmax(model(x_natural), dim=1)
     outputs = model(x_natural)
     loss_natural = loss_fn(outputs, y)
-    if version is not None and "plus" in version:
-        loss_kl = criterion_kl(F.log_softmax(model(x_adv), dim=1),
-                                F.softmax(model(x_natural), dim=1))
-        loss_kl = torch.sum(loss_kl, dim=1) \
-                / torch.norm(torch.flatten(x_adv - x_natural, start_dim=1), p=norm, dim=1)
-        loss_robust = (1.0 / batch_size) * torch.sum(loss_kl)
-    else:
-        loss_robust = (1.0 / batch_size) * criterion_kl(F.log_softmax(model(x_adv), dim=1),
-                                                        F.softmax(model(x_natural), dim=1))
-    if version is not None and "sum" in version:
-        loss = loss_natural + beta * batch_size * loss_robust
-    else:
-        loss = loss_natural + beta * loss_robust
+    loss_robust = criterion_kl(F.log_softmax(model(x_adv), dim=1),
+                               F.softmax(model(x_natural), dim=1))
+    loss_robust = loss_robust
+
+    loss = loss_natural + beta * loss_robust
     return outputs, loss

@@ -14,7 +14,7 @@ import numpy as np
 from sklearn.base import BaseEstimator
 from .torch_utils.losses import get_outputs_loss
 from .torch_utils import get_optimizer, get_loss, get_scheduler, CustomTensorDataset
-from .torch_utils.archs import *
+from .torch_utils import archs
 from .torch_utils import data_augs
 
 DEBUG = int(os.getenv("DEBUG", 0))
@@ -44,7 +44,8 @@ class TorchModelV2(BaseEstimator):
         else:
             self.device = device
 
-        arch_fn = globals()[self.architecture]
+        #arch_fn = globals()[self.architecture]
+        arch_fn = getattr(archs, self.architecture)
         if 'n_features' in inspect.getfullargspec(arch_fn)[0]:
             model = arch_fn(n_features=n_features, n_classes=self.n_classes, n_channels=n_channels)
         else:
@@ -75,8 +76,10 @@ class TorchModelV2(BaseEstimator):
         self.norm = norm
         ###############
 
-    def _get_dataset(self, X, y=None):
+    def _get_dataset(self, X, y=None, sample_weights=None):
         X = self._preprocess_x(X)
+        if sample_weights is None:
+            sample_weights = np.ones(len(X))
 
         if self.dataaug is None:
             transform = None
@@ -91,10 +94,10 @@ class TorchModelV2(BaseEstimator):
         if 'mse' in self.loss_name:
             Y = self.lbl_enc.transform(y.reshape(-1, 1))
             dataset = CustomTensorDataset(
-                (torch.from_numpy(X).float(), torch.from_numpy(Y).float()), transform=transform)
+                (torch.from_numpy(X).float(), torch.from_numpy(Y).float(), torch.from_numpy(sample_weights).float()), transform=transform)
         else:
             dataset = CustomTensorDataset(
-                (torch.from_numpy(X).float(), torch.from_numpy(y).long()), transform=transform)
+                (torch.from_numpy(X).float(), torch.from_numpy(y).long(), torch.from_numpy(sample_weights).float()), transform=transform)
         return dataset
 
     def _preprocess_x(self, X):
@@ -109,10 +112,7 @@ class TorchModelV2(BaseEstimator):
         log_interval = 1
 
         history = []
-        if 'lipl' in self.loss_name or 'tulip' in self.loss_name or 'rbfw' in self.loss_name:
-            loss_fn = get_loss(self.loss_name, reduction="none")
-        else:
-            loss_fn = get_loss(self.loss_name, reduction="sum")
+        loss_fn = get_loss(self.loss_name, reduction="none")
         scheduler = get_scheduler(self.optimizer, n_epochs=self.epochs, loss_name=self.loss_name)
 
         train_loader = torch.utils.data.DataLoader(dataset,
@@ -132,20 +132,28 @@ class TorchModelV2(BaseEstimator):
         for epoch in range(self.start_epoch, self.epochs+1):
             train_loss = 0.
             train_acc = 0.
-            for x, y in tqdm(train_loader, desc=f"Epoch {epoch}"):
+            for data in tqdm(train_loader, desc=f"Epoch {epoch}"):
                 self.model.train()
-                x, y = x.to(self.device), y.to(self.device)
+                if len(data) == 2:
+                    x, y = data[0].to(self.device), data[1].to(self.device)
+                    w = torch.ones(1).to(self.device)
+                elif len(data) == 3:
+                    x, y, w = (d.to(self.device) for d in data)
 
                 params = {
                     'optimizer': self.optimizer,
                     'norm': self.norm,
                     'device': self.device,
                     'eps': self.eps,
+                    'clip_img': True if len(torch.shape(x)) > 2 else False,
+                    'reduction': 'mean',
                 }
                 outputs, loss = get_outputs_loss(
                     self.model, self.optimizer, loss_fn,
-                    self.loss_name, x, y, reduction='mean', **params
+                    self.loss_name, x, y, **params
                 )
+
+                loss = (w * loss).mean()
 
                 loss.backward()
                 self.optimizer.step()
@@ -197,8 +205,8 @@ class TorchModelV2(BaseEstimator):
 
         return history
 
-    def fit(self, X, y, sample_weight=None, verbose=None):
-        dataset = self._get_dataset(X, y)
+    def fit(self, X, y, sample_weights=None, verbose=None):
+        dataset = self._get_dataset(X, y, sample_weights)
         return self.fit_dataset(dataset, verbose=verbose)
 
     def _prep_pred(self, X):
