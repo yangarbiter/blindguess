@@ -7,7 +7,7 @@ from torchvision.models import wide_resnet50_2, wide_resnet101_2
 from torchvision.models.resnet import _resnet, Bottleneck
 
 from .wideresnet import *
-from .resnet import resnet50, resnet152
+from .resnet import resnet50, resnet152, resnet101
 
 def tWRN50_2(n_classes, n_channels):
     return wide_resnet50_2(num_classes=n_classes)
@@ -31,6 +31,9 @@ def tWRN50_4(n_classes, n_channels):
 
 def tWRN50_5(n_classes, n_channels):
     return wide_resnet50_5(num_classes=n_classes)
+
+def ResNet101(n_classes, n_channels):
+    return resnet101(pretrained=False, n_channels=n_channels, num_classes=n_classes)
 
 def ResNet50(n_classes, n_channels):
     return resnet50(pretrained=False, n_channels=n_channels, num_classes=n_classes)

@@ -1,6 +1,7 @@
-
+import numpy as np
 import torch
 from torch.nn import PairwiseDistance
+from sklearn.neighbors import NearestNeighbors
 
 def rbf(alpha, gamma):
     phi = torch.exp(-gamma * alpha.pow(2))
@@ -25,3 +26,6 @@ def rbfw_loss(model, loss_fn, x, y, gamma, norm):
     loss = (weights * loss).sum()
 
     return outputs, loss
+
+def neighbor_weights(X: np.array, radius: float):
+    nn = NearestNeighbors(radius=radius)

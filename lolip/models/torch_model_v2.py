@@ -12,22 +12,15 @@ from torchvision.datasets import VisionDataset
 
 import numpy as np
 from sklearn.base import BaseEstimator
+from .torch_utils.losses import get_outputs_loss
 from .torch_utils import get_optimizer, get_loss, get_scheduler, CustomTensorDataset
 from .torch_utils.archs import *
-from ..attacks.torch.projected_gradient_descent import projected_gradient_descent
-from .torch_utils.trades import trades_loss
-from .torch_utils.llr import locally_linearity_regularization
-from .torch_utils.cure import cure_loss
-from .torch_utils.lip_loss import lip_loss
-from .torch_utils.tulip import tulip_loss
-#from .torch_utils.rbf_weight import rbfw_loss
-from .torch_utils.gradient_regularization import gradient_regularization
 from .torch_utils import data_augs
 
 DEBUG = int(os.getenv("DEBUG", 0))
 
 
-class TorchModel(BaseEstimator):
+class TorchModelV2(BaseEstimator):
     def __init__(self, lbl_enc, n_features, n_classes, loss_name='ce',
                 n_channels=None, learning_rate=1e-4, momentum=0.0, batch_size=256,
                 epochs=20, optimizer='sgd', architecture='arch_001', random_state=None,
@@ -63,7 +56,11 @@ class TorchModel(BaseEstimator):
         if self.multigpu:
             model = torch.nn.DataParallel(model, device_ids=[0, 1])
 
-        self.optimizer = get_optimizer(model, optimizer, learning_rate, momentum)
+        if 'rbfw' in self.loss_name:
+            self.gamma_var = model.gamma_var
+            self.optimizer = get_optimizer(model, optimizer, learning_rate, momentum, additional_vars=[self.gamma_var])
+        else:
+            self.optimizer = get_optimizer(model, optimizer, learning_rate, momentum)
         self.model = model
 
         #self.callbacks=callbacks
@@ -112,7 +109,7 @@ class TorchModel(BaseEstimator):
         log_interval = 1
 
         history = []
-        if 'lipl' in self.loss_name or 'tulip' in self.loss_name:
+        if 'lipl' in self.loss_name or 'tulip' in self.loss_name or 'rbfw' in self.loss_name:
             loss_fn = get_loss(self.loss_name, reduction="none")
         else:
             loss_fn = get_loss(self.loss_name, reduction="sum")
@@ -139,130 +136,16 @@ class TorchModel(BaseEstimator):
                 self.model.train()
                 x, y = x.to(self.device), y.to(self.device)
 
-                if 'trades' in self.loss_name:
-                    if 'trades10' in self.loss_name:
-                        beta = 10.0
-                    elif 'trades20' in self.loss_name:
-                        beta = 20.0
-                    elif 'trades16' in self.loss_name:
-                        beta = 16.0
-                    elif 'trades6' in self.loss_name:
-                        beta = 6.0
-                    elif 'trades.5' in self.loss_name:
-                        beta = 0.5
-                    elif 'trades.1' in self.loss_name:
-                        beta = 0.1
-                    else:
-                        beta = 1.0
-
-                    if 'K20' in self.loss_name:
-                        steps = 20
-                    else:
-                        steps = 10
-
-                    version = None
-                    if 'ptrades' in self.loss_name:
-                        version = "plus"
-                    elif 'pstrades' in self.loss_name:
-                        version = "plussum"
-                    elif 'strades' in self.loss_name:
-                        version = "sum"
-
-                    #print(f"TRADES version: {version}")
-                    outputs, loss = trades_loss(
-                        self.model, loss_fn, x, y, norm=self.norm, optimizer=self.optimizer,
-                        step_size=self.eps*2/steps, epsilon=self.eps, perturb_steps=steps, beta=beta,
-                        version=version, device=self.device
-                    )
-                elif 'tulip' in self.loss_name:
-                    if 'tulipem1' in self.loss_name:
-                        lambd = 1e-1
-                    if 'tulipem2' in self.loss_name:
-                        lambd = 1e-2
-                    if 'tulip0' in self.loss_name:
-                        lambd = 0
-                    else:
-                        lambd = 1
-
-                    if 'ssem1' in self.loss_name:
-                        step_size = 1e-1
-                    elif 'ssem2' in self.loss_name:
-                        step_size = 1e-2
-                    elif 'ssem3' in self.loss_name:
-                        step_size = 1e-3
-                    else:
-                        step_size = 1e-0
-                    self.optimizer.zero_grad()
-                    outputs, loss = tulip_loss(self.model, loss_fn, x, y, step_size=step_size, lambd=1)
-                elif 'lipl' in self.loss_name:
-                    if 'K20' in self.loss_name:
-                        steps = 20
-                    else:
-                        steps = 10
-                    loss = lip_loss(
-                        self.model, loss_fn, x, y, nb_classes=self.n_classes, norm=self.norm,
-                        optimizer=self.optimizer, step_size=self.eps*2/steps, epsilon=self.eps,
-                        perturb_steps=steps, device=self.device
-                    )
-                    outputs = self.model(x)
-                elif 'llr' in self.loss_name:
-                    if 'llr65' in self.loss_name:
-                        lambd, mu = 6.0, 5.0
-                    else:
-                        lambd, mu = 4.0, 3.0
-
-                    if 'sllr' in self.loss_name:
-                        version = "sum"
-                    else:
-                        version = None
-                    outputs, loss = locally_linearity_regularization(
-                        self.model, loss_fn, x, y, norm=self.norm, optimizer=self.optimizer,
-                        step_size=self.eps/5, epsilon=self.eps, perturb_steps=10,
-                        lambd=lambd, mu=mu, version=version
-                    )
-                elif 'cure' in self.loss_name:
-                    if 'cure68' in self.loss_name:
-                        h, lambda_ = 6.0, 8.0
-                    elif 'cure18' in self.loss_name:
-                        h, lambda_ = 1.5, 8.0
-                    elif 'cure14' in self.loss_name:
-                        h, lambda_ = 1.25, 4.0
-                    else:
-                        h, lambda_ = 3.0, 4.0
-
-                    self.optimizer.zero_grad()
-                    if 'scure' in self.loss_name:
-                        version = "sum"
-                    else:
-                        version = None
-                    #print(f"CURE version: {version}")
-                    outputs, loss = cure_loss(self.model, loss_fn, x, y, h=h, lambda_=lambda_, version=version)
-                elif 'gr' in self.loss_name:
-                    if 'gr4' in self.loss_name:
-                        lambd = 4.0
-                    elif 'gr1e6' in self.loss_name:
-                        lambd = 1e6
-                    elif 'gr1e5' in self.loss_name:
-                        lambd = 1e5
-                    elif 'gr1e4' in self.loss_name:
-                        lambd = 1e4
-                    elif 'gr1e3' in self.loss_name:
-                        lambd = 1e3
-                    elif 'gr1e2' in self.loss_name:
-                        lambd = 1e2
-                    else:
-                        lambd = 1.0
-                    outputs, loss = gradient_regularization(
-                        self.model, loss_fn, self.optimizer, x, y, lambd=lambd)
-                else:
-                    if 'adv' in self.loss_name:
-                        x = projected_gradient_descent(self.model, x, y=y,
-                                clip_min=0, clip_max=1,
-                                eps_iter=self.eps/5,
-                                eps=self.eps, norm=self.norm, nb_iter=10)
-                    self.optimizer.zero_grad()
-                    outputs = self.model(x)
-                    loss = loss_fn(outputs, y)
+                params = {
+                    'optimizer': self.optimizer,
+                    'norm': self.norm,
+                    'device': self.device,
+                    'eps': self.eps,
+                }
+                outputs, loss = get_outputs_loss(
+                    self.model, self.optimizer, loss_fn,
+                    self.loss_name, x, y, reduction='mean', **params
+                )
 
                 loss.backward()
                 self.optimizer.step()
@@ -277,6 +160,8 @@ class TorchModel(BaseEstimator):
             self.start_epoch = epoch
 
             if (epoch - 1) % log_interval == 0:
+                if 'rbfw' in self.loss_name:
+                    print(f"current gamma: {self.gamma_var}")
                 print(f"current LR: {current_lr}")
                 self.model.eval()
                 history.append({
