@@ -145,7 +145,7 @@ class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
 
     @register_var(argument=r'(?P<dataaug>[a-zA-Z0-9]+-)?(?P<loss>[a-zA-Z0-9]+)-tor2-(?P<arch>[a-zA-Z0-9_]+)(?P<hyper>-[a-zA-Z0-9]+)?')
     @staticmethod
-    def torch_model(auto_var, inter_var, dataaug, loss, arch, hyper, trnX, trny, n_channels, multigpu=False):
+    def torch_model_v2(auto_var, inter_var, dataaug, loss, arch, hyper, trnX, trny, n_channels, multigpu=False):
         from .torch_model_v2 import TorchModelV2
 
         dataaug = dataaug[:-1] if dataaug else None
