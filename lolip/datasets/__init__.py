@@ -296,3 +296,19 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
                 random_state=random_seed, test_size=0.25)
 
         return trnX, trny, tstX, tsty
+
+    @register_var()
+    @staticmethod
+    def cancer(auto_var, var_value, inter_var):
+        # https://www.csie.ntu.edu.tw/~cjlin/libsvmtools/datasets/binary/breast-cancer
+        X, y = load_svmlight_file("./lolip/datasets/files/breast-cancer")
+        X = X.todense()
+        y[y==2] = 0
+        y[y==4] = 1
+        y = y.astype(int)
+
+        random_seed = auto_var.get_var("random_seed")
+        trnX, tstX, trny, tsty = train_test_split(X, y,
+                random_state=random_seed, test_size=0.25)
+
+        return trnX, trny, tstX, tsty
