@@ -34,7 +34,8 @@ class TorchModel(BaseEstimator):
                 weight_decay=0.0, callbacks=None, train_type=None, eps:float=0.1, norm=np.inf,
                 multigpu=False, dataaug=None, device=None, num_workers=4):
         print(f'lr: {learning_rate}, opt: {optimizer}, loss: {loss_name}, '
-              f'arch: {architecture}, dataaug: {dataaug}, batch_size: {batch_size}')
+              f'arch: {architecture}, dataaug: {dataaug}, batch_size: {batch_size}, '
+              f'momentum: {momentum}, weight_decay: {weight_decay}')
         self.num_workers = num_workers
         self.n_features = n_features
         self.n_classes = n_classes
