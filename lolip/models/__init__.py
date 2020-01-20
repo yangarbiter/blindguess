@@ -8,6 +8,8 @@ DEBUG = int(os.getenv("DEBUG", 0))
 
 def get_hyper(name, loss, arch, dataset_name):
     ret = {}
+    ret['optimizer'] = 'sgd'
+
     if 'rbfw' in loss:
         ret['epochs'] = 20
         ret['learning_rate'] = 1e-4
@@ -85,6 +87,11 @@ def get_hyper(name, loss, arch, dataset_name):
         ret['epochs'] = 2
 
     if name is not None:
+        if 'nadam' in name:
+            ret['optimizer'] = 'nadam'
+        elif 'adam' in name:
+            ret['optimizer'] = 'adam'
+
         if 'wd.9' in name:
             ret['weight_decay'] = 0.9
 
