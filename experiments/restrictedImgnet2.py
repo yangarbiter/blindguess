@@ -20,6 +20,7 @@ def run_restrictedImgnet_2(auto_var):
     _ = set_random_seed(auto_var)
     norm = auto_var.get_var("norm")
     trn_ds, tst_ds = auto_var.get_var("dataset")
+    print(len(trn_ds), len(tst_ds))
     lbl_enc = None # TODO
     auto_var.set_intermidiate_variable("lbl_enc", lbl_enc)
     n_classes = len(trn_ds.classes)
