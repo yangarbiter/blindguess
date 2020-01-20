@@ -208,6 +208,8 @@ class TorchModel(BaseEstimator):
                 elif 'llr' in self.loss_name:
                     if 'llr65' in self.loss_name:
                         lambd, mu = 6.0, 5.0
+                    elif 'llr36' in self.loss_name:
+                        lambd, mu = 3.0, 6.0
                     else:
                         lambd, mu = 4.0, 3.0
 
@@ -215,9 +217,16 @@ class TorchModel(BaseEstimator):
                         version = "sum"
                     else:
                         version = None
+
+                    #if epoch >= 20:
+                    #    epsilon = self.eps
+                    #else:
+                    #    epsilon = self.eps * (epoch-1) / 20
+                    epsilon = self.eps
+
                     outputs, loss = locally_linearity_regularization(
                         self.model, loss_fn, x, y, norm=self.norm, optimizer=self.optimizer,
-                        step_size=self.eps/5, epsilon=self.eps, perturb_steps=10,
+                        step_size=epsilon/2, epsilon=epsilon, perturb_steps=2,
                         lambd=lambd, mu=mu, version=version
                     )
                 elif 'cure' in self.loss_name:

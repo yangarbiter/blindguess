@@ -85,6 +85,8 @@ def get_loss(loss_name: str, reduction='sum'):
 def get_scheduler(optimizer, n_epochs: int, loss_name=None):
     if 'scure' in loss_name:
         scheduler = CureMultiStepLR
+    elif 'sllr' in loss_name or 'tulip' in loss_name:
+        return MultiStepLR(optimizer, milestones=[n_epochs-10], gamma=0.1)
     else:
         scheduler = MultiStepLR
 

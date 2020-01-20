@@ -12,7 +12,8 @@ from lolip.variables import get_file_name
 
 def load_model(auto_var, trnX, trny, tstX, tsty, n_channels):
     model = auto_var.get_var("model", trnX=trnX, trny=trny, n_channels=n_channels)
-    model.tst_ds = (tstX, tsty)
+    if tstX is not None and tsty is not None:
+        model.tst_ds = (tstX, tsty)
     model_path = get_file_name(auto_var).split("-")
     model_path[0] = 'pgd'
     model_path = '-'.join(model_path)
