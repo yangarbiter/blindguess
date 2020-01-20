@@ -13,7 +13,7 @@ from autovar import AutoVar
 from autovar.hooks import get_ext
 
 from experiments import run_experiment01, run_experiment02, run_experiment03, \
-    run_restrictedImgnet, run_sanity
+    run_restrictedImgnet, run_sanity, run_restrictedImgnet_2
 
 logging.basicConfig(level=0)
 tex_base = "./tex_files"
@@ -38,6 +38,10 @@ def setup_experiments(auto_var):
     exp_name = 'restrictedImgnet'
     mkdir_p(f"./results/{exp_name}")
     auto_var.register_experiment(f'{exp_name}', run_restrictedImgnet,
+            {'file_format': 'pickle', 'result_file_dir': f'./results/{exp_name}'})
+    exp_name = 'restrictedImgnet2'
+    mkdir_p(f"./results/{exp_name}")
+    auto_var.register_experiment(f'{exp_name}', run_restrictedImgnet_2,
             {'file_format': 'pickle', 'result_file_dir': f'./results/{exp_name}'})
 
 
