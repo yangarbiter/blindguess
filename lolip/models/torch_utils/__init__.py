@@ -36,22 +36,22 @@ class CustomTensorDataset(Dataset):
     def __len__(self):
         return self.tensors[0].size(0)
 
-def get_optimizer(model, optimizer: str, learning_rate: float, momentum, additional_vars=None):
+def get_optimizer(model, optimizer: str, learning_rate: float, momentum, weight_decay, additional_vars=None):
     if additional_vars is None:
         parameters = model.parameters()
     else:
         parameters = [p for p in model.parameters()] + additional_vars
 
     if optimizer == 'nadam':
-        ret = Nadam(parameters, lr=learning_rate)
+        ret = Nadam(parameters, lr=learning_rate, weight_decay=weight_decay)
     elif optimizer == 'adam':
-        ret = optim.Adam(parameters, lr=learning_rate)
+        ret = optim.Adam(parameters, lr=learning_rate, weight_decay=weight_decay)
     elif optimizer == 'sgd':
-        ret = optim.SGD(parameters, lr=learning_rate, momentum=momentum)
+        ret = optim.SGD(parameters, lr=learning_rate, momentum=momentum, weight_decay=weight_decay)
     elif optimizer == 'adagrad':
-        ret = optim.Adagrad(parameters, lr=learning_rate, momentum=momentum)
+        ret = optim.Adagrad(parameters, lr=learning_rate, momentum=momentum, weight_decay=weight_decay)
     elif optimizer == 'rms':
-        ret = optim.RMSprop(parameters, lr=learning_rate, momentum=momentum)
+        ret = optim.RMSprop(parameters, lr=learning_rate, momentum=momentum, weight_decay=weight_decay)
     else:
         raise ValueError(f"Not supported optimizer {optimizer}")
     return ret

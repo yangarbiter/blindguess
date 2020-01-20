@@ -85,6 +85,12 @@ def get_hyper(name, loss, arch, dataset_name):
         ret['epochs'] = 2
 
     if name is not None:
+        if 'wd.9' in name:
+            ret['weight_decay'] = 0.9
+
+        if 'mo.9' in name:
+            ret['momentum'] = 0.9
+
         if 'lrem4' in name:
             ret['learning_rate'] = 1e-4
         elif 'lrem3' in name:
@@ -94,7 +100,6 @@ def get_hyper(name, loss, arch, dataset_name):
         elif 'lrem1' in name:
             ret['learning_rate'] = 1e-1
 
-    if name is not None:
         if 'bs256' in name:
             ret['batch_size'] = 256
         elif 'bs128' in name:

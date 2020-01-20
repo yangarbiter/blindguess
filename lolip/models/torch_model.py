@@ -31,7 +31,7 @@ class TorchModel(BaseEstimator):
     def __init__(self, lbl_enc, n_features, n_classes, loss_name='ce',
                 n_channels=None, learning_rate=1e-4, momentum=0.0, batch_size=256,
                 epochs=20, optimizer='sgd', architecture='arch_001', random_state=None,
-                callbacks=None, train_type=None, eps:float=0.1, norm=np.inf,
+                weight_decay=0.0, callbacks=None, train_type=None, eps:float=0.1, norm=np.inf,
                 multigpu=False, dataaug=None, device=None, num_workers=4):
         print(f'lr: {learning_rate}, opt: {optimizer}, loss: {loss_name}, '
               f'arch: {architecture}, dataaug: {dataaug}, batch_size: {batch_size}')
@@ -63,7 +63,7 @@ class TorchModel(BaseEstimator):
         if self.multigpu:
             model = torch.nn.DataParallel(model, device_ids=[0, 1])
 
-        self.optimizer = get_optimizer(model, optimizer, learning_rate, momentum)
+        self.optimizer = get_optimizer(model, optimizer, learning_rate, momentum, weight_decay)
         self.model = model
 
         #self.callbacks=callbacks
