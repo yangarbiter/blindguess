@@ -42,23 +42,22 @@ def run_restrictedImgnet_2(auto_var):
     attack_model = auto_var.get_var("attack", model=model, n_classes=n_classes)
     with Stopwatch("Attacking"):
         adv_trnX = attack_model.perturb_ds(trn_ds)
-        adv_tstX = attack_model.perturb_ds(tst_ds) #tstX, tsty)
+        adv_tstX = attack_model.perturb_ds(tst_ds)
     result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
     result['adv_tst_acc'] = (model.predict(adv_tstX) == tsty).mean()
     print(f"adv trn acc: {result['adv_trn_acc']}")
     print(f"adv tst acc: {result['adv_tst_acc']}")
     del attack_model
 
-    result['avg_trn_lip'] = np.nan
     with Stopwatch("Estimating tst Lip"):
         trn_lip, _ = estimate_local_lip_v2(model.model, trn_ds, top_norm=1, btm_norm=norm,
                                      epsilon=auto_var.get_var("eps"), device=device)
         tst_lip, _ = estimate_local_lip_v2(model.model, tst_ds, top_norm=1, btm_norm=norm,
                                      epsilon=auto_var.get_var("eps"), device=device)
-    result['avg_trn_lip'] = trn_lip
-    result['avg_tst_lip'] = tst_lip
-    print(f"avg trn lip: {result['avg_trn_lip']}")
-    print(f"avg tst lip: {result['avg_tst_lip']}")
+    result['avg_trn_lip_1'] = trn_lip
+    result['avg_tst_lip_1'] = tst_lip
+    print(f"avg trn lip: {result['avg_trn_lip_1']}")
+    print(f"avg tst lip: {result['avg_tst_lip_1']}")
 
     print(result)
     return result
