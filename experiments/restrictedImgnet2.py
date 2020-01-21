@@ -19,7 +19,7 @@ def run_restrictedImgnet_2(auto_var):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     _ = set_random_seed(auto_var)
     norm = auto_var.get_var("norm")
-    trn_ds, tst_ds = auto_var.get_var("dataset")
+    trn_ds, tst_ds = auto_var.get_var("dataset", eval_trn=True)
     print(len(trn_ds), len(tst_ds))
     lbl_enc = None # TODO
     auto_var.set_intermidiate_variable("lbl_enc", lbl_enc)
