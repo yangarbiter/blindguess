@@ -11,13 +11,12 @@ import joblib
 
 from .utils import set_random_seed
 from .experiment02 import load_model
-from lolip.utils import estimate_local_lip_v2
 from lolip.variables import get_file_name
 
 
 def load_result(auto_var):
     model_path = get_file_name(auto_var) + ".pkl"
-    model_path = os.path.join("./results/restrictedImgnet3/", model_path)
+    model_path = os.path.join("./results/restrictedImgnet2/", model_path)
     res = joblib.load(model_path)
     ret = {
         'trn_acc': res['trn_acc'],
