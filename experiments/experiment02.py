@@ -4,6 +4,7 @@ import torch
 from bistiming import Stopwatch
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+import joblib
 
 from .utils import set_random_seed
 from lolip.utils import estimate_local_lip_v2
@@ -27,37 +28,47 @@ def load_model(auto_var, trnX, trny, tstX, tsty, n_channels):
     model.model.cuda()
     return model_path, model
 
+def load_result(auto_var):
+    model_path = get_file_name(auto_var) + ".pkl"
+    model_path = os.path.join("./results/experiment03", model_path)
+    res = joblib.load(model_path)
+    ret = {
+        'trn_acc': res['trn_acc'],
+        'tst_acc': res['tst_acc'],
+        'avg_trn_lip_1': res['avg_trn_lip_1'],
+        'avg_tst_lip_1': res['avg_tst_lip_1'],
+        'avg_trn_lip_kl': res['avg_trn_lip_kl'],
+        'avg_tst_lip_kl': res['avg_tst_lip_kl'],
+    }
+    del res
+    return ret
 
 def run_experiment02(auto_var):
     _ = set_random_seed(auto_var)
-    #norm = auto_var.get_var("norm")
     trnX, trny, tstX, tsty = auto_var.get_var("dataset")
     lbl_enc = OneHotEncoder(categories=[np.sort(np.unique(trny))], sparse=False).fit(trny.reshape(-1, 1))
     auto_var.set_intermidiate_variable("lbl_enc", lbl_enc)
     n_classes = len(np.unique(trny))
     n_channels = trnX.shape[-1]
 
-    result = {}
+    result = load_result(auto_var)
+    print(f"loaded results: {result}")
     result['model_path'], model = load_model(auto_var, trnX, trny, tstX, tsty, n_channels)
 
-    result['trn_acc'] = (model.predict(trnX) == trny).mean()
-    result['tst_acc'] = (model.predict(tstX) == tsty).mean()
+    #result['trn_acc'] = (model.predict(trnX) == trny).mean()
+    #result['tst_acc'] = (model.predict(tstX) == tsty).mean()
     print(f"train acc: {result['trn_acc']}")
     print(f"test acc: {result['tst_acc']}")
 
-    attack_model = auto_var.get_var("attack", model=model, n_classes=n_classes)
+    attack_model = auto_var.get_var("attack", model=model,
+            n_classes=n_classes, clip_min=0, clip_max=1)
     with Stopwatch("Attacking"):
-        if len(trnX) < 90000:
-            adv_trnX = attack_model.perturb(trnX[:100], trny[:100])
-        adv_tstX = attack_model.perturb(tstX[:1000], tsty[:1000])
-    if len(trnX) < 90000:
-        result['adv_trn_acc'] = (model.predict(adv_trnX) == trny[:100]).mean()
-    else:
-        result['adv_trn_acc'] = np.nan
-    result['adv_tst_acc'] = (model.predict(adv_tstX[:1000]) == tsty[:1000]).mean()
+        adv_trnX = attack_model.perturb(trnX, trny)
+        adv_tstX = attack_model.perturb(tstX, tsty)
+    result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
+    result['adv_tst_acc'] = (model.predict(adv_tstX) == tsty).mean()
     print(f"adv trn acc: {result['adv_trn_acc']}")
     print(f"adv tst acc: {result['adv_tst_acc']}")
-    del attack_model
 
     #with Stopwatch("Estimating trn Lip"):
     #    trn_lip = estimate_local_lip_v2(model.model, trnX, top_norm=2, btm_norm=norm,
