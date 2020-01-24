@@ -41,11 +41,12 @@ def run_restrictedImgnet_2(auto_var):
 
     attack_model = auto_var.get_var("attack", model=model, n_classes=n_classes)
     with Stopwatch("Attacking"):
-        adv_trnX = attack_model.perturb_ds(trn_ds)
+        #adv_trnX = attack_model.perturb_ds(trn_ds)
         adv_tstX = attack_model.perturb_ds(tst_ds)
-    result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
+    result['adv_trn_acc'] = np.nan
+    #result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
     result['adv_tst_acc'] = (model.predict(adv_tstX) == tsty).mean()
-    print(f"adv trn acc: {result['adv_trn_acc']}")
+    #print(f"adv trn acc: {result['adv_trn_acc']}")
     print(f"adv tst acc: {result['adv_tst_acc']}")
     del attack_model
 
