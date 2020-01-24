@@ -89,6 +89,12 @@ class mnistLip(ExpExperiments):
         cls.grid_params = grid_params
         return ExpExperiments.__new__(cls, *args, **kwargs)
 
+class mnistFixLips(mnistOtherLips):
+    def __new__(cls, *args, **kwargs):
+        return mnistOtherLips.__new__(cls, *args, **kwargs)
+    def __init__(self):
+        self.experiment_fn = 'experiment02'
+
 class svhnLip(ExpExperiments):
     def __new__(cls, *args, **kwargs):
         cls.name = "svhn"
@@ -215,6 +221,12 @@ class cifarOtherLips(ExpExperiments):
         })
         cls.grid_params = grid_params
         return ExpExperiments.__new__(cls, *args, **kwargs)
+
+class cifarFixLips(cifarOtherLips):
+    def __new__(cls, *args, **kwargs):
+        return cifarOtherLips.__new__(cls, *args, **kwargs)
+    def __init__(self):
+        self.experiment_fn = 'experiment02'
 
 class tinyLip(ExpExperiments):
     def __new__(cls, *args, **kwargs):
