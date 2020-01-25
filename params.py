@@ -255,22 +255,21 @@ class resImgOtherLips(ExpExperiments):
         cls.name = "Restricted ImageNet"
         cls.experiment_fn = 'restrictedImgnet2'
         grid_params = []
-        #arch = "ResNet152"
-        #grid_params.append({
-        #    'dataset': ['resImgnet112v3'],
-        #    'model': [
-        #        f'ce-tor-{arch}-adambs128',
-        #        f'trades6ce-tor-{arch}-ba128',
-        #        f'advce-tor-{arch}-bs128',
-        #        f'sllr36ce-tor-{arch}-lrem4bs128',
-        #        f'sllr36ce-tor-{arch}-bs128',
-        #        f'tulipce-tor-{arch}-adambs128',
-        #    ],
-        #    'eps': [0.005],
-        #    'norm': ['inf'],
-        #    'attack': ['pgd'],
-        #    'random_seed': random_seed,
-        #})
+        arch = "ResNet152"
+        grid_params.append({
+            'dataset': ['resImgnet112v3'],
+            'model': [
+                f'ce-tor-{arch}-adambs128',
+                f'trades6ce-tor-{arch}-bs128',
+                f'advce-tor-{arch}-adambs128',
+                f'sllr36ce-tor-{arch}-adambs128',
+                f'tulipce-tor-{arch}-adambs128',
+            ],
+            'eps': [0.005],
+            'norm': ['inf'],
+            'attack': ['pgd'],
+            'random_seed': random_seed,
+        })
         arch = "ResNet50"
         grid_params.append({
             'dataset': ['resImgnet112v3'],
