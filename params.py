@@ -250,10 +250,10 @@ class tinyLip(ExpExperiments):
         cls.grid_params = grid_params
         return ExpExperiments.__new__(cls, *args, **kwargs)
 
-class resImgOtherLip(ExpExperiments):
+class resImgOtherLips(ExpExperiments):
     def __new__(cls, *args, **kwargs):
         cls.name = "Restricted ImageNet"
-        cls.experiment_fn = 'restrictedImgnet3'
+        cls.experiment_fn = 'restrictedImgnet2'
         grid_params = []
         #arch = "ResNet152"
         #grid_params.append({
@@ -289,3 +289,9 @@ class resImgOtherLip(ExpExperiments):
         })
         cls.grid_params = grid_params
         return ExpExperiments.__new__(cls, *args, **kwargs)
+
+class resImgFixLips(resImgOtherLips):
+    def __new__(cls, *args, **kwargs):
+        return resImgOtherLips.__new__(cls, *args, **kwargs)
+    def __init__(self):
+        self.experiment_fn = 'restrictedImgnet3'
