@@ -194,7 +194,8 @@ class TorchModel(BaseEstimator):
                     else:
                         step_size = 1e-0
                     self.optimizer.zero_grad()
-                    outputs, loss = tulip_loss(self.model, loss_fn, x, y, step_size=step_size, lambd=1)
+                    outputs, loss = tulip_loss(self.model, loss_fn, x, y,
+                            step_size=step_size, lambd=lambd)
                 elif 'lipl' in self.loss_name:
                     if 'K20' in self.loss_name:
                         steps = 20
