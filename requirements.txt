@@ -3,7 +3,6 @@ joblib
 mkdir_p
 bistiming
 numpy
-cleverhans
 tqdm
 torch
 torchvision
