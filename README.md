@@ -1,29 +1,41 @@
 # Local Lipschitzness
 
 
-## Install
+## Setup
 
+### Install requiremented libraries
 ```
 pip install -r ./requirements.txt
 ```
 
-Install cleverhans from its github repository
+### Install cleverhans from its github repository
 ```
 pip install --upgrade git+https://github.com/tensorflow/cleverhans.git#egg=cleverhans
 ```
 
-Use the script (`./scripts/restrictedImgNet.py`) to generate Restricted ImageNet
-dataset.
+### Generate the Restricted ImageNet dataset
+Use the script `./scripts/restrictedImgNet.py`
+
+## Parameters
 
 The default training parameters are set in `./lolip/models/__init__.py`
 
 The network architecture defined in `./lolip/models/torch_utils/archs.py`
 
+## Options
+
+arch: ("CNN001", "CNN002", "WRN_40_10", "ResNet152", "ResNet50")
+
+- ce-tor-{arch}
+- strades6ce-tor-{arch}
+- advce-tor-{arch}
+- tulipce-tor-{arch}
+
 ## Examples
 
 Run Natural training with CNN001 on the MNIST dataset
 Perturbation distance is set to $0.1$ with L infinity norm.
-Batch size is $64$ and using the SGD optimizer
+Batch size is $64$ and using the SGD optimizer (default parameters).
 ```
 python ./main.py --experiment experiment01 \
   --no-hooks \
