@@ -160,45 +160,8 @@ class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
         params['multigpu'] = multigpu
         params['n_channels'] = n_channels
         params['dataaug'] = dataaug
-        params['trn_log_callbacks'] = trn_log_callbacks
-        #params['ckpt_dir'] = f"./checkpoints/{auto_var.get_variable_name('model')}"
-        #if hyper == "gd":
-        #    params['batch_size'] = len(trnX)
 
         model = TorchModel(
-            lbl_enc=inter_var['lbl_enc'],
-            **params,
-        )
-        return model
-
-
-    @register_var(argument=r'(?P<dataaug>[a-zA-Z0-9]+-)?(?P<loss>[a-zA-Z0-9]+)-tor2-(?P<arch>[a-zA-Z0-9_]+)(?P<hyper>-[a-zA-Z0-9\.]+)?')
-    @staticmethod
-    def torch_model_v2(auto_var, inter_var, dataaug, loss, arch, hyper, trnX, trny, n_channels, device, multigpu=False):
-        from .torch_model_v2 import TorchModelV2
-
-        dataaug = dataaug[:-1] if dataaug else None
-
-        n_features = trnX.shape[1:]
-        n_classes = len(np.unique(trny))
-        dataset_name = auto_var.get_variable_name('dataset')
-
-        params: dict = get_hyper(hyper, loss, arch, dataset_name)
-        params['eps'] = auto_var.get_var("eps")
-        params['norm'] = auto_var.get_var("norm")
-        params['loss_name'] = loss
-        params['n_features'] = n_features
-        params['n_classes'] = n_classes
-        params['architecture'] = arch
-        params['multigpu'] = multigpu
-        params['n_channels'] = n_channels
-        params['dataaug'] = dataaug
-        params['device'] = device
-        #params['ckpt_dir'] = f"./checkpoints/{auto_var.get_variable_name('model')}"
-        #if hyper == "gd":
-        #    params['batch_size'] = len(trnX)
-
-        model = TorchModelV2(
             lbl_enc=inter_var['lbl_enc'],
             **params,
         )
