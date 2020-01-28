@@ -260,7 +260,9 @@ class resImgOtherLips(ExpExperiments):
             'dataset': ['resImgnet112v3'],
             'model': [
                 f'ce-tor-{arch}-adambs128',
-                f'trades6ce-tor-{arch}-bs128',
+                f'stradesce-tor-{arch}-adambs128',
+                f'strades6ce-tor-{arch}-adambs128',
+                f'strades10ce-tor-{arch}-adambs128',
                 f'advce-tor-{arch}-adambs128',
                 f'sllr36ce-tor-{arch}-adambs128',
                 f'tulipce-tor-{arch}-adambs128',
@@ -277,6 +279,7 @@ class resImgOtherLips(ExpExperiments):
                 f'ce-tor-{arch}-adambs128',
                 f'stradesce-tor-{arch}-adambs128',
                 f'strades6ce-tor-{arch}-adambs128',
+                f'strades10ce-tor-{arch}-adambs128',
                 f'advce-tor-{arch}-adambs128',
                 f'sllr36ce-tor-{arch}-adambs128',
                 f'tulipce-tor-{arch}-adambs128',
