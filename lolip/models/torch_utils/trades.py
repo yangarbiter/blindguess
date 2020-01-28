@@ -85,6 +85,7 @@ def trades_loss(model,
     model.train()
 
     x_adv = Variable(torch.clamp(x_adv, 0.0, 1.0), requires_grad=False)
+    #x_adv = Variable(x_adv, requires_grad=False)
     # zero gradient
     optimizer.zero_grad()
     # calculate robust loss
