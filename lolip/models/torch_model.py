@@ -149,6 +149,8 @@ class TorchModel(BaseEstimator):
                         beta = 16.0
                     elif 'trades6' in self.loss_name:
                         beta = 6.0
+                    elif 'trades3' in self.loss_name:
+                        beta = 3.0
                     elif 'trades.5' in self.loss_name:
                         beta = 0.5
                     elif 'trades.1' in self.loss_name:
