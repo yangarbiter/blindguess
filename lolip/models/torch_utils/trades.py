@@ -1,5 +1,6 @@
 """
 https://raw.githubusercontent.com/yaodongyu/TRADES/master/trades.py
+ICML'19 paper "Theoretically Principled Trade-off between Robustness and Accuracy"
 """
 import numpy as np
 
