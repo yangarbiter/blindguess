@@ -16,13 +16,21 @@ pip install --upgrade git+https://github.com/tensorflow/cleverhans.git#egg=cleve
 ### Generate the Restricted ImageNet dataset
 Use the script `./scripts/restrictedImgNet.py`
 
-## Parameters
+## Repository structure
 
-The default training parameters are set in `./lolip/models/__init__.py`
+### Parameters
 
-The network architecture defined in `./lolip/models/torch_utils/archs.py`
+The default training parameters are set in [lolip/models/__init__.py](lolip/models/__init__.py)
 
-## Options
+The network architecture defined in [lolip/models/torch_utils/archs.py](lolip/models/torch_utils/archs.py)
+
+### Algorithm implementations
+
+- [TRADES](lolip/models/torch_utils/trades.py)
+- [LLR](lolip/models/torch_utils/llr.py)
+- [TULIP](lolip/models/torch_utils/tulip.py)
+
+### Example options for model parameter
 
 arch: ("CNN001", "CNN002", "WRN_40_10", "ResNet152", "ResNet50")
 
