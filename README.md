@@ -29,6 +29,7 @@ The network architecture defined in [lolip/models/torch_utils/archs.py](lolip/mo
 - [TRADES](lolip/models/torch_utils/trades.py)
 - [LLR](lolip/models/torch_utils/llr.py)
 - [TULIP](lolip/models/torch_utils/tulip.py)
+- [Adversarial Training](lolip/models/torch_model.py#L271)
 
 ### Example options for model parameter
 
