@@ -6,7 +6,6 @@ from mkdir_p import mkdir_p
 
 from lolip.variables import auto_var, get_file_name
 from params import (
-    noisyMnistLip,
     mnistLip,
     cifarLip,
     svhnLip,
