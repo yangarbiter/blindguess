@@ -14,6 +14,9 @@ from params import (
     mnistOtherLips,
     cifarOtherLips,
     svhnOtherLips,
+    mnistFixLips,
+    cifarFixLips,
+    svhnFixLips,
 )
 from utils import setup_experiments
 
@@ -23,13 +26,13 @@ DEBUG = True if os.environ.get('DEBUG', False) else False
 
 def main(auto_var):
     experiments = [
-        tinyLip(),
         cifarLip(),
         cifarOtherLips(),
         mnistOtherLips(),
         mnistLip(),
-        #svhnOtherLips(),
-        #svhnLip(),
+        svhnLip(),
+        svhnOtherLips(),
+        svhnFixLips(),
     ]
     grid_params = []
     for exp in experiments:

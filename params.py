@@ -33,7 +33,7 @@ class mnistOtherLips(ExpExperiments):
                 f'stradesce-tor-{arch}',
                 f'ce-tor-{arch}',
                 f'tulipce-tor-{arch}',
-                #f'cure14ce-tor-{arch}',
+                f'cure14ce-tor-{arch}',
                 f'advce-tor-{arch}',
                 f'llrce-tor-{arch}',
             ],
@@ -60,7 +60,7 @@ class mnistLip(ExpExperiments):
                 #f'liplce-tor-{arch}',
                 f'tulipce-tor-{arch}',
                 f'ce-tor-{arch}',
-                #f'cure14ce-tor-{arch}',
+                f'cure14ce-tor-{arch}',
                 f'advce-tor-{arch}',
                 f'llrce-tor-{arch}',
             ],
@@ -77,7 +77,7 @@ class mnistLip(ExpExperiments):
                 f'stradesce-tor-{arch}',
                 f'tulipce-tor-{arch}',
                 f'ce-tor-{arch}',
-                #f'cure14ce-tor-{arch}',
+                f'cure14ce-tor-{arch}',
                 f'advce-tor-{arch}',
                 f'llrce-tor-{arch}',
             ],
@@ -106,7 +106,7 @@ class svhnLip(ExpExperiments):
                 'ce-tor-WRN_40_10',
                 'strades6ce-tor-WRN_40_10',
                 'strades10ce-tor-WRN_40_10',
-                #'curece-tor-WRN_40_10',
+                'tulipce-tor-WRN_40_10',
                 'advce-tor-WRN_40_10-lrem2',
                 'llrce-tor-WRN_40_10',
             ],
@@ -129,8 +129,7 @@ class svhnOtherLips(ExpExperiments):
                 'ce-tor-WRN_40_10',
                 'strades6ce-tor-WRN_40_10',
                 'stradesce-tor-WRN_40_10',
-                'pstrades6ce-tor-WRN_40_10',
-                #'cure14ce-tor-WRN_40_10',
+                'tulipce-tor-WRN_40_10',
                 'advce-tor-WRN_40_10-lrem2',
                 'llrce-tor-WRN_40_10',
             ],
@@ -183,6 +182,12 @@ class cifarLip(ExpExperiments):
         })
         cls.grid_params = grid_params
         return ExpExperiments.__new__(cls, *args, **kwargs)
+
+class svhnFixLips(svhnOtherLips):
+    def __new__(cls, *args, **kwargs):
+        return svhnOtherLips.__new__(cls, *args, **kwargs)
+    def __init__(self):
+        self.experiment_fn = 'experiment02'
 
 class cifarOtherLips(ExpExperiments):
     def __new__(cls, *args, **kwargs):
