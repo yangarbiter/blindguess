@@ -18,6 +18,8 @@ Use the script `./scripts/restrictedImgNet.py`
 
 ## Repository structure
 
+The spline example [notebooks/spline.ipynb](notebooks/spline.ipynb)
+
 ### Parameters
 
 The default training parameters are set in [lolip/models/__init__.py](lolip/models/__init__.py)
