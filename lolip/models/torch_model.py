@@ -180,9 +180,9 @@ class TorchModel(BaseEstimator):
                 elif 'tulip' in self.loss_name:
                     if 'tulipem1' in self.loss_name:
                         lambd = 1e-1
-                    if 'tulipem2' in self.loss_name:
+                    elif 'tulipem2' in self.loss_name:
                         lambd = 1e-2
-                    if 'tulip0' in self.loss_name:
+                    elif 'tulip0' in self.loss_name:
                         lambd = 0
                     else:
                         lambd = 1
