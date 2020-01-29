@@ -18,7 +18,7 @@ Use the script `./scripts/restrictedImgNet.py`
 
 ## Repository structure
 
-The spline example [notebooks/spline.ipynb](notebooks/spline.ipynb)
+The spline example [notebooks/splines.ipynb](notebooks/splines.ipynb)
 
 ### Parameters
 
