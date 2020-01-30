@@ -25,10 +25,12 @@ DEBUG = True if os.environ.get('DEBUG', False) else False
 
 def main(auto_var):
     experiments = [
+        mnistLip(),
+        mnistOtherLips(),
+        mnistFixLips(),
         cifarLip(),
         cifarOtherLips(),
-        mnistOtherLips(),
-        mnistLip(),
+        cifarFixLips(),
         svhnLip(),
         svhnOtherLips(),
         svhnFixLips(),
@@ -42,7 +44,7 @@ def main(auto_var):
             run_param['allow_failure'] = False
         else:
             run_param['n_jobs'] = 1
-            run_param['allow_failure'] = False
+            run_param['allow_failure'] = True
 
         auto_var.run_grid_params(exp_fn, grid_params, **run_param)
     #auto_var.run_grid_params(delete_file, grid_params, n_jobs=1,
