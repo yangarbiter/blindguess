@@ -40,34 +40,34 @@ def run_experiment03(auto_var):
 
     if len(trnX) < 90000:
         with Stopwatch("Estimating trn Lip (L1)"):
-            trn_lip_1, pert = estimate_local_lip_v2(model.model, trnX, top_norm=1, btm_norm=norm,
+            trn_lip_1, _ = estimate_local_lip_v2(model.model, trnX, top_norm=1, btm_norm=norm,
                                          epsilon=auto_var.get_var("eps"))
-            result['trn_lip_1_pert'] = pert
+            result['trn_lip_1_pert'] = np.nan
             result['avg_trn_lip_1'] = trn_lip_1
     else:
         result['trn_lip_1_pert'] = np.nan
         result['avg_trn_lip_1'] = np.nan
     with Stopwatch("Estimating tst Lip (L1)"):
-        tst_lip_1, pert = estimate_local_lip_v2(model.model, tstX, top_norm=1, btm_norm=norm,
+        tst_lip_1, _ = estimate_local_lip_v2(model.model, tstX, top_norm=1, btm_norm=norm,
                                      epsilon=auto_var.get_var("eps"))
-        result['tst_lip_1_pert'] = pert
+        result['tst_lip_1_pert'] = np.nan
         result['avg_tst_lip_1'] = tst_lip_1
     print(f"avg trn lip (L1): {result['avg_trn_lip_1']}")
     print(f"avg tst lip (L1): {result['avg_tst_lip_1']}")
 
     if len(trnX) < 90000:
         with Stopwatch("Estimating trn Lip (KL)"):
-            trn_lip_kl, pert = estimate_local_lip_v2(model.model, trnX, top_norm='kl', btm_norm=norm,
+            trn_lip_kl, _ = estimate_local_lip_v2(model.model, trnX, top_norm='kl', btm_norm=norm,
                                          epsilon=auto_var.get_var("eps"))
-            result['trn_lip_kl_pert'] = pert
+            result['trn_lip_kl_pert'] = np.nan
             result['avg_trn_lip_kl'] = trn_lip_kl
     else:
         result['trn_lip_kl_pert'] = np.nan
         result['avg_trn_lip_kl'] = np.nan
     with Stopwatch("Estimating tst Lip (KL)"):
-        tst_lip_kl, pert = estimate_local_lip_v2(model.model, tstX, top_norm='kl', btm_norm=norm,
+        tst_lip_kl, _ = estimate_local_lip_v2(model.model, tstX, top_norm='kl', btm_norm=norm,
                                      epsilon=auto_var.get_var("eps"))
-        result['tst_lip_kl_pert'] = pert
+        result['tst_lip_kl_pert'] = np.nan
         result['avg_tst_lip_kl'] = tst_lip_kl
     print(f"avg trn lip (KL): {result['avg_trn_lip_kl']}")
     print(f"avg tst lip (KL): {result['avg_tst_lip_kl']}")
