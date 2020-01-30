@@ -13,10 +13,11 @@ class mnistOtherLips(ExpExperiments):
             'dataset': ['mnist'],
             'model': [
                 f'strades6ce-tor-{arch}',
+                f'strades3ce-tor-{arch}',
                 f'stradesce-tor-{arch}',
                 f'ce-tor-{arch}',
                 f'tulipce-tor-{arch}',
-                #f'cure14ce-tor-{arch}',
+                f'cure14ce-tor-{arch}',
                 f'advce-tor-{arch}',
                 f'llrce-tor-{arch}',
             ],
@@ -30,6 +31,7 @@ class mnistOtherLips(ExpExperiments):
             'dataset': ['mnist'],
             'model': [
                 f'strades6ce-tor-{arch}',
+                f'strades3ce-tor-{arch}',
                 f'stradesce-tor-{arch}',
                 f'ce-tor-{arch}',
                 f'tulipce-tor-{arch}',
@@ -55,6 +57,7 @@ class mnistLip(ExpExperiments):
             'dataset': ['mnist'],
             'model': [
                 f'strades6ce-tor-{arch}',
+                f'strades3ce-tor-{arch}',
                 f'stradesce-tor-{arch}',
                 #f'liplkld-tor-{arch}',
                 #f'liplce-tor-{arch}',
@@ -74,6 +77,7 @@ class mnistLip(ExpExperiments):
             'dataset': ['mnist'],
             'model': [
                 f'strades6ce-tor-{arch}',
+                f'strades3ce-tor-{arch}',
                 f'stradesce-tor-{arch}',
                 f'tulipce-tor-{arch}',
                 f'ce-tor-{arch}',
@@ -104,8 +108,9 @@ class svhnLip(ExpExperiments):
             'dataset': ['svhn'],
             'model': [
                 'ce-tor-WRN_40_10',
+                'stradesce-tor-WRN_40_10',
+                'strades3ce-tor-WRN_40_10',
                 'strades6ce-tor-WRN_40_10',
-                'strades10ce-tor-WRN_40_10',
                 'tulipce-tor-WRN_40_10',
                 'advce-tor-WRN_40_10-lrem2',
                 'llrce-tor-WRN_40_10',
@@ -127,8 +132,9 @@ class svhnOtherLips(ExpExperiments):
             'dataset': ['svhn'],
             'model': [
                 'ce-tor-WRN_40_10',
-                'strades6ce-tor-WRN_40_10',
                 'stradesce-tor-WRN_40_10',
+                'strades3ce-tor-WRN_40_10',
+                'strades6ce-tor-WRN_40_10',
                 'tulipce-tor-WRN_40_10',
                 'advce-tor-WRN_40_10-lrem2',
                 'llrce-tor-WRN_40_10',
@@ -152,8 +158,9 @@ class cifarLip(ExpExperiments):
             'model': [
                 'ce-tor-WRN_40_10',
                 'tulipce-tor-WRN_40_10',
-                'strades6ce-tor-WRN_40_10',
                 'stradesce-tor-WRN_40_10',
+                'strades3ce-tor-WRN_40_10',
+                'strades6ce-tor-WRN_40_10',
                 #'cure14ce-tor-WRN_40_10',
                 'advce-tor-WRN_40_10',
                 'llrce-tor-WRN_40_10',
@@ -168,8 +175,9 @@ class cifarLip(ExpExperiments):
             'model': [
                 'aug01-ce-tor-WRN_40_10',
                 'aug01-tulipce-tor-WRN_40_10',
-                'aug01-strades6ce-tor-WRN_40_10',
                 'aug01-stradesce-tor-WRN_40_10',
+                'aug01-strades3ce-tor-WRN_40_10',
+                'aug01-strades6ce-tor-WRN_40_10',
                 'aug01-advce-tor-WRN_40_10-lrem2',
                 #'aug01-scure14ce-tor-WRN_40_10-lrem4',
                 'aug01-llrce-tor-WRN_40_10',
@@ -200,6 +208,7 @@ class cifarOtherLips(ExpExperiments):
                 'ce-tor-WRN_40_10',
                 'tulipce-tor-WRN_40_10',
                 'stradesce-tor-WRN_40_10',
+                'strades3ce-tor-WRN_40_10',
                 'strades6ce-tor-WRN_40_10',
                 'advce-tor-WRN_40_10',
                 'llrce-tor-WRN_40_10',
@@ -214,8 +223,9 @@ class cifarOtherLips(ExpExperiments):
             'model': [
                 'aug01-ce-tor-WRN_40_10',
                 'aug01-tulipce-tor-WRN_40_10',
-                'aug01-strades6ce-tor-WRN_40_10',
                 'aug01-stradesce-tor-WRN_40_10',
+                'aug01-strades3ce-tor-WRN_40_10',
+                'aug01-strades6ce-tor-WRN_40_10',
                 'aug01-advce-tor-WRN_40_10-lrem2',
                 'aug01-llrce-tor-WRN_40_10',
             ],
@@ -260,31 +270,14 @@ class resImgOtherLips(ExpExperiments):
         cls.name = "Restricted ImageNet"
         cls.experiment_fn = 'restrictedImgnet2'
         grid_params = []
-        arch = "ResNet152"
-        grid_params.append({
-            'dataset': ['resImgnet112v3'],
-            'model': [
-                f'ce-tor-{arch}-adambs128',
-                f'stradesce-tor-{arch}-adambs128',
-                f'strades6ce-tor-{arch}-adambs128',
-                f'strades10ce-tor-{arch}-adambs128',
-                f'advce-tor-{arch}-adambs128',
-                f'sllr36ce-tor-{arch}-adambs128',
-                f'tulipce-tor-{arch}-adambs128',
-            ],
-            'eps': [0.005],
-            'norm': ['inf'],
-            'attack': ['pgd'],
-            'random_seed': random_seed,
-        })
         arch = "ResNet50"
         grid_params.append({
             'dataset': ['resImgnet112v3'],
             'model': [
                 f'ce-tor-{arch}-adambs128',
                 f'stradesce-tor-{arch}-adambs128',
+                f'strades3ce-tor-{arch}-adambs128',
                 f'strades6ce-tor-{arch}-adambs128',
-                f'strades10ce-tor-{arch}-adambs128',
                 f'advce-tor-{arch}-adambs128',
                 f'sllr36ce-tor-{arch}-adambs128',
                 f'tulipce-tor-{arch}-adambs128',
