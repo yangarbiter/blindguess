@@ -125,6 +125,8 @@ def get_hyper(name, loss, arch, dataset_name):
             ret['epochs'] = 20
         elif 'ep40' in name:
             ret['epochs'] = 40
+        elif 'ep50' in name:
+            ret['epochs'] = 50
         elif 'ep60' in name:
             ret['epochs'] = 60
 
