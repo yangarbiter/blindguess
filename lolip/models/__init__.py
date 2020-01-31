@@ -121,6 +121,13 @@ def get_hyper(name, loss, arch, dataset_name):
         elif 'bs16' in name:
             ret['batch_size'] = 16
 
+        if 'ep20' in name:
+            ret['epochs'] = 20
+        elif 'ep40' in name:
+            ret['epochs'] = 40
+        elif 'ep60' in name:
+            ret['epochs'] = 60
+
     return ret
 
 class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
@@ -129,7 +136,7 @@ class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
 
     @register_var(argument=r'(?P<dataaug>[a-zA-Z0-9]+-)?(?P<loss>[a-zA-Z0-9\.]+)-tor-(?P<arch>[a-zA-Z0-9_]+)(?P<hyper>-[a-zA-Z0-9\.]+)?')
     @staticmethod
-    def torch_model(auto_var, inter_var, dataaug, loss, arch, hyper, trnX, trny, n_channels, multigpu=False):
+    def torch_model(auto_var, inter_var, dataaug, loss, arch, hyper, trnX, trny, n_channels, multigpu=False, trn_log_callbacks=None):
         from .torch_model import TorchModel
 
         dataaug = dataaug[:-1] if dataaug else None
@@ -149,6 +156,7 @@ class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
         params['multigpu'] = multigpu
         params['n_channels'] = n_channels
         params['dataaug'] = dataaug
+        params['trn_log_callbacks'] = trn_log_callbacks
         #params['ckpt_dir'] = f"./checkpoints/{auto_var.get_variable_name('model')}"
         #if hyper == "gd":
         #    params['batch_size'] = len(trnX)

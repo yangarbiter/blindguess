@@ -32,10 +32,11 @@ class TorchModel(BaseEstimator):
                 n_channels=None, learning_rate=1e-4, momentum=0.0, batch_size=256,
                 epochs=20, optimizer='sgd', architecture='arch_001', random_state=None,
                 weight_decay=0.0, callbacks=None, train_type=None, eps:float=0.1, norm=np.inf,
-                multigpu=False, dataaug=None, device=None, num_workers=4):
+                multigpu=False, dataaug=None, device=None, num_workers=4, trn_log_callbacks=None):
         print(f'lr: {learning_rate}, opt: {optimizer}, loss: {loss_name}, '
               f'arch: {architecture}, dataaug: {dataaug}, batch_size: {batch_size}, '
-              f'momentum: {momentum}, weight_decay: {weight_decay}, eps: {eps}')
+              f'momentum: {momentum}, weight_decay: {weight_decay}, eps: {eps}, '
+              f'epochs: {epochs}')
         self.num_workers = num_workers
         self.n_features = n_features
         self.n_classes = n_classes
@@ -46,6 +47,7 @@ class TorchModel(BaseEstimator):
         self.lbl_enc = lbl_enc
         self.loss_name = loss_name
         self.dataaug = dataaug
+        self.trn_log_callbacks = trn_log_callbacks
 
         if device is None:
             self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -284,6 +286,10 @@ class TorchModel(BaseEstimator):
                     self.model.eval()
                     train_loss += loss.item()
                     train_acc += (outputs.argmax(dim=1)==y).sum().float().item()
+
+                    if self.trn_log_callbacks is not None:
+                        for callback_fn in self.trn_log_callbacks:
+                            callback_fn(self, x, y, loss_fn)
 
             current_lr = self.optimizer.state_dict()['param_groups'][0]['lr']
             scheduler.step()
