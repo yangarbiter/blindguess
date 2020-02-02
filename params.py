@@ -3,50 +3,6 @@ from utils import ExpExperiments
 
 random_seed = list(range(1))
 
-class mnistOtherLips(ExpExperiments):
-    def __new__(cls, *args, **kwargs):
-        cls.name = "mnist"
-        cls.experiment_fn = 'experiment03'
-        grid_params = []
-        arch = "CNN001"
-        grid_params.append({
-            'dataset': ['mnist'],
-            'model': [
-                f'strades6ce-tor-{arch}',
-                f'strades3ce-tor-{arch}',
-                f'stradesce-tor-{arch}',
-                f'ce-tor-{arch}',
-                f'tulipce-tor-{arch}',
-                f'cure14ce-tor-{arch}',
-                f'advce-tor-{arch}',
-                f'llrce-tor-{arch}',
-            ],
-            'eps': [0.1],
-            'norm': ['inf'],
-            'attack': ['pgd'],
-            'random_seed': random_seed,
-        })
-        arch = "CNN002"
-        grid_params.append({
-            'dataset': ['mnist'],
-            'model': [
-                f'strades6ce-tor-{arch}',
-                f'strades3ce-tor-{arch}',
-                f'stradesce-tor-{arch}',
-                f'ce-tor-{arch}',
-                f'tulipce-tor-{arch}',
-                f'cure14ce-tor-{arch}',
-                f'advce-tor-{arch}',
-                f'llrce-tor-{arch}',
-            ],
-            'eps': [0.1],
-            'norm': ['inf'],
-            'attack': ['pgd'],
-            'random_seed': random_seed,
-        })
-        cls.grid_params = grid_params
-        return ExpExperiments.__new__(cls, *args, **kwargs)
-
 class mnistLip(ExpExperiments):
     def __new__(cls, *args, **kwargs):
         cls.name = "mnist"
@@ -63,9 +19,10 @@ class mnistLip(ExpExperiments):
                 #f'liplce-tor-{arch}',
                 f'tulipce-tor-{arch}',
                 f'ce-tor-{arch}',
-                f'cure14ce-tor-{arch}',
+                #f'cure14ce-tor-{arch}',
                 f'advce-tor-{arch}',
-                f'llrce-tor-{arch}',
+                #f'llrce-tor-{arch}',
+                f'sllrce-tor-{arch}',
             ],
             'eps': [0.1],
             'norm': ['inf'],
@@ -81,9 +38,8 @@ class mnistLip(ExpExperiments):
                 f'stradesce-tor-{arch}',
                 f'tulipce-tor-{arch}',
                 f'ce-tor-{arch}',
-                f'cure14ce-tor-{arch}',
                 f'advce-tor-{arch}',
-                f'llrce-tor-{arch}',
+                f'sllrce-tor-{arch}',
             ],
             'eps': [0.1],
             'norm': ['inf'],
@@ -93,9 +49,15 @@ class mnistLip(ExpExperiments):
         cls.grid_params = grid_params
         return ExpExperiments.__new__(cls, *args, **kwargs)
 
-class mnistFixLips(mnistOtherLips):
+class mnistOtherLips(mnistLip):
     def __new__(cls, *args, **kwargs):
-        return mnistOtherLips.__new__(cls, *args, **kwargs)
+        return mnistLip.__new__(cls, *args, **kwargs)
+    def __init__(self):
+        self.experiment_fn = 'experiment03'
+
+class mnistFixLips(mnistLip):
+    def __new__(cls, *args, **kwargs):
+        return mnistLip.__new__(cls, *args, **kwargs)
     def __init__(self):
         self.experiment_fn = 'experiment02'
 
@@ -113,7 +75,7 @@ class svhnLip(ExpExperiments):
                 'strades6ce-tor-WRN_40_10',
                 'tulipce-tor-WRN_40_10',
                 'advce-tor-WRN_40_10-lrem2',
-                'llrce-tor-WRN_40_10',
+                'sllrce-tor-WRN_40_10',
             ],
             'eps': [0.031],
             'norm': ['inf'],
@@ -123,29 +85,17 @@ class svhnLip(ExpExperiments):
         cls.grid_params = grid_params
         return ExpExperiments.__new__(cls, *args, **kwargs)
 
-class svhnOtherLips(ExpExperiments):
+class svhnOtherLips(svhnLip):
     def __new__(cls, *args, **kwargs):
-        cls.name = "svhn"
-        cls.experiment_fn = 'experiment03'
-        grid_params = []
-        grid_params.append({
-            'dataset': ['svhn'],
-            'model': [
-                'ce-tor-WRN_40_10',
-                'stradesce-tor-WRN_40_10',
-                'strades3ce-tor-WRN_40_10',
-                'strades6ce-tor-WRN_40_10',
-                'tulipce-tor-WRN_40_10',
-                'advce-tor-WRN_40_10-lrem2',
-                'llrce-tor-WRN_40_10',
-            ],
-            'eps': [0.031],
-            'norm': ['inf'],
-            'attack': ['pgd'],
-            'random_seed': random_seed,
-        })
-        cls.grid_params = grid_params
-        return ExpExperiments.__new__(cls, *args, **kwargs)
+        return svhnLip.__new__(cls, *args, **kwargs)
+    def __init__(self):
+        self.experiment_fn = 'experiment02'
+
+class svhnFixLips(svhnLip):
+    def __new__(cls, *args, **kwargs):
+        return svhnLip.__new__(cls, *args, **kwargs)
+    def __init__(self):
+        self.experiment_fn = 'experiment02'
 
 
 class cifarLip(ExpExperiments):
@@ -163,7 +113,8 @@ class cifarLip(ExpExperiments):
                 'strades6ce-tor-WRN_40_10',
                 #'cure14ce-tor-WRN_40_10',
                 'advce-tor-WRN_40_10',
-                'llrce-tor-WRN_40_10',
+                #'llrce-tor-WRN_40_10',
+                'sllrce-tor-WRN_40_10-lrem2',
             ],
             'eps': [0.031],
             'norm': ['inf'],
@@ -181,7 +132,8 @@ class cifarLip(ExpExperiments):
                 'aug01-advce-tor-WRN_40_10-lrem2',
                 #'aug01-scure14ce-tor-WRN_40_10-lrem4',
                 'aug01-llrce-tor-WRN_40_10',
-                'aug01-sllrce-tor-WRN_40_10',
+                #'aug01-sllrce-tor-WRN_40_10',
+                'aug01-sllrce-tor-WRN_40_10-lrem2',
             ],
             'eps': [0.031],
             'norm': ['inf'],
@@ -191,55 +143,15 @@ class cifarLip(ExpExperiments):
         cls.grid_params = grid_params
         return ExpExperiments.__new__(cls, *args, **kwargs)
 
-class svhnFixLips(svhnOtherLips):
+class cifarOtherLips(cifarLip):
     def __new__(cls, *args, **kwargs):
-        return svhnOtherLips.__new__(cls, *args, **kwargs)
+        return cifarLip.__new__(cls, *args, **kwargs)
     def __init__(self):
-        self.experiment_fn = 'experiment02'
+        self.experiment_fn = 'experiment03'
 
-class cifarOtherLips(ExpExperiments):
+class cifarFixLips(cifarLip):
     def __new__(cls, *args, **kwargs):
-        cls.name = "cifar"
-        cls.experiment_fn = 'experiment03'
-        grid_params = []
-        grid_params.append({
-            'dataset': ['cifar10'],
-            'model': [
-                'ce-tor-WRN_40_10',
-                'tulipce-tor-WRN_40_10',
-                'stradesce-tor-WRN_40_10',
-                'strades3ce-tor-WRN_40_10',
-                'strades6ce-tor-WRN_40_10',
-                'advce-tor-WRN_40_10',
-                'llrce-tor-WRN_40_10',
-            ],
-            'eps': [0.031],
-            'norm': ['inf'],
-            'attack': ['pgd'],
-            'random_seed': random_seed,
-        })
-        grid_params.append({
-            'dataset': ['cifar10'],
-            'model': [
-                'aug01-ce-tor-WRN_40_10',
-                'aug01-tulipce-tor-WRN_40_10',
-                'aug01-stradesce-tor-WRN_40_10',
-                'aug01-strades3ce-tor-WRN_40_10',
-                'aug01-strades6ce-tor-WRN_40_10',
-                'aug01-advce-tor-WRN_40_10-lrem2',
-                'aug01-llrce-tor-WRN_40_10',
-            ],
-            'eps': [0.031],
-            'norm': ['inf'],
-            'attack': ['pgd'],
-            'random_seed': random_seed,
-        })
-        cls.grid_params = grid_params
-        return ExpExperiments.__new__(cls, *args, **kwargs)
-
-class cifarFixLips(cifarOtherLips):
-    def __new__(cls, *args, **kwargs):
-        return cifarOtherLips.__new__(cls, *args, **kwargs)
+        return cifarLip.__new__(cls, *args, **kwargs)
     def __init__(self):
         self.experiment_fn = 'experiment02'
 
