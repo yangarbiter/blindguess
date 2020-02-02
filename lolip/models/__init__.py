@@ -102,6 +102,8 @@ def get_hyper(name, loss, arch, dataset_name):
 
         if 'mo.9' in name:
             ret['momentum'] = 0.9
+        elif 'mo0' in name:
+            ret['momentum'] = 0
 
         if 'lrem4' in name:
             ret['learning_rate'] = 1e-4
