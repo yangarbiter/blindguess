@@ -4,6 +4,7 @@ from functools import partial
 import numpy as np
 import torch
 from torch.autograd import Variable
+from torch.nn.functional import softmax
 
 from ..base import AttackModel
 from .projected_gradient_descent import projected_gradient_descent
@@ -40,7 +41,8 @@ class MultiTarget(AttackModel):
     for [x, y] in loader:
       x = x.to(device)
 
-      pred = self.model_fn(x).detach().cpu().numpy()
+      pred = self.model_fn(x)
+      pred = softmax(pred, dim=1).detach().cpu().numpy()
       pred = np.array([pred[i, yi] for i, yi in enumerate(y)])
 
       r = []
@@ -48,7 +50,8 @@ class MultiTarget(AttackModel):
       for j in range(self.n_classes):
         yp = j * torch.ones(len(x)).long().to(device)
         adv_x = self.attack_fn(x=x, y=yp).detach()
-        scores.append(self.model_fn(adv_x)[:, j].detach().cpu().numpy() - pred)
+        adv_pred = softmax(self.model_fn(adv_x), dim=1)[:, j]
+        scores.append(adv_pred.detach().cpu().numpy() - pred)
         r.append(adv_x.cpu().numpy())
       scores = np.array(scores)
       #idx = scores.argmax(axis=0)

@@ -37,7 +37,7 @@ class AttackVarClass(VariableClass, metaclass=RegisteringChoiceType):
             eps=auto_var.get_var("eps"),
             eps_iter=auto_var.get_var("eps")*2/nb_iter,
             nb_iter=nb_iter,
-            batch_size=256,
+            batch_size=128,
         )
 
     @register_var()
