@@ -58,7 +58,6 @@ class MultiTarget(AttackModel):
 
 
       idx_top2 = np.argsort(scores, axis=0)[-2:, :]
-      import ipdb; ipdb.set_trace()
       y = y.to("cpu").numpy()
       r = np.array(r)
       for i in range(len(x)):
