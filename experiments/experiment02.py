@@ -30,6 +30,9 @@ def load_model(auto_var, trnX, trny, tstX, tsty, n_channels):
 
 def load_result(auto_var):
     model_path = get_file_name(auto_var) + ".pkl"
+    model_path = model_path.split("-")
+    model_path[0] = 'pgd'
+    model_path = '-'.join(model_path)
     model_path = os.path.join("./results/experiment03", model_path)
     res = joblib.load(model_path)
     ret = {
@@ -55,31 +58,22 @@ def run_experiment02(auto_var):
     print(f"loaded results: {result}")
     result['model_path'], model = load_model(auto_var, trnX, trny, tstX, tsty, n_channels)
 
-    #result['trn_acc'] = (model.predict(trnX) == trny).mean()
-    #result['tst_acc'] = (model.predict(tstX) == tsty).mean()
     print(f"train acc: {result['trn_acc']}")
     print(f"test acc: {result['tst_acc']}")
-
+    attack_name = auto_var.get_variable_name("attack")
     attack_model = auto_var.get_var("attack", model=model,
             n_classes=n_classes, clip_min=0, clip_max=1)
     with Stopwatch("Attacking"):
-        adv_trnX = attack_model.perturb(trnX, trny)
+        if 'multitarget' not in attack_name:
+            adv_trnX = attack_model.perturb(trnX, trny)
         adv_tstX = attack_model.perturb(tstX, tsty)
-    result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
+    if 'multitarget' in attack_name:
+        result['adv_trn_acc'] = np.nan
+    else:
+        result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
     result['adv_tst_acc'] = (model.predict(adv_tstX) == tsty).mean()
     print(f"adv trn acc: {result['adv_trn_acc']}")
     print(f"adv tst acc: {result['adv_tst_acc']}")
-
-    #with Stopwatch("Estimating trn Lip"):
-    #    trn_lip = estimate_local_lip_v2(model.model, trnX, top_norm=2, btm_norm=norm,
-    #                                 epsilon=auto_var.get_var("eps"))
-    #result['avg_trn_lip'] = calc_lip(model, trnX, trn_lip, top_norm=2, btm_norm=norm).mean()
-    #with Stopwatch("Estimating tst Lip"):
-    #    tst_lip = estimate_local_lip_v2(model.model, tstX, top_norm=2, btm_norm=norm,
-    #                                 epsilon=auto_var.get_var("eps"))
-    #result['avg_tst_lip'] = calc_lip(model, tstX, tst_lip, top_norm=2, btm_norm=norm).mean()
-    #print(f"avg trn lip: {result['avg_trn_lip']}")
-    #print(f"avg tst lip: {result['avg_tst_lip']}")
 
     print(result)
     return result

@@ -7,13 +7,16 @@ from torch.autograd import Variable
 
 from ..base import AttackModel
 
-class HongMultiTarget(AttackModel):
+class MultiTargetV2(AttackModel):
 
   def __init__(self, model_fn, eps, eps_iter, nb_iter, norm, n_classes,
-               loss_fn=None, y=None, batch_size=128):
+          clip_min=None, clip_max=None, loss_fn=None, y=None, batch_size=128):
     self.n_classes = n_classes
     self.model_fn = model_fn
     self.eps = eps
+    self.eps_iter = eps_iter
+    self.clip_min = clip_min
+    self.clip_max = clip_max
     self.eps_iter = eps_iter
     self.nb_iter = nb_iter
     self.batch_size = batch_size
@@ -38,7 +41,9 @@ class HongMultiTarget(AttackModel):
 
       advx = _mt_whitebox(
           self.model_fn, x, y, n_classes=self.n_classes,
-          epsilon=self.eps, num_steps=self.nb_iter, step_size=self.eps_iter)
+          epsilon=self.eps, num_steps=self.nb_iter, step_size=self.eps_iter,
+          clip_min=self.clip_min, clip_max=self.clip_max
+      )
 
       ret.append(advx)
 
@@ -52,7 +57,9 @@ def _mt_whitebox(model,
                 n_classes=10,
                 epsilon=0.031,
                 num_steps=20,
-                step_size=0.003):
+                step_size=0.003,
+                clip_min=0.,
+                clip_max=1.,):
     model.eval()
     #out = model(X)
     #err = (out.data.max(1)[1] != y.data).float().sum()
@@ -74,8 +81,13 @@ def _mt_whitebox(model,
             grad = torch.autograd.grad(loss_temp, [x_adv])[0]
             x_adv = x_adv.detach() + step_size * torch.sign(grad.detach())
             x_adv = torch.min(torch.max(x_adv, X - epsilon), X + epsilon)
-            x_adv = torch.clamp(x_adv, 0.0, 1.0)
-        x_adv = Variable(torch.clamp(x_adv, 0.0, 1.0), requires_grad=False)
+            if clip_min is not None and clip_max is not None:
+                x_adv = torch.clamp(x_adv, clip_min, clip_max)
+        if clip_min is not None and clip_max is not None:
+            x_adv = Variable(torch.clamp(x_adv, clip_min, clip_max), requires_grad=False)
+        else:
+            x_adv = Variable(x_adv, requires_grad=False)
+
         with torch.no_grad():
             X_adv_list[idx] = copy.deepcopy(x_adv.detach())
             output = model(x_adv)
@@ -96,7 +108,10 @@ def _mt_whitebox(model,
         else:
             x_adv_mt[idx_batch] = copy.deepcopy(X_adv_list[index_top2[0][idx_batch]][idx_batch])
     x_adv_mt = x_adv_mt.cuda()
-    x_adv_mt = Variable(torch.clamp(x_adv_mt, 0.0, 1.0), requires_grad=False)
+    if clip_min is not None and clip_max is not None:
+        x_adv_mt = Variable(torch.clamp(x_adv_mt, clip_min, clip_max), requires_grad=False)
+    else:
+        x_adv_mt = Variable(x_adv_mt, requires_grad=False)
     #err_mt = (model(x_adv_mt).data.max(1)[1] != y.data).float().sum()
     # print('err mt (white-box): ', err_mt)
 

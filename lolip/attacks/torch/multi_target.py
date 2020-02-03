@@ -29,7 +29,7 @@ class MultiTarget(AttackModel):
     """
     y: correct: label
     """
-    self.model_fn.eval()
+    #self.model_fn.eval()
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     dataset = torch.utils.data.TensorDataset(
       self._preprocess_x(X), torch.from_numpy(y).long())
@@ -51,10 +51,20 @@ class MultiTarget(AttackModel):
         scores.append(self.model_fn(adv_x)[:, j].detach().cpu().numpy() - pred)
         r.append(adv_x.cpu().numpy())
       scores = np.array(scores)
-      idx = scores.argmax(axis=0)
+      #idx = scores.argmax(axis=0)
+      #r = np.array(r)
+      #for i in range(len(x)):
+      #  ret.append(r[idx[i], i])
 
+
+      idx_top2 = np.argsort(scores, axis=0)[-2:, :]
+      import ipdb; ipdb.set_trace()
+      y = y.to("cpu").numpy()
       r = np.array(r)
       for i in range(len(x)):
-        ret.append(r[idx[i], i])
+        if idx_top2[1, i] != y[i]:
+          ret.append(r[idx_top2[1, i], i])
+        else:
+          ret.append(r[idx_top2[0, i], i])
 
     return np.array(ret).transpose(0, 2, 3, 1)
