@@ -60,6 +60,8 @@ class mnistFixLips(mnistLip):
         return mnistLip.__new__(cls, *args, **kwargs)
     def __init__(self):
         self.experiment_fn = 'experiment02'
+        self.grid_params[0]['attack'].append('multitarget')
+        self.grid_params[1]['attack'].append('multitarget')
 
 class svhnLip(ExpExperiments):
     def __new__(cls, *args, **kwargs):
@@ -96,6 +98,7 @@ class svhnFixLips(svhnLip):
         return svhnLip.__new__(cls, *args, **kwargs)
     def __init__(self):
         self.experiment_fn = 'experiment02'
+        self.grid_params[0]['attack'].append('multitarget')
 
 
 class cifarLip(ExpExperiments):
@@ -154,6 +157,8 @@ class cifarFixLips(cifarLip):
         return cifarLip.__new__(cls, *args, **kwargs)
     def __init__(self):
         self.experiment_fn = 'experiment02'
+        self.grid_params[0]['attack'].append('multitarget')
+        self.grid_params[1]['attack'].append('multitarget')
 
 class tinyLip(ExpExperiments):
     def __new__(cls, *args, **kwargs):
@@ -207,3 +212,4 @@ class resImgFixLips(resImgOtherLips):
         return resImgOtherLips.__new__(cls, *args, **kwargs)
     def __init__(self):
         self.experiment_fn = 'restrictedImgnet3'
+        self.grid_params[0]['attack'].append('multitarget')
