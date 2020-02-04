@@ -16,6 +16,7 @@ from params import (
     mnistFixLips,
     cifarFixLips,
     svhnFixLips,
+    resImgFixLips
 )
 from utils import setup_experiments
 
@@ -34,6 +35,7 @@ def main(auto_var):
         svhnLip(),
         svhnOtherLips(),
         svhnFixLips(),
+        resImgFixLips(),
     ]
     grid_params = []
     for exp in experiments:

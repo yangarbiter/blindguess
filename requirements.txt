@@ -2,7 +2,7 @@ autovar
 joblib
 mkdir_p
 bistiming
-numpy
+numpy>=1.18.1
 tqdm
-torch
+torch>=1.13.1
 torchvision
