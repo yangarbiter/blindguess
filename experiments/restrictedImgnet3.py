@@ -16,6 +16,9 @@ from lolip.variables import get_file_name
 
 def load_result(auto_var):
     model_path = get_file_name(auto_var) + ".pkl"
+    model_path = model_path.split("-")
+    model_path[0] = 'pgd'
+    model_path = '-'.join(model_path)
     model_path = os.path.join("./results/restrictedImgnet2/", model_path)
     res = joblib.load(model_path)
     ret = {
