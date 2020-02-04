@@ -4,6 +4,7 @@ from functools import partial
 import numpy as np
 import torch
 import torch.utils.data as data_utils
+from tqdm import tqdm
 
 from .fast_gradient_method import fast_gradient_method
 from ..base import AttackModel
@@ -69,24 +70,17 @@ class ProjectedGradientDescent(AttackModel):
 
   def perturb(self, X, y, eps=None):
     dataset = data_utils.TensorDataset(self._preprocess_x(X), torch.from_numpy(y).long())
-    loader = torch.utils.data.DataLoader(dataset,
-        batch_size=self.batch_size, shuffle=False, num_workers=2)
+    #loader = torch.utils.data.DataLoader(dataset,
+    #    batch_size=self.batch_size, shuffle=False, num_workers=2)
 
-    ret = []
-    for [x, y] in loader:
-      x, y = x.to(self.device), y.to(self.device)
-      ret.append(self.attack_fn(x=x, y=y).detach().cpu().numpy())
-    if self.preprocess_img == True:
-      return np.concatenate(ret, axis=0).transpose(0, 2, 3, 1)
-    else:
-      return np.concatenate(ret, axis=0)
+    return self.perturb_ds(dataset, eps=eps)
 
   def perturb_ds(self, ds, eps=None):
     loader = torch.utils.data.DataLoader(ds,
         batch_size=self.batch_size, shuffle=False, num_workers=2)
 
     ret = []
-    for [x, y] in loader:
+    for [x, y] in tqdm(loader, desc="Attacking (PGD)"):
       x, y = x.to(self.device), y.to(self.device)
       ret.append(self.attack_fn(x=x, y=y).detach().cpu().numpy())
     if self.preprocess_img == True:

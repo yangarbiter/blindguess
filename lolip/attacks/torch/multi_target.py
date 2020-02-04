@@ -33,7 +33,7 @@ class MultiTarget(AttackModel):
         batch_size=self.batch_size, shuffle=False, num_workers=8)
 
     ret = []
-    for [x, y] in tqdm(loader, desc="Attacking"):
+    for [x, y] in tqdm(loader, desc="Attacking (MT)"):
       x = x.to(self.device)
 
       pred = self.model_fn(x)
@@ -76,4 +76,4 @@ class MultiTarget(AttackModel):
     #loader = torch.utils.data.DataLoader(dataset,
     #  batch_size=self.batch_size, shuffle=False, num_workers=1)
 
-    return self.perturb_ds(dataset)
+    return self.perturb_ds(dataset, eps=eps)
