@@ -39,34 +39,3 @@ class AttackVarClass(VariableClass, metaclass=RegisteringChoiceType):
             nb_iter=nb_iter,
             batch_size=128,
         )
-
-    @register_var()
-    @staticmethod
-    def mtv2(auto_var, model, n_classes, clip_min=None, clip_max=None):
-        from .torch.mtv2 import MultiTargetV2
-        nb_iter=20
-        return MultiTargetV2(
-            n_classes=n_classes,
-            model_fn=model.model,
-            norm=auto_var.get_var("norm"),
-            eps=auto_var.get_var("eps"),
-            eps_iter=auto_var.get_var("eps")*2/nb_iter,
-            nb_iter=nb_iter,
-            clip_min=clip_min,
-            clip_max=clip_max,
-            batch_size=256,
-        )
-
-    @register_var()
-    @staticmethod
-    def hongpgd(auto_var, model, n_classes):
-        from .torch.hong_pgd import HongPGD
-        nb_iter=20
-        return HongPGD(
-            n_classes=n_classes,
-            model_fn=model.model,
-            norm=auto_var.get_var("norm"),
-            eps=auto_var.get_var("eps"),
-            eps_iter=auto_var.get_var("eps")*2/nb_iter,
-            nb_iter=nb_iter,
-        )
