@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from torch.autograd import Variable
 from torch.nn.functional import softmax
+from tqdm import tqdm
 
 from ..base import AttackModel
 from .projected_gradient_descent import projected_gradient_descent
@@ -22,24 +23,18 @@ class MultiTarget(AttackModel):
       eps=eps, eps_iter=eps_iter, nb_iter=nb_iter, norm=norm, loss_fn=loss_fn,
       clip_min=clip_min, clip_max=clip_max, targeted=True, rand_init=rand_init,
       rand_minmax=rand_minmax)
+    self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
   def _preprocess_x(self, X):
     return torch.from_numpy(X.transpose(0, 3, 1, 2)).float()
 
-  def perturb(self, X, y=None, eps=None):
-    """
-    y: correct: label
-    """
-    #self.model_fn.eval()
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    dataset = torch.utils.data.TensorDataset(
-      self._preprocess_x(X), torch.from_numpy(y).long())
-    loader = torch.utils.data.DataLoader(dataset,
-      batch_size=self.batch_size, shuffle=False, num_workers=1)
+  def perturb_ds(self, ds, eps=None):
+    loader = torch.utils.data.DataLoader(ds,
+        batch_size=self.batch_size, shuffle=False, num_workers=8)
 
     ret = []
-    for [x, y] in loader:
-      x = x.to(device)
+    for [x, y] in tqdm(loader, desc="Attacking"):
+      x = x.to(self.device)
 
       pred = self.model_fn(x)
       pred = softmax(pred, dim=1).detach().cpu().numpy()
@@ -48,7 +43,7 @@ class MultiTarget(AttackModel):
       r = []
       scores = []
       for j in range(self.n_classes):
-        yp = j * torch.ones(len(x)).long().to(device)
+        yp = j * torch.ones(len(x)).long().to(self.device)
         adv_x = self.attack_fn(x=x, y=yp).detach()
         adv_pred = softmax(self.model_fn(adv_x), dim=1)[:, j]
         scores.append(adv_pred.detach().cpu().numpy() - pred)
@@ -70,3 +65,15 @@ class MultiTarget(AttackModel):
           ret.append(r[idx_top2[0, i], i])
 
     return np.array(ret).transpose(0, 2, 3, 1)
+
+  def perturb(self, X, y=None, eps=None):
+    """
+    y: correct: label
+    """
+    #self.model_fn.eval()
+    dataset = torch.utils.data.TensorDataset(
+      self._preprocess_x(X), torch.from_numpy(y).long())
+    #loader = torch.utils.data.DataLoader(dataset,
+    #  batch_size=self.batch_size, shuffle=False, num_workers=1)
+
+    return self.perturb_ds(dataset)
