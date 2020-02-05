@@ -58,15 +58,17 @@ def run_restrictedImgnet_3(auto_var):
     attack_name = auto_var.get_variable_name("attack")
     attack_model = auto_var.get_var("attack", model=model, n_classes=n_classes)
     #if 'multitarget' not in attack_name:
-    with Stopwatch("Attacking Train"):
-        adv_trnX = attack_model.perturb_ds(trn_ds)
-    with Stopwatch("Attacking Test"):
-        adv_tstX = attack_model.perturb_ds(tst_ds)
     #if 'multitarget' in attack_name:
     #    result['adv_trn_acc'] = np.nan
     #else:
+    with Stopwatch("Attacking Train"):
+        adv_trnX = attack_model.perturb_ds(trn_ds)
     result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
+    del adv_trnX
+    with Stopwatch("Attacking Test"):
+        adv_tstX = attack_model.perturb_ds(tst_ds)
     result['adv_tst_acc'] = (model.predict(adv_tstX) == tsty).mean()
+    del adv_tstX
     print(f"adv trn acc: {result['adv_trn_acc']}")
     print(f"adv tst acc: {result['adv_tst_acc']}")
     del attack_model

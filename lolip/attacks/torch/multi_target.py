@@ -1,5 +1,6 @@
 import copy
 from functools import partial
+import gc
 
 import numpy as np
 import torch
@@ -63,6 +64,10 @@ class MultiTarget(AttackModel):
           ret.append(r[idx_top2[1, i], i])
         else:
           ret.append(r[idx_top2[0, i], i])
+
+      del scores
+      del r
+      gc.collect()
 
     return np.array(ret).transpose(0, 2, 3, 1)
 
