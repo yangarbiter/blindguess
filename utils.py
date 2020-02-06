@@ -12,9 +12,7 @@ from lolip.variables import auto_var, get_file_name
 from autovar import AutoVar
 from autovar.hooks import get_ext
 
-from experiments import run_experiment01, run_experiment02, run_experiment03, \
-    run_restrictedImgnet, run_sanity, run_restrictedImgnet_2, run_restrictedImgnet_3, \
-    run_record
+from experiments import run_experiment01, run_restrictedImgnet
 
 logging.basicConfig(level=0)
 tex_base = "./tex_files"
