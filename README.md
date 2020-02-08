@@ -1,4 +1,4 @@
-# Local Lipschitzness
+# Adversarial Robustness Through Local Lipschitzness
 
 
 ## Setup
