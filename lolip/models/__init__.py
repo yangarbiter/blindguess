@@ -90,7 +90,7 @@ def get_hyper(name, loss, arch, dataset_name):
         elif 'bs16' in name:
             ret['batch_size'] = 16
 
-        if 'ep20' in name:
+        if 'ep2' in name:
             ret['epochs'] = 2
         elif 'ep20' in name:
             ret['epochs'] = 20

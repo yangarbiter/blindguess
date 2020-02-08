@@ -1,4 +1,4 @@
-autovar
+autovar==0.0.1a6
 joblib
 mkdir_p
 bistiming
