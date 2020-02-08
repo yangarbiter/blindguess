@@ -3,7 +3,7 @@
 
 ## Setup
 
-### Install requiremented libraries
+### Install required libraries
 ```
 pip install -r ./requirements.txt
 ```
@@ -14,7 +14,10 @@ pip install --upgrade git+https://github.com/tensorflow/cleverhans.git#egg=cleve
 ```
 
 ### Generate the Restricted ImageNet dataset
-Use the script `./scripts/restrictedImgNet.py`
+Use the script `./scripts/restrictedImgNet.py` to generate restrictedImgNet
+dataset and put the data in `./data/RestrictedImgNet/` with torchvision
+ImageFolder readable format. For more detail, please refer to
+[lolip/dataset/__init__.py](lolip/dataset/__init__.py).
 
 ## Repository structure
 
