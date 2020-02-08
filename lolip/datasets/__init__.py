@@ -68,31 +68,6 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
 
         return x_train, y_train, x_test, y_test
 
-    @register_var(argument=r"resImgnet36", shown_name="Restricted ImageNet")
-    @staticmethod
-    def resImgnet36(auto_var, inter_var, eval_trn=False):
-        if eval_trn:
-            trn_ds = ImageFolder("./data/RestrictedImgNet/train",
-                transform=transforms.Compose([
-                    transforms.Resize(36),
-                    transforms.CenterCrop(32),
-                    transforms.ToTensor(),
-                ]))
-        else:
-            trn_ds = ImageFolder("./data/RestrictedImgNet/train",
-                transform=transforms.Compose([
-                    transforms.Resize(36),
-                    transforms.RandomCrop(32, padding=4),
-                    transforms.ToTensor(),
-                ]))
-        tst_ds = ImageFolder("./data/RestrictedImgNet/val",
-            transform=transforms.Compose([
-                transforms.Resize(36),
-                transforms.CenterCrop(32),
-                transforms.ToTensor(),
-            ]))
-        return trn_ds, tst_ds
-
     @register_var(argument=r"resImgnet112v3", shown_name="Restricted ImageNet")
     @staticmethod
     def resImgnet112v3(auto_var, inter_var, eval_trn=False):
@@ -118,75 +93,3 @@ class DatasetVarClass(VariableClass, metaclass=RegisteringChoiceType):
             ]))
         return trn_ds, tst_ds
 
-    @register_var(argument=r"resImgnet112v2", shown_name="Restricted ImageNet")
-    @staticmethod
-    def resImgnet112v2(auto_var, inter_var, eval_trn=False):
-        if eval_trn:
-            trn_ds = ImageFolder("./data/RestrictedImgNet/train",
-                transform=transforms.Compose([
-                    transforms.Resize(128),
-                    transforms.CenterCrop(112),
-                    transforms.ToTensor(),
-                ]))
-        else:
-            trn_ds = ImageFolder("./data/RestrictedImgNet/train",
-                transform=transforms.Compose([
-                    transforms.Resize(128),
-                    transforms.RandomCrop(112, padding=16),
-                    transforms.ToTensor(),
-                ]))
-        tst_ds = ImageFolder("./data/RestrictedImgNet/val",
-            transform=transforms.Compose([
-                transforms.Resize(128),
-                transforms.CenterCrop(112),
-                transforms.ToTensor(),
-            ]))
-        return trn_ds, tst_ds
-
-    @register_var(argument=r"resImgnet112", shown_name="Restricted ImageNet")
-    @staticmethod
-    def resImgnet112(auto_var, inter_var, eval_trn=False):
-        if eval_trn:
-            trn_ds = ImageFolder("./data/RestrictedImgNet/train",
-                transform=transforms.Compose([
-                    transforms.RandomResizedCrop(112),
-                    transforms.RandomHorizontalFlip(),
-                    transforms.ToTensor(),
-                ]))
-        else:
-            trn_ds = ImageFolder("./data/RestrictedImgNet/train",
-                transform=transforms.Compose([
-                    transforms.Resize(128),
-                    transforms.CenterCrop(112),
-                    transforms.ToTensor(),
-                ]))
-        tst_ds = ImageFolder("./data/RestrictedImgNet/val",
-            transform=transforms.Compose([
-                transforms.Resize(128),
-                transforms.CenterCrop(112),
-                transforms.ToTensor(),
-            ]))
-        return trn_ds, tst_ds
-
-    @register_var(argument=r"resImgnet", shown_name="Restricted ImageNet")
-    @staticmethod
-    def resImgnet(auto_var, inter_var, eval_trn=False):
-        #normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
-        #                             std=[0.229, 0.224, 0.225])
-        trn_ds = ImageFolder(
-            "./data/RestrictedImgNet/train",
-            transform=transforms.Compose([
-                transforms.RandomResizedCrop(224),
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor(),
-                #normalize,
-            ]))
-        tst_ds = ImageFolder(
-            "./data/RestrictedImgNet/val",
-            transform=transforms.Compose([
-                transforms.Resize(256),
-                transforms.CenterCrop(224),
-                transforms.ToTensor(),
-                #normalize,
-            ]))
-        return trn_ds, tst_ds

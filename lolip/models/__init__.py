@@ -27,39 +27,8 @@ def get_hyper(name, loss, arch, dataset_name):
         ret['learning_rate'] = 1e-2
         ret['batch_size'] = 64
 
-    elif 'resImgnet112v2' in dataset_name:
-        ret['epochs'] = 70
-        ret['learning_rate'] = 1e-2
-        ret['batch_size'] = 64
-
-    elif 'resImgnet36' in dataset_name:
-        ret['epochs'] = 70
-        ret['learning_rate'] = 1e-2
-        ret['batch_size'] = 64
-
-    elif 'resImgnet112' in dataset_name:
-        ret['epochs'] = 40
-        ret['learning_rate'] = 1e-2
-        ret['batch_size'] = 64
-
-    elif 'resImgnet' in dataset_name:
-        #if 'tWRN' in arch:
-        #elif 'ResNet' in arch:
-        ret['epochs'] = 40
-        ret['learning_rate'] = 1e-2
-        ret['batch_size'] = 64
-
-    elif 'tinyimgnet' in dataset_name:
-        #if 'tWRN' in arch:
-        #elif 'ResNet' in arch:
-        ret['epochs'] = 60
-        ret['learning_rate'] = 1e-2
-        ret['batch_size'] = 64
-
     elif 'ResNet' in arch or 'WRN' in arch:
-        if 'tinyimgnet' in dataset_name:
-            ret['epochs'] = 60
-        elif 'svhn' in dataset_name:
+        if 'svhn' in dataset_name:
             ret['epochs'] = 60
         elif 'cifar' in dataset_name:
             ret['epochs'] = 120
@@ -70,8 +39,6 @@ def get_hyper(name, loss, arch, dataset_name):
 
         if 'adv' in loss:
             ret['learning_rate'] = 1e-3
-        elif 'pstrades' in loss:
-            ret['learning_rate'] = 1e-5
         elif 'cure' in loss:
             ret['learning_rate'] = 1e-5
         elif 'llr' in loss:
@@ -124,6 +91,8 @@ def get_hyper(name, loss, arch, dataset_name):
             ret['batch_size'] = 16
 
         if 'ep20' in name:
+            ret['epochs'] = 2
+        elif 'ep20' in name:
             ret['epochs'] = 20
         elif 'ep40' in name:
             ret['epochs'] = 40

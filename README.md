@@ -14,7 +14,10 @@ pip install --upgrade git+https://github.com/tensorflow/cleverhans.git#egg=cleve
 ```
 
 ### Generate the Restricted ImageNet dataset
-Use the script `./scripts/restrictedImgNet.py`
+Use the script `./scripts/restrictedImgNet.py` to generate restrictedImgNet
+dataset and put the data in `./data/RestrictedImgNet/` with torchvision
+ImageFolder readable format. For more detail, please refer to
+[lolip/dataset/__init__.py](lolip/dataset/__init__.py).
 
 ## Repository structure
 
@@ -85,7 +88,7 @@ Batch size is $128$ and using the Adam optimizer
 python ./main.py --experiment restrictedImgnet \
   --no-hooks \
   --norm inf --eps 0.005 \
-  --dataset resImgnet \
+  --dataset resImgnet112v3 \
   --model advce-tor-ResNet50-adambs128 \
   --attack pgd \
   --random_seed 0
