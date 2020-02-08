@@ -42,7 +42,7 @@ def run_restrictedImgnet(auto_var):
 
     attack_model = auto_var.get_var("attack", model=model, n_classes=n_classes)
     with Stopwatch("Attacking Train"):
-        adv_trnX = attack_model.perturb(trnX_ds)
+        adv_trnX = attack_model.perturb_ds(trn_ds)
     with Stopwatch("Attacking Test"):
         adv_tstX = attack_model.perturb_ds(tst_ds)
     result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
@@ -59,8 +59,8 @@ def run_restrictedImgnet(auto_var):
         tst_lip, _ = estimate_local_lip_v2(model.model, tst_ds, top_norm=1, btm_norm=norm,
                                      epsilon=auto_var.get_var("eps"), device=device)
     result['avg_tst_lip_1'] = tst_lip
-    print(f"avg trn lip: {result['avg_trn_lip']}")
-    print(f"avg tst lip: {result['avg_tst_lip']}")
+    print(f"avg trn lip: {result['avg_trn_lip_1']}")
+    print(f"avg tst lip: {result['avg_tst_lip_1']}")
 
     print(result)
     return result
