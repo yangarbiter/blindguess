@@ -160,6 +160,12 @@ class cifarFixLips(cifarLip):
         self.grid_params[0]['attack'].append('multitarget')
         self.grid_params[1]['attack'].append('multitarget')
 
+class cifarCalibration(cifarLip):
+    def __new__(cls, *args, **kwargs):
+        return cifarLip.__new__(cls, *args, **kwargs)
+    def __init__(self):
+        self.experiment_fn = 'calibration'
+
 class tinyLip(ExpExperiments):
     def __new__(cls, *args, **kwargs):
         cls.name = "tiny ImageNet"

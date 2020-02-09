@@ -372,7 +372,7 @@ class TorchModel(BaseEstimator):
         loader = self._prep_pred(X)
         ret = []
         for [x] in loader:
-            output = F.softmax(self.model(x.to(self.device)).detach())
+            output = F.softmax(self.model(x.to(self.device)).detach(), dim=1)
             ret.append(output.cpu().numpy())
         del loader
         return np.concatenate(ret, axis=0)
