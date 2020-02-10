@@ -11,6 +11,7 @@ def get_outputs_loss(model, optimizer, base_loss_fn, loss_name, x, y, reduction,
     clip_img = kwargs['clip_img']
 
     if 'trades' in loss_name:
+        #re.search('trades', loss_name)
         if 'trades10' in loss_name:
             beta = 10.0
         elif 'trades20' in loss_name:
@@ -34,12 +35,18 @@ def get_outputs_loss(model, optimizer, base_loss_fn, loss_name, x, y, reduction,
         #print(f"TRADES version: {version}")
         if clip_img:
             clip_min, clip_max = 0, 1
-        outputs, loss = trades_loss(
-            model, base_loss_fn, x, y,
-            norm=norm, optimizer=optimizer, clip_min=clip_min, clip_max=clip_max,
-            step_size=eps*2/steps, epsilon=eps, perturb_steps=steps, beta=beta,
-            device=device
-        )
+
+        if 'truntrades' in loss_name:
+            pass
+        else:
+            outputs, loss = trades_loss(
+                model, base_loss_fn, x, y,
+                norm=norm, optimizer=optimizer, clip_min=clip_min, clip_max=clip_max,
+                step_size=eps*2/steps, epsilon=eps, perturb_steps=steps, beta=beta,
+                device=device
+            )
+    elif 'lipz' in loss_name:
+        pass
     elif 'rbfw' in loss_name:
         optimizer.zero_grad()
         outputs, loss = rbfw_loss(

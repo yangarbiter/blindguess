@@ -16,7 +16,8 @@ from params import (
     mnistFixLips,
     cifarFixLips,
     svhnFixLips,
-    resImgFixLips
+    resImgFixLips,
+    cifarCalibration,
 )
 from utils import setup_experiments
 
@@ -26,16 +27,17 @@ DEBUG = True if os.environ.get('DEBUG', False) else False
 
 def main(auto_var):
     experiments = [
-        mnistLip(),
-        mnistOtherLips(),
-        mnistFixLips(),
-        cifarLip(),
-        cifarOtherLips(),
-        cifarFixLips(),
-        svhnLip(),
-        svhnOtherLips(),
-        svhnFixLips(),
-        resImgFixLips(),
+        cifarCalibration()
+        #mnistLip(),
+        #mnistOtherLips(),
+        #mnistFixLips(),
+        #cifarLip(),
+        #cifarOtherLips(),
+        #cifarFixLips(),
+        #svhnLip(),
+        #svhnOtherLips(),
+        #svhnFixLips(),
+        #resImgFixLips(),
     ]
     grid_params = []
     for exp in experiments:

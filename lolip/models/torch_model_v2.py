@@ -14,8 +14,7 @@ import numpy as np
 from sklearn.base import BaseEstimator
 from .torch_utils.losses import get_outputs_loss
 from .torch_utils import get_optimizer, get_loss, get_scheduler, CustomTensorDataset
-from .torch_utils import archs
-from .torch_utils import data_augs
+from .torch_utils import archs, data_augs
 
 DEBUG = int(os.getenv("DEBUG", 0))
 
@@ -23,11 +22,13 @@ DEBUG = int(os.getenv("DEBUG", 0))
 class TorchModelV2(BaseEstimator):
     def __init__(self, lbl_enc, n_features, n_classes, loss_name='ce',
                 n_channels=None, learning_rate=1e-4, momentum=0.0, weight_decay=0.0,
-                batch_size=256, epochs=20, optimizer='sgd', architecture='arch_001',
+                batch_size=256, epochs=20, optimizer='sgd', architecture='arch_001', weight_decay=0.0, 
                 random_state=None, callbacks=None, train_type=None, eps:float=0.1, norm=np.inf,
                 multigpu=False, dataaug=None, device=None, num_workers=4, trn_log_callbacks=None):
         print(f'lr: {learning_rate}, opt: {optimizer}, loss: {loss_name}, '
-              f'arch: {architecture}, dataaug: {dataaug}, batch_size: {batch_size}')
+              f'arch: {architecture}, dataaug: {dataaug}, batch_size: {batch_size}, '
+              f'momentum: {momentum}, weight_decay: {weight_decay}, eps: {eps}, '
+              f'epochs: {epochs}')
         self.num_workers = num_workers
         self.n_features = n_features
         self.n_classes = n_classes
@@ -44,7 +45,6 @@ class TorchModelV2(BaseEstimator):
         else:
             self.device = device
 
-        #arch_fn = globals()[self.architecture]
         arch_fn = getattr(archs, self.architecture)
         if 'n_features' in inspect.getfullargspec(arch_fn)[0]:
             model = arch_fn(n_features=n_features, n_classes=self.n_classes, n_channels=n_channels)
@@ -57,11 +57,11 @@ class TorchModelV2(BaseEstimator):
         if self.multigpu:
             model = torch.nn.DataParallel(model, device_ids=[0, 1])
 
-        if 'rbfw' in self.loss_name:
-            self.gamma_var = model.gamma_var
-            self.optimizer = get_optimizer(model, optimizer, learning_rate, momentum, additional_vars=[self.gamma_var])
-        else:
-            self.optimizer = get_optimizer(model, optimizer, learning_rate, momentum)
+        #if 'rbfw' in self.loss_name:
+        #    self.gamma_var = model.gamma_var
+        #    self.optimizer = get_optimizer(model, optimizer, learning_rate, momentum, additional_vars=[self.gamma_var])
+        #else:
+        self.optimizer = get_optimizer(model, optimizer, learning_rate, momentum, weight_decay)
         self.model = model
 
         #self.callbacks=callbacks
@@ -246,7 +246,7 @@ class TorchModelV2(BaseEstimator):
         loader = self._prep_pred(X)
         ret = []
         for [x] in loader:
-            output = F.softmax(self.model(x.to(self.device)).detach())
+            output = F.softmax(self.model(x.to(self.device)).detach(), dim=1)
             ret.append(output.cpu().numpy())
         del loader
         return np.concatenate(ret, axis=0)
@@ -260,7 +260,6 @@ class TorchModelV2(BaseEstimator):
         return np.concatenate(ret, axis=0)
 
     def save(self, path):
-        #torch.save(self.model.state_dict(), path)
         if self.multigpu:
             model_state_dict = self.model.module.state_dict()
         else:

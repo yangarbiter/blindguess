@@ -54,15 +54,9 @@ auto_var.add_variable_class(ModelVarClass())
 auto_var.add_variable_class(AttackVarClass())
 auto_var.add_variable('random_seed', int)
 auto_var.add_variable('eps', float)
-
-#from autovar.base import RegisteringChoiceType, VariableClass, register_var
-#class ExampleVarClass(VariableClass, metaclass=RegisteringChoiceType):
-#    """Example Variable Class"""
-#    var_name = "example"
-#
-#    @register_var()
-#    @staticmethod
-#    def exp(auto_var):
-#        pass
-
-#auto_var.add_variable_class(ExampleVarClass())
+auto_var.add_variable('optimizer', str)
+auto_var.add_variable('learning_rate', float, default=1e-2)
+auto_var.add_variable('batch_size', int, default=64)
+auto_var.add_variable('momentum', float, default=0.9)
+auto_var.add_variable('epochs', int, default=2)
+auto_var.add_variable('weight_decay', int, default=0.)

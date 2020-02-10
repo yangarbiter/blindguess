@@ -10,11 +10,6 @@ from lolip.utils import estimate_local_lip_v2
 from lolip.variables import get_file_name
 
 
-def calc_lip(model, X, Xp, top_norm, btm_norm):
-    top = np.linalg.norm(model.predict_real(X)-model.predict_real(Xp), ord=top_norm, axis=1)
-    down = np.linalg.norm(X.reshape(len(Xp), -1)-Xp.reshape(len(Xp), -1), ord=btm_norm, axis=1)
-    return np.mean(top / (down+1e-6))
-
 def run_experiment01(auto_var):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     _ = set_random_seed(auto_var)
@@ -33,9 +28,10 @@ def run_experiment01(auto_var):
     #tstX = scaler.transform(tstX.reshape(len(tstX), -1)).reshape((len(tstX), ) + img_shape)
 
     result = {}
-    multigpu = True if len(trnX) > 90000 and torch.cuda.device_count() > 1 else False
-    #multigpu = False
-    model = auto_var.get_var("model", trnX=trnX, trny=trny, multigpu=multigpu, n_channels=n_channels)
+    #multigpu = True if len(trnX) > 90000 and torch.cuda.device_count() > 1 else False
+    multigpu = False
+    model = auto_var.get_var("model", trnX=trnX, trny=trny, multigpu=multigpu,
+            n_channels=n_channels, device=device)
     model.tst_ds = (tstX, tsty)
     result['model_path'] = os.path.join('./models', get_file_name(auto_var) + '-ep%04d.pt')
     if None:
@@ -43,7 +39,7 @@ def run_experiment01(auto_var):
         model.load(result['model_path'])
         model.model.to(device)
     else:
-        with Stopwatch("Fitting Model"):
+        with Stopwatch("Fitting Model", logger=auto_var.logger):
             history = model.fit(trnX, trny)
         model.save(result['model_path'])
         result['model_path'] = result['model_path'] % model.epochs
@@ -55,30 +51,24 @@ def run_experiment01(auto_var):
     print(f"test acc: {result['tst_acc']}")
 
     attack_model = auto_var.get_var("attack", model=model, n_classes=n_classes)
-    with Stopwatch("Attacking"):
-        if len(trnX) <= 90000:
-            adv_trnX = attack_model.perturb(trnX, trny)
+    with Stopwatch("Attacking Train", logger=auto_var.logger):
+        adv_trnX = attack_model.perturb(trnX, trny)
+    with Stopwatch("Attacking Test", logger=auto_var.logger):
         adv_tstX = attack_model.perturb(tstX, tsty)
-    if len(trnX) <= 90000:
-        result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
-    else:
-        result['adv_trn_acc'] = np.nan
+    result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
     result['adv_tst_acc'] = (model.predict(adv_tstX) == tsty).mean()
     print(f"adv trn acc: {result['adv_trn_acc']}")
     print(f"adv tst acc: {result['adv_tst_acc']}")
     del attack_model
 
-    if len(trnX) <= 90000:
-        with Stopwatch("Estimating trn Lip"):
-            _, trn_lip = estimate_local_lip_v2(model.model, trnX, top_norm=2, btm_norm=norm,
-                                        epsilon=auto_var.get_var("eps"), device=device)
-        result['avg_trn_lip'] = calc_lip(model, trnX, trn_lip, top_norm=2, btm_norm=norm).mean()
-    else:
-        result['avg_trn_lip'] = np.nan
-    with Stopwatch("Estimating tst Lip"):
-        _, tst_lip = estimate_local_lip_v2(model.model, tstX, top_norm=2, btm_norm=norm,
+    with Stopwatch("Estimating trn Lip", logger=auto_var.logger):
+        trn_lip, _ = estimate_local_lip_v2(model.model, trnX, top_norm=1, btm_norm=norm,
+                                    epsilon=auto_var.get_var("eps"), device=device)
+    result['avg_trn_lip'] = trn_lip
+    with Stopwatch("Estimating tst Lip", logger=auto_var.logger):
+        tst_lip, _ = estimate_local_lip_v2(model.model, tstX, top_norm=1, btm_norm=norm,
                                      epsilon=auto_var.get_var("eps"), device=device)
-    result['avg_tst_lip'] = calc_lip(model, tstX, tst_lip, top_norm=2, btm_norm=norm).mean()
+    result['avg_tst_lip'] = tst_lip
     print(f"avg trn lip: {result['avg_trn_lip']}")
     print(f"avg tst lip: {result['avg_tst_lip']}")
 
