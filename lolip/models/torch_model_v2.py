@@ -22,7 +22,7 @@ DEBUG = int(os.getenv("DEBUG", 0))
 class TorchModelV2(BaseEstimator):
     def __init__(self, lbl_enc, n_features, n_classes, loss_name='ce',
                 n_channels=None, learning_rate=1e-4, momentum=0.0, weight_decay=0.0,
-                batch_size=256, epochs=20, optimizer='sgd', architecture='arch_001', weight_decay=0.0, 
+                batch_size=256, epochs=20, optimizer='sgd', architecture='arch_001',
                 random_state=None, callbacks=None, train_type=None, eps:float=0.1, norm=np.inf,
                 multigpu=False, dataaug=None, device=None, num_workers=4, trn_log_callbacks=None):
         print(f'lr: {learning_rate}, opt: {optimizer}, loss: {loss_name}, '
@@ -127,30 +127,25 @@ class TorchModelV2(BaseEstimator):
                 ts_dataset = self._get_dataset(tstX, tsty)
 
             test_loader = torch.utils.data.DataLoader(ts_dataset,
-                batch_size=16, shuffle=False, num_workers=self.num_workers)
+                batch_size=32, shuffle=False, num_workers=self.num_workers)
 
         for epoch in range(self.start_epoch, self.epochs+1):
             train_loss = 0.
             train_acc = 0.
             for data in tqdm(train_loader, desc=f"Epoch {epoch}"):
                 self.model.train()
-                if len(data) == 2:
-                    x, y = data[0].to(self.device), data[1].to(self.device)
-                    w = torch.ones(1).to(self.device)
-                elif len(data) == 3:
-                    x, y, w = (d.to(self.device) for d in data)
+                x, y, w = (d.to(self.device) for d in data)
 
                 params = {
-                    'optimizer': self.optimizer,
                     'norm': self.norm,
                     'device': self.device,
                     'eps': self.eps,
-                    'clip_img': True if len(torch.shape(x)) > 2 else False,
+                    'clip_img': True if len(x.shape) > 2 else False,
+                    'loss_name': self.loss_name,
                     'reduction': 'mean',
                 }
                 outputs, loss = get_outputs_loss(
-                    self.model, self.optimizer, loss_fn,
-                    self.loss_name, x, y, **params
+                    self.model, self.optimizer, loss_fn, x, y, **params
                 )
 
                 loss = (w * loss).mean()
@@ -184,7 +179,7 @@ class TorchModelV2(BaseEstimator):
                 if self.tst_ds is not None:
                     tst_loss, tst_acc = 0., 0.
                     with torch.no_grad():
-                        for tx, ty in test_loader:
+                        for tx, ty, _ in test_loader:
                             tx, ty = tx.to(self.device), ty.to(self.device)
                             outputs = self.model(tx)
                             if loss_fn.reduction == 'none':

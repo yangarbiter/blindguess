@@ -21,7 +21,7 @@ class ModelVarClass(VariableClass, metaclass=RegisteringChoiceType):
         n_classes = len(np.unique(trny))
         dataset_name = auto_var.get_variable_name('dataset')
 
-        params: dict = get_hyper(hyper, loss, arch, dataset_name)
+        params = {}
         params['eps'] = auto_var.get_var("eps")
         params['norm'] = auto_var.get_var("norm")
         params['loss_name'] = loss

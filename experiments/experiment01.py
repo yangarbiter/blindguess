@@ -1,4 +1,5 @@
 import os
+import logging
 
 import torch
 from bistiming import Stopwatch
@@ -8,6 +9,10 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from .utils import set_random_seed
 from lolip.utils import estimate_local_lip_v2
 from lolip.variables import get_file_name
+
+logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s',
+                    level=logging.WARNING, datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger(__name__)
 
 
 def run_experiment01(auto_var):
@@ -39,7 +44,7 @@ def run_experiment01(auto_var):
         model.load(result['model_path'])
         model.model.to(device)
     else:
-        with Stopwatch("Fitting Model", logger=auto_var.logger):
+        with Stopwatch("Fitting Model", logger=logger):
             history = model.fit(trnX, trny)
         model.save(result['model_path'])
         result['model_path'] = result['model_path'] % model.epochs
@@ -51,9 +56,9 @@ def run_experiment01(auto_var):
     print(f"test acc: {result['tst_acc']}")
 
     attack_model = auto_var.get_var("attack", model=model, n_classes=n_classes)
-    with Stopwatch("Attacking Train", logger=auto_var.logger):
+    with Stopwatch("Attacking Train", logger=logger):
         adv_trnX = attack_model.perturb(trnX, trny)
-    with Stopwatch("Attacking Test", logger=auto_var.logger):
+    with Stopwatch("Attacking Test", logger=logger):
         adv_tstX = attack_model.perturb(tstX, tsty)
     result['adv_trn_acc'] = (model.predict(adv_trnX) == trny).mean()
     result['adv_tst_acc'] = (model.predict(adv_tstX) == tsty).mean()
@@ -61,11 +66,11 @@ def run_experiment01(auto_var):
     print(f"adv tst acc: {result['adv_tst_acc']}")
     del attack_model
 
-    with Stopwatch("Estimating trn Lip", logger=auto_var.logger):
+    with Stopwatch("Estimating trn Lip", logger=logger):
         trn_lip, _ = estimate_local_lip_v2(model.model, trnX, top_norm=1, btm_norm=norm,
                                     epsilon=auto_var.get_var("eps"), device=device)
     result['avg_trn_lip'] = trn_lip
-    with Stopwatch("Estimating tst Lip", logger=auto_var.logger):
+    with Stopwatch("Estimating tst Lip", logger=logger):
         tst_lip, _ = estimate_local_lip_v2(model.model, tstX, top_norm=1, btm_norm=norm,
                                      epsilon=auto_var.get_var("eps"), device=device)
     result['avg_tst_lip'] = tst_lip

@@ -10,7 +10,7 @@ from .utils import set_random_seed
 from lolip.utils import estimate_local_lip_v2
 from lolip.variables import get_file_name
 
-from .experiment02 import load_model
+from .utils import load_model
 
 
 def load_result(auto_var):

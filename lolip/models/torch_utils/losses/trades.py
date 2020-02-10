@@ -24,6 +24,7 @@ def trades_loss(model,
                 perturb_steps=10,
                 beta=1.0,
                 reduction='none',
+                version=None,
                 device="gpu"):
     # define KL-loss
     criterion_kl = nn.KLDivLoss(reduction='batchmean')
@@ -93,5 +94,6 @@ def trades_loss(model,
                                F.softmax(model(x_natural), dim=1))
     loss_robust = loss_robust
 
-    loss = loss_natural + beta * loss_robust
+    if version is None:
+        loss = loss_natural + beta * loss_robust
     return outputs, loss

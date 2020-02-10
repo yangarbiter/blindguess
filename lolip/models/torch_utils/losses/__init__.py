@@ -2,13 +2,13 @@
 from .trades import trades_loss
 from ....attacks.torch.projected_gradient_descent import projected_gradient_descent
 
-def get_outputs_loss(model, optimizer, base_loss_fn, loss_name, x, y, reduction, **kwargs):
+def get_outputs_loss(model, optimizer, base_loss_fn, x, y, reduction, **kwargs):
 
-    optimizer = kwargs['optimizer']
     norm = kwargs['norm']
     eps = kwargs['eps']
     device = kwargs['device']
     clip_img = kwargs['clip_img']
+    loss_name = kwargs['loss_name']
 
     if 'trades' in loss_name:
         #re.search('trades', loss_name)

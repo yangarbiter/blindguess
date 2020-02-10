@@ -12,9 +12,7 @@ from lolip.variables import auto_var, get_file_name
 from autovar import AutoVar
 from autovar.hooks import get_ext
 
-from experiments import run_experiment01, \
-    run_restrictedImgnet, run_sanity, run_restrictedImgnet_2, run_restrictedImgnet_3, \
-    run_record, run_calibration
+from experiments import run_experiment01, run_restrictedImgnet, run_calibration
 
 logging.basicConfig(level=0)
 tex_base = "./tex_files"
@@ -28,33 +26,9 @@ def setup_experiments(auto_var):
     mkdir_p(f"./results/{exp_name}")
     auto_var.register_experiment(f'{exp_name}', run_experiment01,
             {'file_format': 'pickle', 'result_file_dir': f'./results/{exp_name}'})
-    exp_name = 'experiment02'
-    mkdir_p(f"./results/{exp_name}")
-    auto_var.register_experiment(f'{exp_name}', run_experiment02,
-            {'file_format': 'pickle', 'result_file_dir': f'./results/{exp_name}'})
-    exp_name = 'experiment03'
-    mkdir_p(f"./results/{exp_name}")
-    auto_var.register_experiment(f'{exp_name}', run_experiment03,
-            {'file_format': 'pickle', 'result_file_dir': f'./results/{exp_name}'})
-    exp_name = 'sanity'
-    mkdir_p(f"./results/{exp_name}")
-    auto_var.register_experiment(f'{exp_name}', run_sanity,
-            {'file_format': 'pickle', 'result_file_dir': f'./results/{exp_name}'})
     exp_name = 'restrictedImgnet'
     mkdir_p(f"./results/{exp_name}")
     auto_var.register_experiment(f'{exp_name}', run_restrictedImgnet,
-            {'file_format': 'pickle', 'result_file_dir': f'./results/{exp_name}'})
-    exp_name = 'restrictedImgnet2'
-    mkdir_p(f"./results/{exp_name}")
-    auto_var.register_experiment(f'{exp_name}', run_restrictedImgnet_2,
-            {'file_format': 'pickle', 'result_file_dir': f'./results/{exp_name}'})
-    exp_name = 'restrictedImgnet3'
-    mkdir_p(f"./results/{exp_name}")
-    auto_var.register_experiment(f'{exp_name}', run_restrictedImgnet_3,
-            {'file_format': 'pickle', 'result_file_dir': f'./results/{exp_name}'})
-    exp_name = 'record'
-    mkdir_p(f"./results/{exp_name}")
-    auto_var.register_experiment(f'{exp_name}', run_record,
             {'file_format': 'pickle', 'result_file_dir': f'./results/{exp_name}'})
 
 
