@@ -9,7 +9,47 @@ class AttackVarClass(VariableClass, metaclass=RegisteringChoiceType):
 
     @register_var()
     @staticmethod
-    def pgd(auto_var, inter_var, model, n_classes, clip_min=None, clip_max=None):
+    def fftspatial(auto_var, model, n_classes, clip_min=None, clip_max=None, device=None):
+        from .torch.spatials import FFTAttackModel
+        return FFTAttackModel(
+            model_fn=model.model,
+            perturb_iters=10,
+            step_size=0.05,
+            rot_constraint=0,
+            trans_constraint=0.2,
+            scale_constraint=0,
+            batch_size=128,
+        )
+
+    @register_var()
+    @staticmethod
+    def fospatial(auto_var, model, n_classes, clip_min=None, clip_max=None, device=None):
+        from .torch.spatials import FirstOrderAttackModel
+        return FirstOrderAttackModel(
+            model_fn=model.model,
+            perturb_iters=10,
+            step_size=0.05,
+            rot_constraint=0,
+            trans_constraint=0.2,
+            scale_constraint=0,
+            batch_size=128,
+        )
+
+    @register_var()
+    @staticmethod
+    def gridspatial(auto_var, model, n_classes, clip_min=None, clip_max=None, device=None):
+        from .torch.spatials import GridAttackModel
+        return GridAttackModel(
+            model_fn=model.model,
+            rot_constraint=0,
+            trans_constraint=0.2,
+            scale_constraint=0,
+            batch_size=128,
+        )
+
+    @register_var()
+    @staticmethod
+    def pgd(auto_var, inter_var, model, n_classes, clip_min=None, clip_max=None, device=None):
         from .torch.projected_gradient_descent import ProjectedGradientDescent
         nb_iter=10
         return ProjectedGradientDescent(
@@ -25,7 +65,7 @@ class AttackVarClass(VariableClass, metaclass=RegisteringChoiceType):
 
     @register_var()
     @staticmethod
-    def multitarget(auto_var, model, n_classes, clip_min=None, clip_max=None):
+    def multitarget(auto_var, model, n_classes, clip_min=None, clip_max=None, device=None):
         from .torch.multi_target import MultiTarget
         nb_iter=20
         return MultiTarget(

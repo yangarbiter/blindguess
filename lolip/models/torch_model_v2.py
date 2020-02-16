@@ -125,7 +125,6 @@ class TorchModelV2(BaseEstimator):
             else:
                 tstX, tsty = self.tst_ds
                 ts_dataset = self._get_dataset(tstX, tsty)
-
             test_loader = torch.utils.data.DataLoader(ts_dataset,
                 batch_size=32, shuffle=False, num_workers=self.num_workers)
 
@@ -134,6 +133,7 @@ class TorchModelV2(BaseEstimator):
             train_acc = 0.
             for data in tqdm(train_loader, desc=f"Epoch {epoch}"):
                 self.model.train()
+
                 x, y, w = (d.to(self.device) for d in data)
 
                 params = {
@@ -144,6 +144,7 @@ class TorchModelV2(BaseEstimator):
                     'loss_name': self.loss_name,
                     'reduction': 'mean',
                 }
+                self.optimizer.zero_grad()
                 outputs, loss = get_outputs_loss(
                     self.model, self.optimizer, loss_fn, x, y, **params
                 )

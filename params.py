@@ -3,6 +3,37 @@ from utils import ExpExperiments
 
 random_seed = list(range(1))
 
+__all__ = ['fashionLip']
+
+class fashionLip(ExpExperiments):
+    def __new__(cls, *args, **kwargs):
+        cls.name = "fashion"
+        cls.experiment_fn = 'experiment01'
+        grid_params = []
+        arch = "CNN002"
+        grid_params.append({
+            'dataset': ['fashion'],
+            'model': [
+                f'trades6ce-tor2-{arch}',
+                f'htrades6ce-tor2-{arch}',
+                f'wtrades6ce-tor2-{arch}',
+                f'ce-tor2-{arch}',
+                f'advce-tor2-{arch}',
+            ],
+            'eps': [0.1],
+            'norm': ['inf'],
+            'attack': ['pgd'],
+            'optimizer': ['sgd'],
+            'learning_rate': [0.01],
+            'epochs': [40],
+            'momentum': [0.9],
+            'weight_decay': [0.],
+            'batch_size': [64],
+            'random_seed': random_seed,
+        })
+        cls.grid_params = grid_params
+        return ExpExperiments.__new__(cls, *args, **kwargs)
+
 class mnistLip(ExpExperiments):
     def __new__(cls, *args, **kwargs):
         cls.name = "mnist"
