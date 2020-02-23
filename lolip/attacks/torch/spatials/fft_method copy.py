@@ -27,7 +27,7 @@ class FFTAttackModel(SpatialAttackModel):
         with torch.no_grad():
             for [x, y] in tqdm(loader, desc="Attacking (FFT)"):
                 x, y = x.to(self.device), y.to(self.device)
-                _, advx = first_order_attack_spatial_fft(x, y, self.model_fn, self.loss_fn, self.perturb_iters,
+                _, advx = first_order_attack_fft(x, y, self.model_fn, self.loss_fn, self.perturb_iters,
                         self.step_size, self.rot_constraint, self.trans_constraint,
                         self.scale_constraint, self.device)
                 ret.append(advx.cpu().numpy())
@@ -42,8 +42,8 @@ def torch_freq_shift_2d(f, a, b, device):
     m1, m2 = torch.meshgrid(torch.arange(m), torch.arange(n))
     m1, m2 = m1.to(device), m2.to(device)
     
-    a = (a.view(bs, 1, 1, 1).repeat(1, c, 1, 1) / m * m1.unsqueeze(0).repeat(bs, c, 1, 1))
-    b = (b.view(bs, 1, 1, 1).repeat(1, c, 1, 1) / n * m2.unsqueeze(0).repeat(bs, c, 1, 1))
+    a = (a.view(bs, 1, 1) / m / m1.unsqueeze(0).repeat(bs, 1, 1))
+    b = (b.view(bs, 1, 1) / n / m2.unsqueeze(0).repeat(bs, 1, 1))
     re = torch.cos(2 * np.pi * (a + b))
     im = torch.sin(2 * np.pi * (a + b))
     
@@ -57,11 +57,12 @@ def fft_shift(x, a, b, device):
     """
     _, _, m, n = x.shape
     freq = torch.rfft(x, signal_ndim=2, onesided=False)
+    import ipdb; ipdb.set_trace()
     shift_freq = torch_freq_shift_2d(freq, -a*m/2, -b*n/2, device)
     advx = torch.irfft(shift_freq, signal_ndim=2, onesided=False)
     return advx
 
-def first_order_attack_spatial_fft(x, y, model_fn, loss_fn, perturb_iters, step_size,
+def first_order_attack_fft(x, y, model_fn, loss_fn, perturb_iters, step_size,
                            rot_constraint, trans_constraint, scale_constraint, device):
     batch_size = len(x)
     x_v = (torch.zeros(batch_size).float() + 0.01 * torch.randn(batch_size)).to(device)
@@ -75,7 +76,7 @@ def first_order_attack_spatial_fft(x, y, model_fn, loss_fn, perturb_iters, step_
         x_v, y_v = x_v.requires_grad_(), y_v.requires_grad_()
         with torch.enable_grad():
             advx = fft_shift(x, x_v, y_v, device=device)
-            loss = (-1) * loss_fn(model_fn(advx), y).mean()
+            loss = (-1) * loss_fn(model_fn(advx), y).sum()
 
         loss.backward(retain_graph=True)
         #optimizer.step()
@@ -84,19 +85,19 @@ def first_order_attack_spatial_fft(x, y, model_fn, loss_fn, perturb_iters, step_
         y_v = y_v.detach() + step_size * torch.sign(y_v.grad.data)
         x_v, y_v = project_trans_constraint(x_v, y_v, trans_constraint)
 
+    fft_advx = torch.tensor(advx, requires_grad=False)
     x_v, y_v = x_v.requires_grad_(False), y_v.requires_grad_(False)
-    fft_advx = fft_shift(x, x_v, y_v, device=device)
+    final_matrix[:, 0, 2] = x_v
+    final_matrix[:, 1, 2] = y_v
 
-    #final_matrix[:, 0, 2] = x_v
-    #final_matrix[:, 1, 2] = y_v
-    #grid = F.affine_grid(final_matrix, x.size(), align_corners=False)
-    #advx = F.grid_sample(x, grid, align_corners=False)
-    #print((model_fn(x).argmax(1) == y).float().mean())
-    #print((model_fn(advx).argmax(1) == y).float().mean())
-    #print((model_fn(fft_advx).argmax(1) == y).float().mean())
-    loss = loss_fn(model_fn(fft_advx), y).mean()
+    grid = F.affine_grid(final_matrix, x.size(), align_corners=False)
+    advx = F.grid_sample(x, grid, align_corners=False)
+    print((model_fn(x).argmax(1) == y).float().mean())
+    print((model_fn(advx).argmax(1) == y).float().mean())
+    print((model_fn(torch.cat(fft_advx)).argmax(1) == y).float().mean())
+    loss = loss_fn(model_fn(advx), y).mean()
 
-    return loss, fft_advx
+    return loss, advx
 
 
     #all_advx = []

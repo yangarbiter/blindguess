@@ -77,7 +77,7 @@ def first_order_attack(x, y, model_fn, loss_fn, perturb_iters, step_size, rot_co
 
     grid = F.affine_grid(final_matrix, x.size(), align_corners=False)
     advx = F.grid_sample(x, grid, align_corners=False)
-    #print((model_fn(x).argmax(1) == y).float().mean())
-    #print((model_fn(advx).argmax(1) == y).float().mean())
+    print((model_fn(x).argmax(1) == y).float().mean())
+    print((model_fn(advx).argmax(1) == y).float().mean())
 
     return loss, advx

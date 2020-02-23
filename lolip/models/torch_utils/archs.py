@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -8,6 +9,7 @@ from torchvision.models.resnet import _resnet, Bottleneck
 
 from .wideresnet import *
 from .resnet import resnet50, resnet152, resnet101
+
 
 def tWRN50_2(n_classes, n_channels):
     return wide_resnet50_2(num_classes=n_classes)
@@ -65,6 +67,58 @@ class CNN001(nn.Module):
         #output = F.log_softmax(x, dim=1)
         return x
 
+class STNCNN001(CNN001):
+    def __init__(self, n_classes, n_channels=None):
+        super(STNCNN001, self).__init__(n_classes=n_classes)
+
+        self.localization = nn.Sequential(
+            nn.Conv2d(1, 8, kernel_size=7),
+            nn.MaxPool2d(2, stride=2),
+            nn.ReLU(True),
+            nn.Conv2d(8, 10, kernel_size=5),
+            nn.MaxPool2d(2, stride=2),
+            nn.ReLU(True)
+        )
+
+        # Regressor for the 3 * 2 affine matrix
+        self.fc_loc = nn.Sequential(
+            nn.Linear(10 * 3 * 3, 32),
+            nn.ReLU(True),
+            nn.Linear(32, 3 * 2)
+        )
+
+        # Initialize the weights/bias with identity transformation
+        self.fc_loc[2].weight.data.zero_()
+        self.fc_loc[2].bias.data.copy_(torch.tensor([1, 0, 0, 0, 1, 0], dtype=torch.float))
+
+    def stn(self, x):
+        xs = self.localization(x)
+        xs = xs.view(-1, 10 * 3 * 3)
+        theta = self.fc_loc(xs)
+        theta = theta.view(-1, 2, 3)
+
+        grid = F.affine_grid(theta, x.size(), align_corners=False)
+        x = F.grid_sample(x, grid, align_corners=False)
+
+        return x
+
+    def forward(self, x):
+        # transform the input
+        x = self.stn(x)
+        return super(STNCNN001, self).forward(x)
+
+class CNN001Init1(CNN001):
+    def __init__(self, n_classes, n_channels=None):
+        super(CNN001Init1, self).__init__(n_classes, n_channels=None)
+        nn.init.kaiming_normal_(self.conv1.weight)
+        nn.init.constant_(self.conv1.bias, 0)
+        nn.init.kaiming_normal_(self.conv2.weight)
+        nn.init.constant_(self.conv2.bias, 0)
+        nn.init.kaiming_normal_(self.fc1.weight)
+        nn.init.constant_(self.fc1.bias, 0)
+        nn.init.kaiming_normal_(self.fc2.weight)
+        nn.init.constant_(self.fc2.bias, 0)
+
 class CNN002(nn.Module):
     """https://github.com/yaodongyu/TRADES/blob/e20f7b9b99c79ed3cf0d1bb12a47c229ebcac24a/models/small_cnn.py#L5"""
     def __init__(self, n_classes, drop=0.5, n_channels=1):
@@ -106,6 +160,42 @@ class CNN002(nn.Module):
                 nn.init.constant_(m.bias, 0)
         nn.init.constant_(self.classifier.fc3.weight, 0)
         nn.init.constant_(self.classifier.fc3.bias, 0)
+
+    def forward(self, x):
+        features = self.feature_extractor(x)
+        logits = self.classifier(features.view(-1, 64 * 4 * 4))
+        return logits
+
+class CNN002uni(nn.Module):
+    """https://github.com/yaodongyu/TRADES/blob/e20f7b9b99c79ed3cf0d1bb12a47c229ebcac24a/models/small_cnn.py#L5"""
+    def __init__(self, n_classes, drop=0.5, n_channels=1):
+        super(CNN002uni, self).__init__()
+
+        self.num_channels = n_channels
+
+        activ = nn.ReLU(True)
+
+        self.feature_extractor = nn.Sequential(OrderedDict([
+            ('conv1', nn.Conv2d(self.num_channels, 32, 3)),
+            ('relu1', activ),
+            ('conv2', nn.Conv2d(32, 32, 3)),
+            ('relu2', activ),
+            ('maxpool1', nn.MaxPool2d(2, 2)),
+            ('conv3', nn.Conv2d(32, 64, 3)),
+            ('relu3', activ),
+            ('conv4', nn.Conv2d(64, 64, 3)),
+            ('relu4', activ),
+            ('maxpool2', nn.MaxPool2d(2, 2)),
+        ]))
+
+        self.classifier = nn.Sequential(OrderedDict([
+            ('fc1', nn.Linear(64 * 4 * 4, 200)),
+            ('relu1', activ),
+            ('drop', nn.Dropout(drop)),
+            ('fc2', nn.Linear(200, 200)),
+            ('relu2', activ),
+            ('fc3', nn.Linear(200, n_classes)),
+        ]))
 
     def forward(self, x):
         features = self.feature_extractor(x)

@@ -52,14 +52,40 @@ class GridAttackModel(SpatialAttackModel):
         with torch.no_grad():
             for [x, y] in tqdm(loader, desc="Attacking (Grid)"):
                 x, y = x.to(self.device), y.to(self.device)
-                _, advx = spatial_attack(x, y, self.model_fn, self.loss_fn, self.rot_constraint,
+                _, advx = grid_spatial_attack(x, y, self.model_fn, self.loss_fn, self.rot_constraint,
                             self.trans_constraint, self.scale_constraint, self.device)
                 ret.append(advx.cpu().numpy())
 
         return np.concatenate(ret, axis=0).transpose(0, 2, 3, 1)
 
 
-def spatial_attack(x, y, model_fn, loss_fn, rot_constraint, trans_constraint, scale_constraint, device):
+def torch_freq_shift_2d(f, a, b, device):
+    """
+    a, b is number of pixels to shift
+    """
+    bs, c, m, n, _ = f.shape
+    #bs, m, n, c, _ = f.shape
+    m1, m2 = torch.meshgrid(torch.arange(m), torch.arange(n))
+    m1, m2 = m1.to(device), m2.to(device)
+    
+    re = torch.cos(2*np.pi* (a/m*m1 + b/n*m2))
+    im = torch.sin(2*np.pi* (a/m*m1 + b/n*m2))
+    
+    return torch.stack((
+        (f[:, :, :, :, 0] * re - f[:, :, :, :, 1] * im),
+        (f[:, :, :, :, 0] * im + f[:, :, :, :, 1] * re)), axis=4)
+
+def fft_shift(x, a, b, device):
+    """
+    a, b is (-1, 1) here
+    """
+    _, _, m, n = x.shape
+    freq = torch.rfft(x, signal_ndim=2, onesided=False)
+    shift_freq = torch_freq_shift_2d(freq, -a*m/2, -b*n/2, device)
+    advx = torch.irfft(shift_freq, signal_ndim=2, onesided=False)
+    return advx
+
+def grid_spatial_attack(x, y, model_fn, loss_fn, rot_constraint, trans_constraint, scale_constraint, device):
     trans_x = torch.linspace(-trans_constraint, trans_constraint, steps=5)
     trans_y = torch.linspace(-trans_constraint, trans_constraint, steps=5)
 
@@ -75,8 +101,9 @@ def spatial_attack(x, y, model_fn, loss_fn, rot_constraint, trans_constraint, sc
             ]).float().repeat([batch_size, 1]).view(batch_size, 2, 3).to(device)
             
             #.repeat(len(x))
-            grid = F.affine_grid(matrix, ori_x.size(), align_corners=False)
-            x = F.grid_sample(ori_x, grid, align_corners=False)
+            #grid = F.affine_grid(matrix, ori_x.size(), align_corners=False)
+            #x = F.grid_sample(ori_x, grid, align_corners=False)
+            x = fft_shift(ori_x, trans_x[i], trans_y[j], device=device)
             loss = loss_fn(model_fn(x), y)
 
             current_loss, mask = torch.max(torch.stack((current_loss, loss), dim=1), dim=1)

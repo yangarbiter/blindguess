@@ -35,8 +35,9 @@ def run_spatial(auto_var):
         model.model.to(device)
         result['model_path'] = model_path
     except:
+        del model
         logger.info("Model not trained yet, retrain the model")
-        mkdir_p("./models/experment01")
+        mkdir_p("./models/experiment01")
         result['model_path'] = os.path.join(
             './models/experiment01', get_file_name(auto_var) + '-ep%04d.pt')
         result['model_path'] = result['model_path'].replace(

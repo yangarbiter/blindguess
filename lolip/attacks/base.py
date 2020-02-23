@@ -1,5 +1,6 @@
 from abc import abstractmethod
 
+import torch
 import numpy as np
 
 
@@ -31,3 +32,25 @@ class AttackModel():
     @abstractmethod
     def perturb(self, X, y, eps):
         pass
+
+
+class TorchAttackModel(AttackModel):
+
+    def __init__(self, model_fn, norm, batch_size, device=None):
+        super().__init__(norm=norm)
+        self.model_fn = model_fn
+        self.batch_size = batch_size
+        if device is None:
+            self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        else:
+            self.device = device
+
+    def _preprocess_x(self, X):
+        return torch.from_numpy(X.transpose(0, 3, 1, 2)).float()
+
+    def _get_loader(self, X, y):
+        dataset = torch.utils.data.TensorDataset(
+            self._preprocess_x(X), torch.from_numpy(y).long())
+        loader = torch.utils.data.DataLoader(dataset,
+            batch_size=self.batch_size, shuffle=False, num_workers=1)
+        return loader

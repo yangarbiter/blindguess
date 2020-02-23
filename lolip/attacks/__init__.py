@@ -9,6 +9,21 @@ class AttackVarClass(VariableClass, metaclass=RegisteringChoiceType):
 
     @register_var()
     @staticmethod
+    def ffteps(auto_var, model, n_classes, clip_min=None, clip_max=None, device=None):
+        from .torch.fft_epsilon import FFTEPSAttackModel
+        eps = 0.1
+        return FFTEPSAttackModel(
+            model_fn=model.model,
+            norm=auto_var.get_var("norm"),
+            eps=eps,
+            perturb_iters=10,
+            step_size=eps/5,
+            batch_size=128,
+            device=device,
+        )
+
+    @register_var()
+    @staticmethod
     def fftspatial(auto_var, model, n_classes, clip_min=None, clip_max=None, device=None):
         from .torch.spatials import FFTAttackModel
         return FFTAttackModel(
