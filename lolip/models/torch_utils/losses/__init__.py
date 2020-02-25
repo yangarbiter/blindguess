@@ -1,6 +1,7 @@
 
 from .trades import trades_loss
 from .l1lip import l1lip_loss
+from .local_lip.local_lip_loss import local_lip_loss
 from ....attacks.torch.projected_gradient_descent import projected_gradient_descent
 from ....attacks.torch.spatials.grid import grid_spatial_attack
 from ....attacks.torch.spatials.fft_method import first_order_attack_spatial_fft
@@ -14,7 +15,42 @@ def get_outputs_loss(model, optimizer, base_loss_fn, x, y, reduction, **kwargs):
     clip_img = kwargs['clip_img']
     loss_name = kwargs['loss_name']
 
-    if 'trades' in loss_name:
+    if 'lolip' in loss_name:
+        if 'lolip10' in loss_name:
+            beta = 10.0
+        elif 'lolip20' in loss_name:
+            beta = 20.0
+        elif 'lolip6' in loss_name:
+            beta = 6.0
+        elif 'lolip3' in loss_name:
+            beta = 6.0
+        elif 'lolip.5' in loss_name:
+            beta = 0.5
+        elif 'lolip.1' in loss_name:
+            beta = 0.1
+        else:
+            beta = 1.0
+
+        if 'K20' in loss_name:
+            steps = 20
+        else:
+            steps = 10
+
+        if clip_img:
+            clip_min, clip_max = 0, 1
+
+        if 'fft' in loss_name:
+            perturb_type = "fft"
+
+
+        outputs, loss = local_lip_loss(
+            model, base_loss_fn, x, y, norm, optimizer, perturb_type,
+            top_norm=1, btm_norm=norm,
+            clip_min=clip_min, clip_max=clip_max,
+            step_size=eps*2/steps, epsilon=eps, perturb_steps=steps, beta=beta,
+            device=device,
+        )
+    elif 'trades' in loss_name:
         if 'trades10' in loss_name:
             beta = 10.0
         elif 'trades20' in loss_name:
@@ -103,7 +139,6 @@ def get_outputs_loss(model, optimizer, base_loss_fn, x, y, reduction, **kwargs):
             _, x = first_order_attack_spatial_fft(x, y, model,
                     base_loss_fn, 10, 0.1, 0, 0.2, 0, device)
         elif 'fftadv' in loss_name:
-            # fft shift
             _, x = first_order_attack_fft(x, y, model, base_loss_fn,
                     eps=eps, perturb_iters=10, step_size=eps/10, device=device)
         elif 'adv' in loss_name:

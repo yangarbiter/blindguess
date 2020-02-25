@@ -26,7 +26,7 @@ class FirstOrderAttackModel(SpatialAttackModel):
         with torch.no_grad():
             for [x, y] in tqdm(loader, desc="Attacking (First Order)"):
                 x, y = x.to(self.device), y.to(self.device)
-                _, advx = first_order_attack(x, y, self.model_fn, self.loss_fn, self.perturb_iters,
+                _, advx = first_order_spatial_attack(x, y, self.model_fn, self.loss_fn, self.perturb_iters,
                         self.step_size, self.rot_constraint, self.trans_constraint,
                         self.scale_constraint, self.device)
                 ret.append(advx.cpu().numpy())
@@ -38,10 +38,11 @@ def project_trans_constraint(x_v, y_v, trans_constraint):
     y_v = torch.clamp(y_v, -trans_constraint, trans_constraint)
     return x_v, y_v
 
-def first_order_attack(x, y, model_fn, loss_fn, perturb_iters, step_size, rot_constraint, trans_constraint, scale_constraint, device):
+def first_order_spatial_attack(x, y, model_fn, loss_fn, perturb_iters, step_size,
+                               rot_constraint, trans_constraint, scale_constraint, device):
     batch_size = len(x)
-    #x_v = (torch.zeros(batch_size).float() + 0.01 * torch.randn(batch_size)).to(device)
-    #y_v = (torch.zeros(batch_size).float() + 0.01 * torch.randn(batch_size)).to(device)
+    x_v = (torch.zeros(batch_size).float() + 0.01 * torch.randn(batch_size)).to(device)
+    y_v = (torch.zeros(batch_size).float() + 0.01 * torch.randn(batch_size)).to(device)
     final_matrix = torch.zeros((batch_size, 2, 3)).to(device)
     final_matrix[:, 0, 0] = 1
     final_matrix[:, 1, 1] = 1

@@ -27,7 +27,6 @@ def wide_resnet50_5(pretrained=False, progress=True, **kwargs):
     return _resnet('wide_resnet50_5', Bottleneck, [3, 4, 6, 3],
                    pretrained, progress, **kwargs)
 
-
 def tWRN50_4(n_classes, n_channels):
     return wide_resnet50_4(num_classes=n_classes)
 

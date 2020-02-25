@@ -43,10 +43,10 @@ def first_order_attack_fft(x, y, model_fn, loss_fn, perturb_iters, step_size,
                            eps, device):
     freq = torch.rfft(x, signal_ndim=2, onesided=False)
     pert_v = (torch.ones_like(freq) + 0.01 * torch.randn_like(freq)).to(device)
-    optimizer = optim.SGD([pert_v], lr=step_size)
+    #optimizer = optim.SGD([pert_v], lr=step_size)
 
     for _ in range(perturb_iters):
-        optimizer.zero_grad()
+        #optimizer.zero_grad()
         pert_v = pert_v.requires_grad_()
         with torch.enable_grad():
             advx = torch.irfft(freq * pert_v, signal_ndim=2, onesided=False).to(device)
